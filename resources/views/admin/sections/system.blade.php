@@ -73,16 +73,19 @@
                             @endif
                         </td>
                         <td class="px-4 py-3.5 text-right space-x-1">
-                            <button onclick='openEditStaffModal(@json([
-                                "id" => $user->id,
-                                "name" => $user->name,
-                                "email" => $user->email,
-                                "phone" => $user->phone ?? "",
-                                "role" => $user->role,
-                                "branch_access_type" => $user->branch_access_type ?? "all",
-                                "branch_ids" => $user->branches->pluck("id")->toArray(),
-                                "is_active" => $user->is_active ? 1 : 0,
-                            ]))' class="px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition font-medium">Edit</button>
+                            @php
+                                $staffData = [
+                                    'id' => $user->id,
+                                    'name' => $user->name,
+                                    'email' => $user->email,
+                                    'phone' => $user->phone ?? '',
+                                    'role' => $user->role,
+                                    'branch_access_type' => $user->branch_access_type ?? 'all',
+                                    'branch_ids' => $user->branches->pluck('id')->toArray(),
+                                    'is_active' => $user->is_active ? 1 : 0,
+                                ];
+                            @endphp
+                            <button onclick='openEditStaffModal(@json($staffData))' class="px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition font-medium">Edit</button>
                             @if(auth()->id() !== $user->id)
                             <button onclick="deleteStaffMember({{ $user->id }}, '{{ addslashes($user->name) }}')" class="px-2 py-1 text-xs text-rose-600 hover:bg-rose-50 rounded transition font-medium">Delete</button>
                             @endif
