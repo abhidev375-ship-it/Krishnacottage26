@@ -1,12 +1,31 @@
+[variables]
+NIXPACKS_NODE_VERSION = "20"
+NIXPACKS_PHP_VERSION = "8.3"
+
 [phases.setup]
-nixPkgs = ["...", "php83", "php83Extensions.pdo_mysql", "php83Extensions.mbstring", "php83Extensions.xml", "php83Extensions.curl", "php83Extensions.gd", "php83Extensions.zip", "php83Extensions.bcmath", "php83Extensions.tokenizer", "php83Extensions.fileinfo", "php83Extensions.openssl", "php83Extensions.ctype", "php83Extensions.intl", "php83Extensions.redis", "nodejs_22"]
+nixPkgs = [
+    "...",
+    "php83Extensions.pdo_mysql",
+    "php83Extensions.mbstring",
+    "php83Extensions.xml",
+    "php83Extensions.curl",
+    "php83Extensions.gd",
+    "php83Extensions.zip",
+    "php83Extensions.bcmath",
+    "php83Extensions.tokenizer",
+    "php83Extensions.fileinfo",
+    "php83Extensions.openssl",
+    "php83Extensions.ctype",
+    "php83Extensions.intl",
+    "php83Extensions.redis"
+]
 
 [phases.install]
 cmds = [
     "mkdir -p /etc/php",
     "cp /app/php.ini /etc/php/php.ini || true",
     "composer install --no-dev --optimize-autoloader --no-interaction",
-    "npm ci",
+    "npm ci --prefer-offline || npm install",
     "npm run build"
 ]
 
@@ -16,4 +35,4 @@ cmds = [
 ]
 
 [start]
-cmd = "php artisan migrate --force && php artisan storage:link && php -S 0.0.0.0:$PORT -t public"
+cmd = "php artisan migrate --force && php artisan db:seed --force --class=KrishnaResortsSeeder || true && php artisan storage:link || true && php artisan config:cache && php artisan route:cache && php artisan view:cache && php -S 0.0.0.0:$PORT -t public"
