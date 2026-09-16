@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishna Resorts — Administration & Operations</title>
+    <title>Krishna Cottages — Administration & Operations</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Google Fonts -->
@@ -89,12 +89,12 @@
                     K
                 </div>
                 <div>
-                    <h1 class="font-bold text-sm tracking-wide text-white">Krishna Resorts</h1>
+                    <h1 class="font-bold text-sm tracking-wide text-white">Krishna Cottages</h1>
                     <p class="text-[10px] text-brand-accent uppercase tracking-widest font-semibold">Admin Panel</p>
                 </div>
             </a>
             <div class="flex items-center gap-1">
-                <a href="/" target="_blank" class="text-white/60 hover:text-white p-1.5 rounded transition" title="View Public Resort Website">
+                <a href="/" target="_blank" class="text-white/60 hover:text-white p-1.5 rounded transition" title="View Public Cottages Website">
                     <i data-lucide="external-link" class="w-4 h-4"></i>
                 </a>
                 <button type="button" onclick="closeMobileSidebar()" class="lg:hidden text-white/60 hover:text-white p-1.5 rounded transition cursor-pointer" title="Close Menu">
@@ -226,7 +226,7 @@
                 </button>
                 <div class="relative">
                     <select id="global-branch-selector" onchange="switchGlobalBranch(this.value)" class="appearance-none bg-brand-canvas border border-gray-200 text-brand-text rounded-lg py-1.5 pl-2.5 sm:pl-3 pr-7 sm:pr-8 focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer text-xs font-bold shadow-xs max-w-[135px] xs:max-w-[170px] sm:max-w-xs truncate">
-                        <option value="all" {{ !$branchId ? 'selected' : '' }}>All Branches (Resort Central)</option>
+                        <option value="all" {{ !$branchId ? 'selected' : '' }}>All Branches (Cottages Central)</option>
                         @foreach($branches as $b)
                             <option value="{{ $b->id }}" {{ $branchId == $b->id ? 'selected' : '' }}>
                                 {{ $b->name }} ({{ $b->city }})
@@ -2333,7 +2333,7 @@
                             <h5 class="font-bold text-xs text-brand-text truncate">${escapeAdminHtml(b.name)}</h5>
                             <p class="text-[10px] text-brand-muted truncate">${escapeAdminHtml(b.city || '')} &middot; ${escapeAdminHtml(b.tagline || 'Cottage Location')}</p>
                         </div>
-                        <button type="button" onclick="toggleCardAttachment('branch', ${b.id}, '${escapeAdminHtml(b.name)}', '${escapeAdminHtml(b.city || '')} · Luxury Resort & Cottage', '', '${b.hero_image_url || b.cover_image_url || ''}', '/stay?branch_id=${b.id}', 'Explore Branch & Stays', 'Cottage Branch')" class="px-2.5 py-1 ${isAttached ? 'bg-emerald-700 text-white shadow-xs' : 'bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800'} rounded-lg text-[10px] font-bold shrink-0 transition cursor-pointer flex items-center gap-1">
+                        <button type="button" onclick="toggleCardAttachment('branch', ${b.id}, '${escapeAdminHtml(b.name)}', '${escapeAdminHtml(b.city || '')} · Luxury Cottages of Kerala', '', '${b.hero_image_url || b.cover_image_url || ''}', '/stay?branch_id=${b.id}', 'Explore Branch & Stays', 'Cottage Branch')" class="px-2.5 py-1 ${isAttached ? 'bg-emerald-700 text-white shadow-xs' : 'bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800'} rounded-lg text-[10px] font-bold shrink-0 transition cursor-pointer flex items-center gap-1">
                             ${isAttached ? '✓ Added' : '+ Add'}
                         </button>
                     `;
@@ -2470,7 +2470,7 @@
                     if (t.type === 'room') {
                         toggleCardAttachment('room', item.id, item.name, (item.branch ? item.branch.name : '') + ' · Up to ' + item.max_guests + ' Guests', '₹' + Number(item.base_price).toLocaleString(), item.cover_image_url, '/rooms/' + item.slug, 'View Room Details', 'Verified Cottage');
                     } else if (t.type === 'branch') {
-                        toggleCardAttachment('branch', item.id, item.name, (item.city || '') + ' · Luxury Resort & Cottage', '', item.hero_image_url || item.cover_image_url, '/stay?branch_id=' + item.id, 'Explore Branch & Stays', 'Cottage Branch');
+                        toggleCardAttachment('branch', item.id, item.name, (item.city || '') + ' · Luxury Cottages of Kerala', '', item.hero_image_url || item.cover_image_url, '/stay?branch_id=' + item.id, 'Explore Branch & Stays', 'Cottage Branch');
                     } else if (t.type === 'spice') {
                         toggleCardAttachment('spice', item.id, item.name, 'Pack Size: ' + (item.package_size || '250g'), '₹' + Number(item.price).toLocaleString(), item.image_url, '/spices', 'View in Spices Shop', 'Organic Kerala Spice');
                     } else if (t.type === 'dining') {
@@ -2740,7 +2740,7 @@
                                 <i data-lucide="lock" class="w-6 h-6"></i>
                             </div>
                             <h4 class="font-bold text-brand-text text-sm">Conversation Locked by ${enq.locked_by}</h4>
-                            <p class="text-xs text-brand-muted max-w-sm">Under Krishna Resorts direct messaging protocols, only the committed staff member can read or respond to this conversation until they release the lock.</p>
+                            <p class="text-xs text-brand-muted max-w-sm">Under Krishna Cottages direct messaging protocols, only the committed staff member can read or respond to this conversation until they release the lock.</p>
                         </div>
                     `;
                 } else {

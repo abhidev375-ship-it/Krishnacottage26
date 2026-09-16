@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', $roomType->name . ' | Krishna Resorts')
+@section('title', $roomType->name . ' | Krishna Cottages')
 
 @section('content')
 <div class="mx-auto max-w-[1480px] px-4 sm:px-6 py-4 sm:py-6">
@@ -131,7 +131,7 @@
             <div class="border-b border-forest/10 pb-6 text-forest/80 text-xs sm:text-sm leading-relaxed space-y-3">
                 <h3 class="serif text-xl font-bold text-forest">About this slow-living space</h3>
                 <p>
-                    {{ $roomType->description ?: ($roomType->short_description ?: 'Tucked into the lush slopes of our Kerala resort, this retreat features reclaimed hardwood framing, hand-chiseled stone bathrooms, and broad private balconies bathed in morning mist.') }}
+                    {{ $roomType->description ?: ($roomType->short_description ?: 'Tucked into the lush slopes of our Kerala cottages, this retreat features reclaimed hardwood framing, hand-chiseled stone bathrooms, and broad private balconies bathed in morning mist.') }}
                 </p>
             </div>
 
@@ -254,7 +254,7 @@
                         <div class="mt-2 p-3 rounded-xl bg-paper/70 border-l-2 border-emerald space-y-1 text-xs">
                             <div class="flex items-center gap-1.5 text-emerald font-bold text-[10px]">
                                 <i data-lucide="message-square" class="w-3 h-3"></i>
-                                <span>Resort Manager Response</span>
+                                <span>Cottage Manager Response</span>
                             </div>
                             <p class="text-forest/70 italic text-[11px] leading-relaxed">{{ $rev->staff_reply }}</p>
                         </div>
@@ -451,11 +451,11 @@
 
             <div>
                 <label class="block text-xs font-bold text-forest mb-1">Your Detailed Experience *</label>
-                <textarea name="comment" required rows="4" placeholder="Tell future guests about the serene atmosphere, heritage room comforts, views, and resort hospitality..." class="w-full px-3 py-2 rounded-xl border border-forest/20 bg-white text-forest focus:outline-hidden focus:ring-1 focus:ring-forest text-xs"></textarea>
+                <textarea name="comment" required rows="4" placeholder="Tell future guests about the serene atmosphere, heritage room comforts, views, and cottage hospitality..." class="w-full px-3 py-2 rounded-xl border border-forest/20 bg-white text-forest focus:outline-hidden focus:ring-1 focus:ring-forest text-xs"></textarea>
             </div>
 
             <p class="text-[11px] text-forest/50 leading-relaxed">
-                ℹ️ To maintain authentic trust, guest reviews are verified and displayed once approved by our resort management team.
+                ℹ️ To maintain authentic trust, guest reviews are verified and displayed once approved by our cottage management team.
             </p>
 
             <div class="pt-3 border-t border-forest/10 flex justify-end gap-2">

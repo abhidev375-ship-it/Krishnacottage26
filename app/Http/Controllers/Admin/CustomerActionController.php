@@ -477,7 +477,7 @@ class CustomerActionController extends Controller
                     'card_type' => 'branch',
                     'entity_id' => $b->id,
                     'title' => $b->name,
-                    'subtitle' => $b->city . ' · ' . ($b->tagline ?? 'Luxury Resort & Cottage'),
+                    'subtitle' => $b->city . ' · ' . ($b->tagline ?? 'Luxury Cottages of Kerala'),
                     'image_url' => $b->hero_image_url ?? $b->cover_image_url,
                     'link_url' => route('rooms.index', ['branch_id' => $b->id]),
                     'action_text' => 'Explore Branch & Stays',

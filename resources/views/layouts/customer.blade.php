@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#F4F1E8">
-    <title>@yield('title', 'Krishna Cottage & Resorts — Best Resorts & Homestay in Idukki, Rajakkadu, Munnar, Kerala')</title>
+    <title>@yield('title', 'Krishna Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu, Munnar, Kerala')</title>
 
     <!-- PRIMARY HIGH-RANKING SEO METADATA -->
-    <meta name="description" content="@yield('meta_description', 'Discover Krishna Cottages &amp; Resorts in Rajakkad, Idukki. Book luxury wooden cottages, nature homestays &amp; private hillside villas across Rajakkadu, Rajakumari, Adimali &amp; Munnar, Kerala with organic dining &amp; plantation views.')">
+    <meta name="description" content="@yield('meta_description', 'Discover Krishna Cottages in Rajakkad, Idukki. Book luxury wooden cottages, nature homestays &amp; private hillside villas across Rajakkadu, Rajakumari, Adimali &amp; Munnar, Kerala with organic dining &amp; plantation views.')">
     <meta name="keywords" content="@yield('meta_keywords', 'krishna cottage idukki, krishna cottages rajakkad, krishna resort idukki, krishna homestay idukki, idukki cottages, idukki resorts, resorts in idukki, rajakkadu, resort in rajakkadu, home stay in idukki, home stay in rajakkadu, home stay in rajakumari, resort in rajakumari, resort in adimali, cottage in adimali, home stay in adimali, idukki, kerala, best resort in idukki, best cottage in idukki, best cottage in munnar, munnar resorts, munnar homestay, cottages in rajakkad idukki, kuthumkal waterfalls resort, mailadumpara cottages idukki, ponmudi lake resort rajakkad, adivaram idukki homestay, wooden cottages in idukki, plantation homestay in rajakkadu, budget homestay in rajakumari, family resort in adimali idukki, honeymoon cottage in munnar idukki, kerala eco cottage idukki, ayurvedic resort in idukki')">
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="{{ url()->current() }}" />
@@ -21,16 +21,16 @@
 
     <!-- OPEN GRAPH / FACEBOOK SOCIAL SHARING -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Krishna Resorts &amp; Cottages" />
+    <meta property="og:site_name" content="Krishna Cottages" />
     <meta property="og:url" content="{{ url()->current() }}" />
-    <meta property="og:title" content="@yield('og_title', 'Krishna Cottage & Resorts — Best Resorts & Homestay in Idukki, Rajakkadu & Munnar')" />
+    <meta property="og:title" content="@yield('og_title', 'Krishna Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar')" />
     <meta property="og:description" content="@yield('og_description', 'Authentic wooden cottages and peaceful hillside homestays in Rajakkad, Idukki, Kerala.')" />
     <meta property="og:image" content="@yield('og_image', 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=85')" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- TWITTER CARDS -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="@yield('twitter_title', 'Krishna Cottage & Resorts — Best Resorts & Homestay in Idukki, Rajakkadu & Munnar')" />
+    <meta name="twitter:title" content="@yield('twitter_title', 'Krishna Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar')" />
     <meta name="twitter:description" content="@yield('twitter_description', 'Experience peaceful wooden cottages and estate living in Rajakkadu, Rajakumari, Adimali & Munnar, Idukki, Kerala.')" />
 
     <!-- SPEED OPTIMIZATION & RESOURCE HINTS (Sub-3-Second Load Guarantee) -->
@@ -170,7 +170,7 @@
                 <div class="flex items-center gap-2.5">
                     <span class="grid h-10 w-10 place-items-center rounded-xl bg-forest text-sm font-bold text-paper">K</span>
                     <div>
-                        <p class="text-sm font-semibold">Krishna Resorts</p>
+                        <p class="text-sm font-semibold">Krishna Cottages</p>
                         <p class="mt-0.5 text-[9px] uppercase tracking-[.18em] text-forest/40">Luxury Cottages of Kerala</p>
                     </div>
                 </div>
@@ -266,7 +266,7 @@
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="serif text-base sm:text-lg font-bold">Resort Concierge Desk</h3>
+                            <h3 class="serif text-base sm:text-lg font-bold">Cottage Concierge Desk</h3>
                             <span class="px-2 py-0.5 rounded-full text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold uppercase tracking-wider">Live</span>
                         </div>
                         <p class="text-[10px] text-paper/60 flex items-center gap-1.5 mt-0.5">
@@ -288,7 +288,7 @@
                     <div class="truncate">
                         <div class="flex items-center gap-2">
                             <span id="stayBadge" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-400 text-emerald-950 uppercase tracking-wider">Checked In</span>
-                            <span id="stayBranch" class="font-bold text-paper text-xs truncate">Resort Branch</span>
+                            <span id="stayBranch" class="font-bold text-paper text-xs truncate">Cottage Branch</span>
                         </div>
                         <p class="text-[10px] text-paper/80 mt-0.5 truncate" id="stayRoomAndDates">
                             Room 101 &middot; Stays
@@ -382,7 +382,7 @@
             <!-- Input Bar -->
             <div class="p-3 sm:p-3.5 bg-white border-t border-forest/15 shrink-0">
                 <form id="chatMessageForm" onsubmit="handleSendChatMessage(event)" class="flex items-center gap-2">
-                    <input type="text" id="chatTextInput" autocomplete="off" placeholder="Type message to resort manager..." class="flex-1 text-xs py-2.5 px-3.5 rounded-xl border border-forest/15 bg-paper/60 text-forest placeholder-forest/40 focus:outline-none focus:ring-1 focus:ring-forest">
+                    <input type="text" id="chatTextInput" autocomplete="off" placeholder="Type message to cottage manager..." class="flex-1 text-xs py-2.5 px-3.5 rounded-xl border border-forest/15 bg-paper/60 text-forest placeholder-forest/40 focus:outline-none focus:ring-1 focus:ring-forest">
                     <button type="submit" id="chatSendBtn" class="h-9 w-9 rounded-xl bg-forest hover:bg-emerald text-paper flex items-center justify-center shadow-card transition shrink-0">
                         <i data-lucide="send" class="w-4 h-4 text-brass"></i>
                     </button>

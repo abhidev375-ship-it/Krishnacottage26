@@ -46,7 +46,7 @@ class AdminNotificationController extends Controller
 
         foreach ($reservations as $r) {
             $guestName = $r->guest ? $r->guest->full_name : 'Guest';
-            $roomName = $r->roomType ? $r->roomType->name : 'Resort Villa';
+            $roomName = $r->roomType ? $r->roomType->name : 'Cottage Villa';
             $isUnread = $lastReadCarbon ? $r->created_at->gt($lastReadCarbon) : true;
 
             $feed->push([
@@ -143,7 +143,7 @@ class AdminNotificationController extends Controller
         foreach ($extensions as $ext) {
             $res = $ext->reservation;
             $guestName = ($res && $res->guest) ? $res->guest->full_name : 'In-House Guest';
-            $villa = ($res && $res->room) ? "Villa {$res->room->room_number}" : 'Resort Cottage';
+            $villa = ($res && $res->room) ? "Villa {$res->room->room_number}" : 'Cottage Suite';
 
             $feed->push([
                 'id' => "ext_{$ext->id}",

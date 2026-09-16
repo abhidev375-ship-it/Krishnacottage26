@@ -232,7 +232,7 @@ class AdminController extends Controller
         $homepageContent = $this->getHomepageContent();
 
         $cancellationRules = CancellationRule::with('branch')->orderBy('sort_order')->orderByDesc('hours_before_checkin')->get();
-        $cancellationPolicy = Setting::get('cancellation_policy_description', 'At Krishna Resorts, cancellations made 72+ hours prior receive 100% cashback. 48-72h prior receive 75%, and 24-48h prior receive 50%. Instant automated payback.');
+        $cancellationPolicy = Setting::get('cancellation_policy_description', 'At Krishna Cottages, cancellations made 72+ hours prior receive 100% cashback. 48-72h prior receive 75%, and 24-48h prior receive 50%. Instant automated payback.');
         $stayExtensionRequests = StayExtensionRequest::with(['reservation.room', 'reservation.roomType', 'reservation.branch', 'guest', 'user', 'reviewer'])
             ->latest()
             ->take(30)
@@ -655,7 +655,7 @@ class AdminController extends Controller
             'cta_heading_1' => 'Stay for the place.',
             'cta_heading_2' => 'Remember the feeling.',
             'cta_description' => 'Choose a branch, check your dates, discover what is around you and talk directly to Krishna whenever you need.',
-            'footer_brand_title' => 'Krishna Resorts',
+            'footer_brand_title' => 'Krishna Cottages',
             'footer_brand_tagline' => 'Luxury Cottages of Kerala',
             'footer_brand_desc' => 'Immersive, slow-living cottages nestled in the spice hills, misty valleys, and tranquil backwaters of Kerala.',
             'footer_badge' => 'Eco-Conscious Botanical Cottages',
@@ -663,14 +663,14 @@ class AdminController extends Controller
             'footer_exp_title' => 'Experiences',
             'footer_exp_link_1' => 'Plantation Kitchen & Dining',
             'footer_exp_link_2' => 'Krishna Spices Farm Shop',
-            'footer_exp_link_3' => 'Resort Visual Gallery',
+            'footer_exp_link_3' => 'Cottages Visual Gallery',
             'footer_exp_link_4' => 'Guided Nature Discoveries',
             'footer_concierge_title' => 'Direct Concierge',
             'footer_concierge_desc' => 'Front desk assistance 24/7 for bespoke retreat arrangements.',
             'footer_phone' => '+91 484 290 0000',
-            'footer_email' => 'concierge@krishnaresorts.com',
+            'footer_email' => 'concierge@krishnacottages.com',
             'footer_chat_btn' => 'Chat with Concierge',
-            'footer_copyright' => 'Krishna Resorts Hospitality Ltd. All rights reserved.',
+            'footer_copyright' => 'Krishna Cottages Hospitality Ltd. All rights reserved.',
             'footer_support_link' => 'Help & Support',
             'footer_policy_note' => '🌿 Strictly No Swimming Pool Policy'
         ];
@@ -682,7 +682,7 @@ class AdminController extends Controller
     public function exportCsv(Request $request)
     {
         $type = $request->get('type', 'reservations');
-        $filename = "krishna_resorts_{$type}_" . date('Ymd_His') . ".csv";
+        $filename = "krishna_cottages_{$type}_" . date('Ymd_His') . ".csv";
 
         $headers = [
             "Content-type"        => "text/csv",

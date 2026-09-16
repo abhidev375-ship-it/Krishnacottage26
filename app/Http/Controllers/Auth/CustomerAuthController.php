@@ -201,7 +201,7 @@ class CustomerAuthController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => "Account created successfully! Welcome to Krishna Resorts.",
+                'message' => "Account created successfully! Welcome to Krishna Cottages.",
                 'redirect' => $redirectTo,
                 'user' => [
                     'id' => $user->id,
@@ -211,7 +211,7 @@ class CustomerAuthController extends Controller
             ]);
         }
 
-        return redirect()->to($redirectTo)->with('success', "Account created successfully! Welcome to Krishna Resorts.");
+        return redirect()->to($redirectTo)->with('success', "Account created successfully! Welcome to Krishna Cottages.");
     }
 
     /**

@@ -324,8 +324,8 @@ class StayExtensionController extends Controller
                     'branch_id' => $res->branch_id,
                     'reference_type' => 'StayExtensionRequest',
                     'reference_id' => $ext->id,
-                    'subject' => 'Stay Extension Approved with Special Offer - Krishna Resorts',
-                    'message_body' => "Namaste {$res->guest->first_name}! Your stay extension until {$ext->requested_checkout_date->format('M d, Y')} is APPROVED at special rate ₹" . number_format($offeredAmount, 2) . " (Save {$discountPct}%!). Payment can be paid on-hand to cottage staff or at checkout. - Krishna Resorts",
+                    'subject' => 'Stay Extension Approved with Special Offer - Krishna Cottages',
+                    'message_body' => "Namaste {$res->guest->first_name}! Your stay extension until {$ext->requested_checkout_date->format('M d, Y')} is APPROVED at special rate ₹" . number_format($offeredAmount, 2) . " (Save {$discountPct}%!). Payment can be paid on-hand to cottage staff or at checkout. - Krishna Cottages",
                     'status' => 'delivered',
                     'sent_at' => Carbon::now(),
                 ]);

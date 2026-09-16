@@ -1,13 +1,13 @@
 @extends('layouts.customer')
 
-@section('title', 'Photo Gallery & Visual Journal | Krishna Resorts')
+@section('title', 'Photo Gallery & Visual Journal | Krishna Cottages')
 
 @section('content')
 <!-- HERO SECTION -->
 <div class="bg-forest text-paper py-6 sm:py-10 md:py-12 px-4 sm:px-6 relative overflow-hidden">
     <div class="mx-auto max-w-[1480px] text-center relative z-10">
         <span class="eyebrow text-brass block mb-2">Visual Journeys</span>
-        <h1 class="serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">The Resort Gallery</h1>
+        <h1 class="serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">The Cottages Gallery</h1>
         <p class="text-xs sm:text-sm text-paper/70 max-w-2xl mx-auto mt-3 leading-relaxed">
             Moments of stillness, mist-draped plantation mornings, heritage wooden architecture, and tranquil nature trails.
         </p>
@@ -34,7 +34,7 @@
             @endforeach
             <a href="{{ route('gallery.index', array_filter(['branch_id' => 'resort', 'category' => $selectedCategory])) }}" 
                class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition shrink-0 {{ $selectedBranchId === 'resort' || $selectedBranchId === 'none' ? 'bg-forest text-paper shadow-xs' : 'bg-white/80 text-forest/70 hover:bg-white soft-border' }}">
-                Resort-Wide
+                Cottages-Wide
             </a>
         </div>
 
@@ -75,7 +75,7 @@
             <!-- Cover image container -->
             <div class="img-zoom relative h-64 w-full overflow-hidden bg-mint">
                 <img src="{{ $album->cover_image_url ?: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80' }}" 
-                     alt="{{ $album->name ?? 'Resort Album' }}" 
+                     alt="{{ $album->name ?? 'Cottage Album' }}" 
                      class="w-full h-full object-cover">
                 
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -83,7 +83,7 @@
                 <!-- Top badges -->
                 <div class="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between pointer-events-none">
                     <span class="eyebrow text-brass bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full">
-                        {{ $album->branch ? $album->branch->name : 'Resort Wide' }}
+                        {{ $album->branch ? $album->branch->name : 'Cottages Wide' }}
                     </span>
                     <span class="bg-black/60 backdrop-blur-md text-paper text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5">
                         <i data-lucide="images" class="w-3.5 h-3.5 text-brass"></i>
@@ -97,7 +97,7 @@
                         {{ $album->category }}
                     </span>
                     <h3 class="serif text-xl font-bold text-paper mt-0.5 leading-snug">
-                        {{ $album->name ?: 'Resort Album' }}
+                        {{ $album->name ?: 'Cottage Album' }}
                     </h3>
                 </div>
             </div>
@@ -225,10 +225,10 @@
     const clientAlbums = {!! json_encode($albums->map(function($a) {
         return [
             'id' => $a->id,
-            'name' => $a->name ?: 'Resort Album',
-            'branch' => $a->branch ? $a->branch->name : 'Resort-Wide',
+            'name' => $a->name ?: 'Cottage Album',
+            'branch' => $a->branch ? $a->branch->name : 'Cottages-Wide',
             'category' => ucfirst($a->category),
-            'description' => $a->description ?: 'Visual moments captured at Krishna Resorts.',
+            'description' => $a->description ?: 'Visual moments captured at Krishna Cottages.',
             'cover_url' => $a->cover_image_url ?: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
             'images' => $a->images->values()->map(function($img) {
                 return [
@@ -306,7 +306,7 @@
 
     // Single photo direct open (fallback for direct links)
     function openLightbox(url, caption) {
-        currentLightboxList = [{ url: url, title: caption || 'Resort Photograph' }];
+        currentLightboxList = [{ url: url, title: caption || 'Cottage Photograph' }];
         currentLightboxIndex = 0;
         document.getElementById('lightbox-album-tag').textContent = '';
         renderLightboxCurrent();
@@ -320,7 +320,7 @@
         const photo = currentLightboxList[currentLightboxIndex];
         const imgEl = document.getElementById('lightbox-img');
         imgEl.src = photo.url;
-        imgEl.alt = photo.title || 'Resort Photograph';
+        imgEl.alt = photo.title || 'Cottage Photograph';
         document.getElementById('lightbox-caption').textContent = photo.title || '';
         document.getElementById('lightbox-counter').textContent = `${currentLightboxIndex + 1} / ${currentLightboxList.length}`;
 

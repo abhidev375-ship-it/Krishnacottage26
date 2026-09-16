@@ -23,7 +23,7 @@
         <div class="bg-forest text-paper px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
                 <span class="grid h-7 w-7 place-items-center rounded-lg bg-white/10 text-brass font-bold text-xs">K</span>
-                <span class="serif text-sm font-bold tracking-wider">Krishna Resorts Stay Pass</span>
+                <span class="serif text-sm font-bold tracking-wider">Krishna Cottages Stay Pass</span>
             </div>
             <span class="text-[10px] bg-white/10 px-3 py-1 rounded-full font-bold uppercase text-brass">
                 {{ ucfirst($reservation->status) }}
@@ -64,7 +64,7 @@
                 <div>
                     <h3 class="eyebrow text-forest/50 mb-1">Room & Branch Destination</h3>
                     <div class="serif text-lg font-bold text-forest">{{ $reservation->roomType ? $reservation->roomType->name : 'Signature Suite' }}</div>
-                    <div class="text-xs text-emerald font-semibold mt-0.5">{{ $reservation->branch ? $reservation->branch->name : 'Krishna Resort' }}</div>
+                    <div class="text-xs text-emerald font-semibold mt-0.5">{{ $reservation->branch ? $reservation->branch->name : 'Krishna Cottages' }}</div>
                     <div class="text-xs text-forest/70 mt-1.5 flex items-start gap-1.5">
                         <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brass shrink-0 mt-0.5"></i>
                         <span>{{ $reservation->branch ? $reservation->branch->full_address : 'Kerala, India' }}</span>

@@ -3,53 +3,53 @@
     <div class="w-full h-full md:max-w-6xl md:h-auto md:max-h-[92vh] bg-white md:rounded-2xl shadow-2xl flex flex-col overflow-hidden text-brand-text">
         
         <!-- TOP APP BAR / GUEST BANNER -->
-        <div class="bg-brand-deep text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between shrink-0 shadow-md">
-            <div class="flex items-center gap-3 min-w-0">
-                <button type="button" onclick="closeGuest360Modal()" class="p-1.5 -ml-1 text-white/70 hover:text-white rounded-lg hover:bg-white/10 transition" title="Close / Back to In-House Hub">
-                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        <div class="bg-brand-deep text-white px-3 sm:px-6 py-2 sm:py-3.5 flex items-center justify-between shrink-0 shadow-md">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <button type="button" onclick="closeGuest360Modal()" class="p-1 sm:p-1.5 -ml-1 text-white/70 hover:text-white rounded-lg hover:bg-white/10 transition shrink-0" title="Close / Back to In-House Hub">
+                    <i data-lucide="arrow-left" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </button>
-                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-700 text-white font-mono font-bold flex items-center justify-center text-sm sm:text-base shrink-0 shadow-inner" id="g360-room-badge">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-700 text-white font-mono font-bold flex items-center justify-center text-xs sm:text-base shrink-0 shadow-inner" id="g360-room-badge">
                     --
                 </div>
                 <div class="min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <h3 class="font-bold text-sm sm:text-base text-white truncate" id="g360-guest-name">Loading Guest Profile...</h3>
-                        <span id="g360-vip-badge" class="px-2 py-0.2 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-400 text-brand-deep">STANDARD</span>
-                        <span class="px-2 py-0.2 rounded-full text-[9px] font-bold uppercase bg-emerald-500/30 text-emerald-300 border border-emerald-500/40">In-House</span>
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        <h3 class="font-bold text-xs sm:text-base text-white truncate max-w-[120px] xs:max-w-[180px] sm:max-w-none" id="g360-guest-name">Loading Guest Profile...</h3>
+                        <span id="g360-vip-badge" class="px-1.5 py-0.5 sm:px-2 sm:py-0.2 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-amber-400 text-brand-deep shrink-0">STANDARD</span>
+                        <span class="hidden sm:inline-block px-2 py-0.2 rounded-full text-[9px] font-bold uppercase bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 shrink-0">In-House</span>
                     </div>
-                    <div class="text-[11px] text-white/70 mt-0.5 flex items-center gap-2.5 flex-wrap">
-                        <span id="g360-cottage-type">Cottage</span>
-                        <span>•</span>
-                        <span id="g360-dates-summary">Dates</span>
-                        <span>•</span>
-                        <span id="g360-code" class="font-mono text-white/50">KR-...</span>
+                    <div class="text-[10px] sm:text-[11px] leading-tight text-white/70 mt-0.5 flex items-center gap-1.5 sm:gap-2.5 truncate">
+                        <span id="g360-cottage-type" class="truncate">Cottage</span>
+                        <span class="opacity-60">•</span>
+                        <span id="g360-dates-summary" class="truncate">Dates</span>
+                        <span class="hidden xs:inline opacity-60">•</span>
+                        <span id="g360-code" class="hidden xs:inline font-mono text-white/50">KR-...</span>
                     </div>
                 </div>
             </div>
 
             <!-- Top Right Financial Due & Contacts -->
-            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
                 <!-- Financial Net Due Chip -->
-                <div id="g360-net-due-pill" class="px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-right">
-                    <div class="text-[9px] uppercase font-bold text-white/60 tracking-wider">Folio Due</div>
-                    <div class="text-xs sm:text-sm font-extrabold text-white" id="g360-net-due-amount">₹0.00</div>
+                <div id="g360-net-due-pill" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-white/10 border border-white/20 text-right shrink-0">
+                    <div class="text-[8px] sm:text-[9px] uppercase font-bold text-white/60 tracking-wider leading-none">Folio Due</div>
+                    <div class="text-xs sm:text-sm font-extrabold text-white leading-tight mt-0.5" id="g360-net-due-amount">₹0.00</div>
                 </div>
 
                 <!-- Call & WhatsApp Quick Buttons -->
-                <a id="g360-call-link" href="#" class="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-xs" title="Call Guest Phone">
-                    <i data-lucide="phone" class="w-4 h-4"></i>
+                <a id="g360-call-link" href="#" class="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-xs shrink-0" title="Call Guest Phone">
+                    <i data-lucide="phone" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                 </a>
-                <a id="g360-whatsapp-link" href="#" target="_blank" class="hidden sm:inline-flex p-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white transition shadow-xs" title="Chat on WhatsApp">
+                <a id="g360-whatsapp-link" href="#" target="_blank" class="hidden sm:inline-flex p-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white transition shadow-xs shrink-0" title="Chat on WhatsApp">
                     <i data-lucide="message-circle" class="w-4 h-4"></i>
                 </a>
-                <button type="button" onclick="closeGuest360Modal()" class="hidden md:inline-flex p-2 text-white/60 hover:text-white rounded-xl hover:bg-white/10 transition">
+                <button type="button" onclick="closeGuest360Modal()" class="hidden md:inline-flex p-2 text-white/60 hover:text-white rounded-xl hover:bg-white/10 transition shrink-0">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
         </div>
 
         <!-- TAB NAVIGATION BAR (Horizontally Scrollable) -->
-        <div class="bg-gray-50 border-b border-gray-200 px-3 sm:px-6 py-2 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar shrink-0">
+        <div class="bg-gray-50 border-b border-gray-200 px-2 sm:px-6 py-1.5 sm:py-2 flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar shrink-0">
             <button type="button" onclick="switchGuest360Tab('folio')" id="g360-tab-btn-folio" class="g360-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-primary text-white shadow-xs transition shrink-0 flex items-center gap-1.5">
                 <i data-lucide="wallet" class="w-3.5 h-3.5"></i>
                 <span>Overview & Folio</span>

@@ -399,7 +399,7 @@
                             <div class="h-9 w-9 rounded-xl bg-[#063F34]/5 flex items-center justify-center text-[#0B5D4B]">
                                 <i data-lucide="images" class="h-4.5 w-4.5"></i>
                             </div>
-                            <p class="mt-3 text-xs font-bold text-[#063F34]">Resort Gallery</p>
+                            <p class="mt-3 text-xs font-bold text-[#063F34]">Cottages Gallery</p>
                             <p class="mt-1 text-[10px] text-[#5A6B65] leading-snug">Moments captured across our 3 Kerala retreats</p>
                         </div>
                     </div>
@@ -976,9 +976,9 @@
                             <div class="flex items-center gap-2.5">
                                 <span class="grid h-9 w-9 place-items-center rounded-xl bg-[#F7F5EF] text-sm font-bold text-[#063F34]">K</span>
                                 <div>
-                                    <span id="edit-footer-brand-title" class="wysiwyg-text font-serif text-xl font-bold block text-[#F7F5EF] tracking-tight" contenteditable="true">{{ $homepageContent['footer_brand_title'] ?? 'Krishna Resorts' }}</span>
-                                    <span id="edit-footer-brand-tagline" class="wysiwyg-text text-[9px] uppercase tracking-[.25em] text-[#C7A76A] font-bold block" contenteditable="true">{{ $homepageContent['footer_brand_tagline'] ?? 'Luxury Cottages of Kerala' }}</span>
-                                </div>
+                                     <span id="edit-footer-brand-title" class="wysiwyg-text font-serif text-xl font-bold block text-[#F7F5EF] tracking-tight" contenteditable="true">{{ $homepageContent['footer_brand_title'] ?? 'Krishna Cottages' }}</span>
+                                     <span id="edit-footer-brand-tagline" class="wysiwyg-text text-[9px] uppercase tracking-[.25em] text-[#C7A76A] font-bold block" contenteditable="true">{{ $homepageContent['footer_brand_tagline'] ?? 'Luxury Cottages of Kerala' }}</span>
+                                 </div>
                             </div>
                             <p id="edit-footer-brand-desc" class="wysiwyg-text text-xs text-white/70 leading-relaxed max-w-sm" contenteditable="true">
                                 {{ $homepageContent['footer_brand_desc'] ?? 'Immersive, slow-living cottages nestled in the spice hills, misty valleys, and tranquil backwaters of Kerala.' }}
@@ -1019,7 +1019,7 @@
                             <ul class="space-y-2 text-xs text-white/75">
                                 <li><span id="edit-footer-exp-1" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_exp_link_1'] ?? 'Plantation Kitchen & Dining' }}</span></li>
                                 <li><span id="edit-footer-exp-2" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_exp_link_2'] ?? 'Krishna Spices Farm Shop' }}</span></li>
-                                <li><span id="edit-footer-exp-3" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_exp_link_3'] ?? 'Resort Visual Gallery' }}</span></li>
+                                <li><span id="edit-footer-exp-3" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_exp_link_3'] ?? 'Cottages Visual Gallery' }}</span></li>
                                 <li><span id="edit-footer-exp-4" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_exp_link_4'] ?? 'Guided Nature Discoveries' }}</span></li>
                             </ul>
                         </div>
@@ -1035,7 +1035,7 @@
                                 </div>
                                 <div class="flex items-center gap-2 text-white/75">
                                     <i data-lucide="mail" class="w-3.5 h-3.5 shrink-0"></i>
-                                    <span id="edit-footer-email" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_email'] ?? 'concierge@krishnaresorts.com' }}</span>
+                                    <span id="edit-footer-email" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_email'] ?? 'concierge@krishnacottages.com' }}</span>
                                 </div>
                             </div>
                             <div class="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#C7A76A] px-3.5 py-2 text-[10px] font-bold text-[#063F34]">
@@ -1047,7 +1047,7 @@
 
                     <!-- Bottom Copyright & Legal Links -->
                     <div class="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between text-[11px] text-white/50 gap-4">
-                        <p>&copy; {{ date('Y') }} <span id="edit-footer-copyright" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_copyright'] ?? 'Krishna Resorts Hospitality Ltd. All rights reserved.' }}</span></p>
+                        <p>&copy; {{ date('Y') }} <span id="edit-footer-copyright" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_copyright'] ?? 'Krishna Cottages Hospitality Ltd. All rights reserved.' }}</span></p>
                         <div class="flex items-center gap-6">
                             <span id="edit-footer-support" class="wysiwyg-text hover:text-white" contenteditable="true">{{ $homepageContent['footer_support_link'] ?? 'Help & Support' }}</span>
                             <span id="edit-footer-policy" class="wysiwyg-text text-[#C7A76A]/80" contenteditable="true">{{ $homepageContent['footer_policy_note'] ?? '🌿 Strictly No Swimming Pool Policy' }}</span>

@@ -113,9 +113,9 @@ class ChatController extends Controller
             ]);
 
             // Welcome greeting message from Concierge
-            $welcomeText = "Namaste! Welcome to Krishna Resorts & Cottages. How may our concierge team assist your holiday plans, room selection, or dining experience today?";
+            $welcomeText = "Namaste! Welcome to Krishna Cottages. How may our concierge team assist your holiday plans, room selection, or dining experience today?";
             if ($activeReservation) {
-                $bName = $activeReservation->branch ? $activeReservation->branch->name : 'our resort';
+                $bName = $activeReservation->branch ? $activeReservation->branch->name : 'our cottages';
                 $roomLabel = $activeReservation->room ? "Room {$activeReservation->room->room_number}" : ($activeReservation->roomType ? $activeReservation->roomType->name : 'cottage');
                 $welcomeText = "Namaste! Welcome to {$bName}. Our concierge team and branch manager are at your service for {$roomLabel}. Please let us know if you need housekeeping, dining service, farm fresh spices, or local excursions!";
             }

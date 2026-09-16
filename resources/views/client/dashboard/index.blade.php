@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Guest Dashboard & Stay Pass | Krishna Resorts')
+@section('title', 'Guest Dashboard & Stay Pass | Krishna Cottages')
 
 @section('content')
 <!-- TOP BANNER / GUEST IDENTITY BAR (COMPACT) -->

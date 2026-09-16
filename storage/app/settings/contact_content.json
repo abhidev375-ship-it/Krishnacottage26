@@ -1,0 +1,27 @@
+{
+    "hero_eyebrow": "24/7 Front Desk & Concierge",
+    "hero_title": "Connect With Us",
+    "hero_subtitle": "Whether planning a bespoke anniversary retreat, private plantation dinner, or requiring travel assistance across Kerala.",
+    "central_phone": "+91 94471 22334",
+    "central_email": "concierge@krishnacottages.com",
+    "central_address": "Tea Garden Estate, Rajakkad, Idukki District, Kerala - 685566",
+    "frontdesk_hours": "Open 24 Hours · 7 Days a Week",
+    "faqs": [
+        {
+            "question": "What are the check-in and check-out timings?",
+            "answer": "Check-in begins at 2:00 PM and check-out is by 11:00 AM. Early check-in and late checkout can be requested through your guest dashboard or front desk subject to room readiness."
+        },
+        {
+            "question": "Do you have swimming pools on the property?",
+            "answer": "Krishna Cottages maintains a strictly preserved peaceful nature atmosphere with a Strict No Swimming Pool Policy. We emphasize mist walks, natural spice plantation trekking, cold stream trails, and traditional Ayurvedic wellness."
+        },
+        {
+            "question": "Are vegetarian, Jain, or bespoke dietary meals available?",
+            "answer": "Yes, our plantation dining kitchen offers 100% organic, locally sourced Kerala vegetarian delicacies, Jain meals prepared upon request, and tailored Ayurvedic diet options."
+        },
+        {
+            "question": "Can you arrange airport pickup and sightseeing taxis?",
+            "answer": "Yes, our 24/7 concierge can arrange certified chauffeur transfers from Cochin International Airport (COK) and local sightseeing around Munnar, Rajakkad waterfalls, and tea estates."
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Nearby Discoveries & Excursions | Krishna Resorts')
+@section('title', 'Nearby Discoveries & Excursions | Krishna Cottages')
 
 @section('content')
 <!-- HERO SECTION -->
@@ -9,7 +9,7 @@
         <span class="eyebrow text-brass block mb-2">Curated Excursions</span>
         <h1 class="serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">Nearby Discoveries</h1>
         <p class="text-xs sm:text-sm text-paper/70 max-w-2xl mx-auto mt-3 leading-relaxed">
-            Cascading waterfalls, mist-shrouded peaks, ancient spice trade paths, and tranquil lakes just moments from our resort gates.
+            Cascading waterfalls, mist-shrouded peaks, ancient spice trade paths, and tranquil lakes just moments from our cottage gates.
         </p>
     </div>
 </div>
@@ -46,7 +46,7 @@
                     <input type="hidden" name="category" value="{{ $selectedCategory }}">
                 @endif
                 <select name="branch_id" onchange="this.form.submit()" class="bg-white soft-border rounded-xl text-xs font-semibold px-3 py-1.5 text-forest focus:outline-hidden cursor-pointer shadow-xs">
-                    <option value="">All Resort Regions</option>
+                    <option value="">All Cottage Regions</option>
                     @foreach($branches as $b)
                         <option value="{{ $b->id }}" {{ (string)$selectedBranchId === (string)$b->id ? 'selected' : '' }}>
                             Near {{ $b->name }}

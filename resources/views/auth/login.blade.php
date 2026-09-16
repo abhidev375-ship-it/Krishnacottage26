@@ -26,10 +26,10 @@
   <div class="min-h-screen lg:h-screen lg:max-h-screen flex flex-col lg:grid lg:grid-cols-12 bg-[#FAF8F5] lg:overflow-hidden">
     <!-- Left Hero Image Column (Single Viewport Fitted) -->
     <aside class="relative hidden lg:flex lg:col-span-5 xl:col-span-5 flex-col justify-between p-7 xl:p-9 overflow-hidden bg-forest text-paper h-full">
-      <!-- High-res Kerala Cottage Sunset & Waterscape Imagery -->
+      <!-- High-res Kerala Resort Sunset & Waterscape Imagery -->
       <img 
         src="{{ $loginPageImage }}" 
-        alt="Krishna Cottage Kerala Slow Living" 
+        alt="Krishna Cottages Kerala Slow Living" 
         class="absolute inset-0 h-full w-full object-cover object-center scale-105 transition duration-1000 ease-out"
       />
       <!-- Luxury Dark Overlay Gradient -->
@@ -49,7 +49,7 @@
 
         <a href="{{ route('home') }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[11px] font-semibold text-paper/90 backdrop-blur-md transition">
           <i data-lucide="arrow-left" class="w-3 h-3"></i>
-          <span>Home</span>
+          <span>Cottage Home</span>
         </a>
       </div>
 
@@ -109,7 +109,7 @@
       <div class="flex lg:hidden items-center justify-between pb-3.5 border-b border-forest/10 mb-3 shrink-0">
         <a href="{{ route('home') }}" class="inline-flex items-center gap-2">
           <div class="grid h-8 w-8 place-items-center rounded-xl bg-forest text-paper font-black text-xs">K</div>
-          <span class="text-xs font-bold uppercase tracking-wider text-forest">Krishna Cottage</span>
+          <span class="text-xs font-bold uppercase tracking-wider text-forest">Krishna Cottages</span>
         </a>
         <a href="{{ route('home') }}" class="inline-flex items-center gap-1 text-xs font-bold text-forest/70 hover:text-forest transition">
           <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
@@ -245,7 +245,7 @@
 
       <!-- Bottom Brand Footer -->
       <div class="text-center text-[10.5px] text-forest/40 font-medium shrink-0 pt-2">
-        &copy; {{ date('Y') }} Krishna Cottage; Preserving Kerala Heritage & Nature
+        &copy; {{ date('Y') }} Krishna Cottages &middot; Preserving Kerala Heritage & Nature
       </div>
     </main>
   </div>

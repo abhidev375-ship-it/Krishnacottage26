@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Rooms & Cottages | Krishna Resorts')
+@section('title', 'Rooms & Cottages | Krishna Cottages')
 
 @section('content')
 <!-- AIRBNB-STYLE FLOATING SEARCH & FILTER BAR -->

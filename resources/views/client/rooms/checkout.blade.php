@@ -89,7 +89,7 @@
                                 <input type="radio" name="payment_choice" value="deposit_20" class="mt-1 text-forest focus:ring-forest">
                                 <div>
                                     <div class="text-xs font-bold text-forest">Pay 20% deposit now</div>
-                                    <div class="text-[11px] text-forest/60 mt-0.5">Pay ₹{{ number_format($deposit) }} today, and the rest (₹{{ number_format($total - $deposit) }}) upon arrival at the resort.</div>
+                                    <div class="text-[11px] text-forest/60 mt-0.5">Pay ₹{{ number_format($deposit) }} today, and the rest (₹{{ number_format($total - $deposit) }}) upon arrival at the cottages.</div>
                                 </div>
                             </div>
                             <span class="text-xs font-bold text-forest">₹{{ number_format($deposit) }}</span>
@@ -289,11 +289,11 @@
                             <span class="text-[10px] text-forest/50">All Major Banks</span>
                         </label>
 
-                        <!-- PAY AT RESORT -->
+                        <!-- PAY AT COTTAGES -->
                         <label class="flex items-center justify-between p-3.5 rounded-2xl soft-border hover:border-forest/40 transition cursor-pointer" id="box-pay_at_resort-option" onclick="togglePaymentRadio('pay_at_resort')">
                             <div class="flex items-center gap-3">
                                 <input type="radio" name="payment_method" value="pay_at_resort" class="text-forest focus:ring-forest" onchange="togglePaymentRadio('pay_at_resort')">
-                                <span class="text-xs font-bold text-forest">Pay at Resort upon Check-in</span>
+                                <span class="text-xs font-bold text-forest">Pay at Cottages upon Check-in</span>
                             </div>
                             <span class="text-[10px] bg-paper text-forest font-bold px-2 py-0.5 rounded-lg soft-border">Front Desk</span>
                         </label>
@@ -307,7 +307,7 @@
                         Free cancellation until 48 hours before check-in. If cancelled less than 48 hours before arrival, 1 night's charge applies.
                     </p>
                     <p class="text-[11px] leading-relaxed">
-                        By selecting the button below, I agree to the <button type="button" onclick="openGroundRulesModal()" class="underline hover:text-forest font-semibold cursor-pointer">Resort Ground Rules</button>, <button type="button" onclick="openTermsModal()" class="underline hover:text-forest font-semibold cursor-pointer">Terms of Service</button>, and the strictly preserved peaceful nature atmosphere.
+                        By selecting the button below, I agree to the <button type="button" onclick="openGroundRulesModal()" class="underline hover:text-forest font-semibold cursor-pointer">Cottage Ground Rules</button>, <button type="button" onclick="openTermsModal()" class="underline hover:text-forest font-semibold cursor-pointer">Terms of Service</button>, and the strictly preserved peaceful nature atmosphere.
                     </p>
                 </div>
 
@@ -372,13 +372,13 @@
         </div>
 </div>
 
-<!-- RESORT GROUND RULES & TERMS MODAL -->
+<!-- COTTAGE GROUND RULES & TERMS MODAL -->
 <div id="ground-rules-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-forest/80 backdrop-blur-xs">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 soft-border shadow-card max-h-[85vh] overflow-y-auto space-y-4">
         <div class="flex items-center justify-between border-b border-forest/10 pb-4">
             <div>
-                <span class="eyebrow text-brass block">Krishna Resorts Protocols</span>
-                <h3 class="serif text-xl sm:text-2xl font-bold text-forest mt-0.5" id="policy-modal-title">Resort Ground Rules</h3>
+                <span class="eyebrow text-brass block">Krishna Cottages Protocols</span>
+                <h3 class="serif text-xl sm:text-2xl font-bold text-forest mt-0.5" id="policy-modal-title">Cottage Ground Rules</h3>
             </div>
             <button type="button" onclick="closeGroundRulesModal()" class="w-8 h-8 rounded-full bg-forest/5 hover:bg-forest/10 flex items-center justify-center text-forest cursor-pointer">
                 <i data-lucide="x" class="w-4 h-4"></i>
@@ -395,7 +395,7 @@
                 <h4 class="font-bold text-forest flex items-center gap-1.5 text-xs">
                     <i data-lucide="ban" class="w-3.5 h-3.5 text-brass"></i> Strictly No Swimming Pool Policy
                 </h4>
-                <p>Krishna Resorts operates under eco-botanical heritage principles with no artificial swimming pools. We encourage cold mountain stream walks, herbal spice plantation trails, and natural veranda unwinding.</p>
+                <p>Krishna Cottages operates under eco-botanical heritage principles with no artificial swimming pools. We encourage cold mountain stream walks, herbal spice plantation trails, and natural veranda unwinding.</p>
             </div>
             <div class="space-y-1">
                 <h4 class="font-bold text-forest flex items-center gap-1.5 text-xs">
@@ -425,7 +425,7 @@
 function openGroundRulesModal() {
     const modal = document.getElementById('ground-rules-modal');
     const title = document.getElementById('policy-modal-title');
-    if (title) title.textContent = 'Resort Ground Rules';
+    if (title) title.textContent = 'Cottage Ground Rules';
     if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -508,7 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (upiPanel) upiPanel.classList.add('hidden');
             if (btnText) {
                 if (method === 'pay_at_resort') {
-                    btnText.textContent = 'Confirm & Reserve (Pay at Resort)';
+                    btnText.textContent = 'Confirm & Reserve (Pay at Cottages)';
                 } else if (method === 'card') {
                     btnText.textContent = 'Confirm & Pay with Card (₹{{ number_format($total) }})';
                 } else if (method === 'netbanking') {
@@ -605,7 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
 
                 if (!res.ok || !data.success) {
-                    showError(data.message || 'Unable to initialize online payment. Please try again or select Pay at Resort.');
+                    showError(data.message || 'Unable to initialize online payment. Please try again or select Pay at Cottages.');
                     setLoading(false);
                     return;
                 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Create Guest Account — Krishna Resorts</title>
+  <title>Create Guest Account — Krishna Cottages</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -29,7 +29,7 @@
       <!-- High-res Resort / Backwaters / Wooden Cottage Imagery -->
       <img 
         src="{{ $loginPageImage }}" 
-        alt="Krishna Resorts Kerala Slow Living" 
+        alt="Krishna Cottages Kerala Slow Living" 
         class="absolute inset-0 h-full w-full object-cover object-center scale-105 transition duration-1000 ease-out"
       />
       <!-- Luxury Dark Overlay Gradient -->
@@ -42,14 +42,14 @@
             K
           </div>
           <div>
-            <span class="block text-xs font-bold tracking-wider uppercase text-paper leading-tight">Krishna Resorts</span>
+            <span class="block text-xs font-bold tracking-wider uppercase text-paper leading-tight">Krishna Cottages</span>
             <span class="block text-[9px] text-paper/70 tracking-widest uppercase">Kerala Slow Living</span>
           </div>
         </a>
 
         <a href="{{ route('home') }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[11px] font-semibold text-paper/90 backdrop-blur-md transition">
           <i data-lucide="arrow-left" class="w-3 h-3"></i>
-          <span>Resort Home</span>
+          <span>Cottage Home</span>
         </a>
       </div>
 
@@ -109,7 +109,7 @@
       <div class="flex lg:hidden items-center justify-between pb-3.5 border-b border-forest/10 mb-3 shrink-0">
         <a href="{{ route('home') }}" class="inline-flex items-center gap-2">
           <div class="grid h-8 w-8 place-items-center rounded-xl bg-forest text-paper font-black text-xs">K</div>
-          <span class="text-xs font-bold uppercase tracking-wider text-forest">Krishna Resorts</span>
+          <span class="text-xs font-bold uppercase tracking-wider text-forest">Krishna Cottages</span>
         </a>
         <a href="{{ route('home') }}" class="inline-flex items-center gap-1 text-xs font-bold text-forest/70 hover:text-forest transition">
           <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
@@ -273,7 +273,7 @@
 
           <!-- Policy Note -->
           <div class="text-[10.5px] text-forest/55 pt-0.5 leading-snug">
-            By registering, you agree to Krishna Resorts' slow-living guest policies and stay charter.
+            By registering, you agree to Krishna Cottages' slow-living guest policies and stay charter.
           </div>
 
           <!-- Submit Button -->
@@ -292,7 +292,7 @@
 
       <!-- Bottom Brand Footer -->
       <div class="text-center text-[10.5px] text-forest/40 font-medium shrink-0 pt-2">
-        &copy; {{ date('Y') }} Krishna Resorts &middot; Preserving Kerala Heritage & Nature
+        &copy; {{ date('Y') }} Krishna Cottages &middot; Preserving Kerala Heritage & Nature
       </div>
     </main>
   </div>

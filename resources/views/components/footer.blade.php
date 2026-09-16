@@ -1,6 +1,6 @@
 @php
     $content = $homepageContent ?? app(\App\Http\Controllers\Admin\AdminController::class)->getHomepageContent();
-    $fBrandTitle = $content['footer_brand_title'] ?? 'Krishna Resorts';
+    $fBrandTitle = $content['footer_brand_title'] ?? 'Krishna Cottages';
     $fBrandTagline = $content['footer_brand_tagline'] ?? 'Luxury Cottages of Kerala';
     $fBrandDesc = $content['footer_brand_desc'] ?? 'Immersive, slow-living cottages nestled in the spice hills, misty valleys, and tranquil backwaters of Kerala.';
     $fBadge = $content['footer_badge'] ?? 'Eco-Conscious Botanical Cottages';
@@ -8,14 +8,14 @@
     $fExpTitle = $content['footer_exp_title'] ?? 'Experiences';
     $fExpLink1 = $content['footer_exp_link_1'] ?? 'Plantation Kitchen & Dining';
     $fExpLink2 = $content['footer_exp_link_2'] ?? 'Krishna Spices Farm Shop';
-    $fExpLink3 = $content['footer_exp_link_3'] ?? 'Resort Visual Gallery';
+    $fExpLink3 = $content['footer_exp_link_3'] ?? 'Cottages Visual Gallery';
     $fExpLink4 = $content['footer_exp_link_4'] ?? 'Guided Nature Discoveries';
     $fConciergeTitle = $content['footer_concierge_title'] ?? 'Direct Concierge';
     $fConciergeDesc = $content['footer_concierge_desc'] ?? 'Front desk assistance 24/7 for bespoke retreat arrangements.';
     $fPhone = $content['footer_phone'] ?? '+91 484 290 0000';
-    $fEmail = $content['footer_email'] ?? 'concierge@krishnaresorts.com';
+    $fEmail = $content['footer_email'] ?? 'concierge@krishnacottages.com';
     $fChatBtn = $content['footer_chat_btn'] ?? 'Chat with Concierge';
-    $fCopyright = $content['footer_copyright'] ?? 'Krishna Resorts Hospitality Ltd. All rights reserved.';
+    $fCopyright = $content['footer_copyright'] ?? 'Krishna Cottages Hospitality Ltd. All rights reserved.';
     $fSupportLink = $content['footer_support_link'] ?? 'Help & Support';
     $fPolicyNote = $content['footer_policy_note'] ?? '🌿 Strictly No Swimming Pool Policy';
 

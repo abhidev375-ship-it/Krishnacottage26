@@ -23,15 +23,15 @@ class WhatsAppNotificationService
     public function sendBookingAlert(Reservation $reservation): ?NotificationLog
     {
         $guestName = $reservation->guest ? $reservation->guest->full_name : 'Guest';
-        $branchName = $reservation->branch ? $reservation->branch->name : 'Krishna Resorts';
-        $roomTypeName = $reservation->roomType ? $reservation->roomType->name : 'Resort Suite';
+        $branchName = $reservation->branch ? $reservation->branch->name : 'Krishna Cottages';
+        $roomTypeName = $reservation->roomType ? $reservation->roomType->name : 'Cottage Suite';
         $checkIn = Carbon::parse($reservation->check_in_date)->format('d M Y');
         $checkOut = Carbon::parse($reservation->check_out_date)->format('d M Y');
         $nights = Carbon::parse($reservation->check_in_date)->diffInDays(Carbon::parse($reservation->check_out_date)) ?: 1;
         $total = number_format($reservation->total_amount, 2);
         $paymentStatus = strtoupper($reservation->payment_status ?? 'PENDING');
 
-        $text = "🏨 *NEW ROOM RESERVATION — KRISHNA RESORTS*\n\n"
+        $text = "🏨 *NEW ROOM RESERVATION — KRISHNA COTTAGES*\n\n"
             . "• *Booking Ref:* #{$reservation->booking_code}\n"
             . "• *Guest:* {$guestName}\n"
             . "• *Branch:* {$branchName}\n"
@@ -58,7 +58,7 @@ class WhatsAppNotificationService
         $topic = strtoupper(str_replace('_', ' ', $enquiry->topic ?? 'GENERAL'));
         $branchName = $enquiry->branch ? $enquiry->branch->name : 'Central Reservations';
 
-        $text = "💬 *NEW GUEST ENQUIRY — KRISHNA RESORTS*\n\n"
+        $text = "💬 *NEW GUEST ENQUIRY — KRISHNA COTTAGES*\n\n"
             . "• *Ticket:* #{$enquiry->ticket_number}\n"
             . "• *Customer:* {$enquiry->customer_name}\n"
             . "• *Topic:* #{$topic}\n"
@@ -114,7 +114,7 @@ class WhatsAppNotificationService
         $reqCheckout = Carbon::parse($ext->requested_checkout_date)->format('d M Y');
         $amount = number_format($ext->standard_amount, 2);
 
-        $text = "🛎️ *HOLIDAY EXTENSION REQUEST — KRISHNA RESORTS*\n\n"
+        $text = "🛎️ *HOLIDAY EXTENSION REQUEST — KRISHNA COTTAGES*\n\n"
             . "• *Guest:* {$guestName} ({$villa})\n"
             . "• *Booking Ref:* #{$reservation->booking_code}\n"
             . "• *Current Checkout:* {$curCheckout}\n"
@@ -242,8 +242,8 @@ class WhatsAppNotificationService
      */
     public function sendTestMessage(string $phone, string $apiKey): array
     {
-        $text = "👋 *Namaste from Krishna Resorts & Spices!*\n\n"
-            . "This is a test notification confirming that your *CallMeBot WhatsApp Service* is fully connected and ready to receive real-time resort operational alerts!\n\n"
+        $text = "👋 *Namaste from Krishna Cottages & Spices!*\n\n"
+            . "This is a test notification confirming that your *CallMeBot WhatsApp Service* is fully connected and ready to receive real-time cottage operational alerts!\n\n"
             . "Timestamp: " . Carbon::now()->format('d M Y, h:i A');
 
         return $this->executeCallMeBotApi($phone, $text, $apiKey);

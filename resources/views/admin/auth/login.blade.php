@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Staff & Administration Login — Krishna Resorts</title>
+  <title>Staff & Administration Login — Krishna Cottages</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -22,7 +22,7 @@
         <i data-lucide="shield-check" class="w-7 h-7 text-[#C7A76A]"></i>
       </div>
       <h1 class="text-2xl font-bold tracking-tight text-white">Management Console</h1>
-      <p class="text-xs text-white/50">Krishna Resorts Operations & Central Admin</p>
+      <p class="text-xs text-white/50">Krishna Cottages Operations & Central Admin</p>
     </div>
 
     <!-- Login Card -->

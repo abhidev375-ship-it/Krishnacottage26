@@ -18,7 +18,7 @@ class AdminAuthMiddleware
             if ($request->expectsJson()) {
                 return response()->json(['error' => 'Unauthenticated'], 401);
             }
-            return redirect()->route('admin.login')->with('error', 'Please sign in to access resort administration.');
+            return redirect()->route('admin.login')->with('error', 'Please sign in to access cottage administration.');
         }
 
         $user = Auth::user();
@@ -28,7 +28,7 @@ class AdminAuthMiddleware
             if ($request->expectsJson()) {
                 return response()->json(['error' => 'Access denied: Staff privileges required'], 403);
             }
-            return redirect()->route('admin.login')->with('error', 'Access restricted to authorized resort management staff.');
+            return redirect()->route('admin.login')->with('error', 'Access restricted to authorized cottage management staff.');
         }
 
         if (!$user->is_active) {

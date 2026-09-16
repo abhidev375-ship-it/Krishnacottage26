@@ -65,7 +65,7 @@ class SmsNotificationService
             }
 
             $checkInFormatted = Carbon::parse($upcomingReservation->check_in_date)->format('d M');
-            $branchSmsText = "[Krishna Resorts Alert] Guest {$enquiry->customer_name} (Upcoming stay #{$upcomingReservation->booking_code} at {$branch->name} on {$checkInFormatted}) sent a message: \"{$snippet}\". Please check console.";
+            $branchSmsText = "[Krishna Cottages Alert] Guest {$enquiry->customer_name} (Upcoming stay #{$upcomingReservation->booking_code} at {$branch->name} on {$checkInFormatted}) sent a message: \"{$snippet}\". Please check console.";
 
             foreach ($branchManagers as $manager) {
                 $targetPhone = $manager->phone ?: ($branch->phone ?: '+91 94471 22334');
@@ -84,7 +84,7 @@ class SmsNotificationService
         if ($enquiry->locked_by && $enquiry->lockedBy) {
             // If chat is locked to a specific staff member, alert them directly
             $targetPhone = $enquiry->lockedBy->phone ?: '+91 98401 99880';
-            $adminText = "[Krishna Resorts Chat] Customer {$enquiry->customer_name} replied to your active locked conversation: \"{$snippet}\".";
+            $adminText = "[Krishna Cottages Chat] Customer {$enquiry->customer_name} replied to your active locked conversation: \"{$snippet}\".";
             $dispatched[] = $this->dispatchSms(
                 $targetPhone,
                 $adminText,
@@ -102,7 +102,7 @@ class SmsNotificationService
                 $centralStaff = User::where('role', 'super_admin')->take(1)->get();
             }
 
-            $centralSmsText = "[Krishna Resorts Alert] New guest message from {$enquiry->customer_name} (Ticket: {$enquiry->ticket_number}): \"{$snippet}\". Open Admin Chat to claim.";
+            $centralSmsText = "[Krishna Cottages Alert] New guest message from {$enquiry->customer_name} (Ticket: {$enquiry->ticket_number}): \"{$snippet}\". Open Admin Chat to claim.";
 
             foreach ($centralStaff->take(2) as $staff) {
                 $targetPhone = $staff->phone ?: '+91 98765 43210';

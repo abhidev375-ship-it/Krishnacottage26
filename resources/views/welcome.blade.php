@@ -44,11 +44,11 @@
   <meta name="theme-color" content="#F4F1E8" />
   
   <!-- PRIMARY HIGH-RANKING SEO METADATA -->
-  <title>Krishna Cottage &amp; Resorts — Best Resorts &amp; Homestay in Idukki, Rajakkadu, Rajakumari, Adimali &amp; Munnar, Kerala</title>
-  <meta name="description" content="Discover Krishna Cottages &amp; Resorts in Rajakkad, Idukki. Book luxury wooden cottages, nature homestays &amp; private hillside villas across Rajakkadu, Rajakumari, Adimali &amp; Munnar, Kerala with organic dining &amp; plantation views." />
+  <title>Krishna Cottages — Best Luxury Cottages &amp; Homestay in Idukki, Rajakkadu, Rajakumari, Adimali &amp; Munnar, Kerala</title>
+  <meta name="description" content="Discover Krishna Cottages in Rajakkad, Idukki. Book luxury wooden cottages, nature homestays &amp; private hillside villas across Rajakkadu, Rajakumari, Adimali &amp; Munnar, Kerala with organic dining &amp; plantation views." />
   <meta name="keywords" content="krishna cottage idukki, krishna cottages rajakkad, krishna resort idukki, krishna homestay idukki, idukki cottages, idukki resorts, resorts in idukki, rajakkadu, resort in rajakkadu, home stay in idukki, home stay in rajakkadu, home stay in rajakumari, resort in rajakumari, resort in adimali, cottage in adimali, home stay in adimali, idukki, kerala, best resort in idukki, best cottage in idukki, best cottage in munnar, munnar resorts, munnar homestay, cottages in rajakkad idukki, kuthumkal waterfalls resort, mailadumpara cottages idukki, ponmudi lake resort rajakkad, adivaram idukki homestay, wooden cottages in idukki, plantation homestay in rajakkadu, budget homestay in rajakumari, family resort in adimali idukki, honeymoon cottage in munnar idukki, kerala eco cottage idukki, ayurvedic resort in idukki, best resort in rajakkadu, best homestay in idukki, resorts near ponmudi dam" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-  <meta name="author" content="Krishna Resorts &amp; Cottages" />
+  <meta name="author" content="Krishna Cottages" />
   <link rel="canonical" href="{{ url()->current() }}" />
 
   <!-- GEO-LOCALIZATION TAGS (Rajakkad, Idukki, Kerala) -->
@@ -59,16 +59,16 @@
 
   <!-- OPEN GRAPH / FACEBOOK SOCIAL SHARING -->
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Krishna Resorts &amp; Cottages" />
+  <meta property="og:site_name" content="Krishna Cottages" />
   <meta property="og:url" content="{{ url()->current() }}" />
-  <meta property="og:title" content="Krishna Cottage &amp; Resorts — Best Resorts &amp; Homestay in Idukki, Rajakkadu &amp; Munnar" />
+  <meta property="og:title" content="Krishna Cottages — Best Luxury Cottages &amp; Homestay in Idukki, Rajakkadu &amp; Munnar" />
   <meta property="og:description" content="Authentic wooden cottages, misty tea garden views, and peaceful hillside homestays in Rajakkad, Idukki, Kerala. Experience heritage living near Munnar." />
   <meta property="og:image" content="{{ $heroSlides[0]['image'] ?? 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=85' }}" />
   <meta property="og:locale" content="en_IN" />
 
   <!-- TWITTER CARDS -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Krishna Cottage &amp; Resorts — Best Resorts &amp; Homestay in Idukki, Rajakkadu &amp; Munnar" />
+  <meta name="twitter:title" content="Krishna Cottages — Best Luxury Cottages &amp; Homestay in Idukki, Rajakkadu &amp; Munnar" />
   <meta name="twitter:description" content="Experience peaceful wooden cottages and estate living in Rajakkadu, Rajakumari, Adimali &amp; Munnar, Idukki, Kerala." />
   <meta name="twitter:image" content="{{ $heroSlides[0]['image'] ?? 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=85' }}" />
 
@@ -87,9 +87,9 @@
       '@context' => 'https://schema.org',
       '@graph' => [
         [
-          '@type' => ['Resort', 'LodgingBusiness', 'BedAndBreakfast'],
-          '@id' => url('/') . '#resort',
-          'name' => 'Krishna Resorts & Cottages',
+          '@type' => ['LodgingBusiness', 'BedAndBreakfast'],
+          '@id' => url('/') . '#cottages',
+          'name' => 'Krishna Cottages',
           'alternateName' => ['Krishna Cottage Idukki', 'Krishna Cottages Rajakkad', 'Krishna Homestay Idukki'],
           'url' => url('/'),
           'telephone' => '+91 95676 02774',
@@ -480,7 +480,7 @@
                     <!-- Slide Photo (Optimized with fetchpriority & SEO alt) -->
                     <img src="{{ $slide['image'] }}" 
                          class="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" 
-                         alt="{{ $slide['title'] }} — Best Resort &amp; Cottages in {{ $slide['tag'] ?? 'Rajakkadu, Idukki, Munnar, Kerala' }}"
+                         alt="{{ $slide['title'] }} — Best Luxury Cottages in {{ $slide['tag'] ?? 'Rajakkadu, Idukki, Munnar, Kerala' }}"
                          {{ $sIdx === 0 ? 'fetchpriority="high" loading="eager" decoding="sync"' : 'loading="lazy" decoding="async"' }} />
                     
                     <!-- Subtle Vignette / Gradient -->
@@ -553,7 +553,7 @@
               </label>
               <div class="relative flex items-center justify-between mt-0.5">
                 <select name="branch_id" id="branchSelect" class="w-full bg-transparent text-sm font-semibold text-forest focus:outline-none cursor-pointer appearance-none pr-6 truncate z-10">
-                  <option value="">All Branches (Resort Central)</option>
+                  <option value="">All Branches (Cottages Central)</option>
                   @foreach($branches as $b)
                     <option value="{{ $b->id }}">{{ $b->name }} ({{ $b->city }})</option>
                   @endforeach
@@ -824,7 +824,7 @@
               <div class="h-10 w-10 rounded-xl bg-forest/5 flex items-center justify-center text-emerald group-hover:bg-forest group-hover:text-brass transition">
                 <i data-lucide="images" class="h-5 w-5"></i>
               </div>
-              <p class="mt-3.5 text-xs sm:text-sm font-bold text-forest group-hover:text-emerald transition">Resort Gallery</p>
+              <p class="mt-3.5 text-xs sm:text-sm font-bold text-forest group-hover:text-emerald transition">Cottages Gallery</p>
               <p class="mt-1 text-[10px] sm:text-[11px] text-forest/60 leading-snug">Moments captured across our 3 Kerala retreats</p>
               <div class="mt-3 flex items-center gap-1 text-[10px] font-bold text-emerald group-hover:translate-x-1 transition">
                 <span>View</span>
@@ -1131,7 +1131,7 @@
         <div class="flex items-end justify-between mb-8">
           <div class="reveal">
             <p class="eyebrow text-emerald">{{ $homepageContent['gallery_eyebrow'] ?? 'Visual Journeys' }}</p>
-            <h2 class="serif mt-2 text-4xl tracking-[-.04em] text-forest md:text-6xl">{!! $homepageContent['gallery_heading'] ?? 'Resort Albums &amp; Stillness.' !!}</h2>
+            <h2 class="serif mt-2 text-4xl tracking-[-.04em] text-forest md:text-6xl">{!! $homepageContent['gallery_heading'] ?? 'Cottage Albums &amp; Stillness.' !!}</h2>
           </div>
           <a href="{{ route('gallery.index') }}" class="rounded-xl bg-forest px-4 py-2.5 text-[10px] font-bold text-paper hover:bg-forest/90 transition inline-flex items-center gap-1.5 shadow-xs">
             <span>Explore all albums</span>
@@ -1485,7 +1485,7 @@
         <div class="flex items-center gap-2.5">
           <span class="grid h-10 w-10 place-items-center rounded-xl bg-forest text-sm font-bold text-paper">K</span>
           <div>
-            <p class="text-sm font-semibold">Krishna Resorts</p>
+            <p class="text-sm font-semibold">Krishna Cottages</p>
             <p class="mt-0.5 text-[9px] uppercase tracking-[.18em] text-forest/40">Luxury Cottages of Kerala</p>
           </div>
         </div>
@@ -1581,7 +1581,7 @@
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="serif text-base sm:text-lg font-bold">Resort Concierge Desk</h3>
+              <h3 class="serif text-base sm:text-lg font-bold">Cottage Concierge Desk</h3>
               <span class="px-2 py-0.5 rounded-full text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold uppercase tracking-wider">Live</span>
             </div>
             <p class="text-[10px] text-paper/60 flex items-center gap-1.5 mt-0.5">
@@ -1603,7 +1603,7 @@
           <div class="truncate">
             <div class="flex items-center gap-2">
               <span id="stayBadge" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-400 text-emerald-950 uppercase tracking-wider">Checked In</span>
-              <span id="stayBranch" class="font-bold text-paper text-xs truncate">Resort Branch</span>
+              <span id="stayBranch" class="font-bold text-paper text-xs truncate">Cottage Branch</span>
             </div>
             <p class="text-[10px] text-paper/80 mt-0.5 truncate" id="stayRoomAndDates">
               Room 101 &middot; Stays
@@ -1681,7 +1681,7 @@
       <!-- Input Bar -->
       <div class="p-3 sm:p-3.5 bg-white border-t border-forest/15 shrink-0">
         <form id="chatMessageForm" onsubmit="handleSendChatMessage(event)" class="flex items-center gap-2">
-          <input type="text" id="chatTextInput" autocomplete="off" placeholder="Type message to resort manager..." class="flex-1 text-xs py-2.5 px-3.5 rounded-xl border border-forest/15 bg-paper/60 text-forest placeholder-forest/40 focus:outline-none focus:ring-1 focus:ring-forest">
+          <input type="text" id="chatTextInput" autocomplete="off" placeholder="Type message to cottage manager..." class="flex-1 text-xs py-2.5 px-3.5 rounded-xl border border-forest/15 bg-paper/60 text-forest placeholder-forest/40 focus:outline-none focus:ring-1 focus:ring-forest">
           <button type="submit" id="chatSendBtn" class="h-9 w-9 rounded-xl bg-forest hover:bg-emerald text-paper flex items-center justify-center shadow-card transition shrink-0">
             <i data-lucide="send" class="w-4 h-4 text-brass"></i>
           </button>
@@ -2953,7 +2953,7 @@
           <div class="flex items-center justify-between gap-3">
             <div>
               <p id="modal-suite-name" class="text-xs sm:text-sm font-bold text-forest">Suite Name</p>
-              <p id="modal-suite-branch" class="text-[11px] text-forest/60 mt-0.5">Krishna Resorts &middot; 2 Nights</p>
+              <p id="modal-suite-branch" class="text-[11px] text-forest/60 mt-0.5">Krishna Cottages &middot; 2 Nights</p>
             </div>
             <div class="text-right shrink-0">
               <span id="modal-suite-total" class="text-sm sm:text-base font-extrabold text-forest">₹0</span>

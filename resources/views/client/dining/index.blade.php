@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Heritage Dining & Kitchen | Krishna Resorts')
+@section('title', 'Heritage Dining & Kitchen | Krishna Cottages')
 
 @section('content')
 <!-- HERO SECTION -->

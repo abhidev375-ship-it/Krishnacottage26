@@ -8,7 +8,7 @@
     $faqs = $contactContent['faqs'] ?? [];
 @endphp
 
-@section('title', 'Concierge & Contact | Krishna Resorts')
+@section('title', 'Concierge & Contact | Krishna Cottages')
 
 @section('content')
 <!-- HERO SECTION -->
@@ -186,7 +186,7 @@
                     <div>
                         <label class="block text-[10px] uppercase font-bold tracking-wider text-forest/70 mb-1">Destination Branch</label>
                         <select name="branch_id" id="field-branch" onchange="syncBranchSelection(this.value)" class="w-full px-3.5 py-2.5 rounded-xl bg-paper/30 soft-border text-xs text-forest focus:ring-1 focus:ring-forest focus:outline-hidden">
-                            <option value="">General Resort Concierge (All Branches)</option>
+                            <option value="">General Cottages Concierge (All Branches)</option>
                             @foreach($branches as $b)
                                 <option value="{{ $b->id }}" {{ (string)old('branch_id', request('branch_id')) === (string)$b->id ? 'selected' : '' }}>
                                     {{ $b->name }} ({{ $b->city }})
@@ -232,7 +232,7 @@
                     <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
                     Your details are securely held under strict privacy protocols.
                 </span>
-                <span class="hidden sm:inline text-forest/40">Krishna Resorts Hospitality</span>
+                <span class="hidden sm:inline text-forest/40">Krishna Cottages Hospitality</span>
             </div>
         </div>
 
@@ -286,7 +286,7 @@
             <div class="bg-white rounded-[28px] p-6 soft-border shadow-card space-y-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="eyebrow text-brass">Resort Sanctuaries</span>
+                        <span class="eyebrow text-brass">Cottage Sanctuaries</span>
                         <h3 class="serif text-xl font-bold text-forest mt-0.5">Branch Directory</h3>
                     </div>
                     <span class="text-xs font-bold text-forest/40">{{ $branches->count() }} Properties</span>
