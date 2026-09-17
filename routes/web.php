@@ -47,6 +47,7 @@ Route::get('/', function () {
                 $q->orderBy('sort_order');
             }])->where('is_published', true)->orderBy('sort_order')->take(6)->get(),
             'testimonials' => Testimonial::with('branch')->where('is_active', true)->orderBy('sort_order')->get(),
+            'featuredRooms' => \App\Models\RoomType::with(['branch', 'category', 'amenitiesList'])->where('is_active', true)->where('is_bookable', true)->orderBy('sort_order')->take(8)->get(),
         ];
     });
 
