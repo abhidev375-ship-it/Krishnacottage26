@@ -60,29 +60,29 @@
 
 @push('styles')
 <style>
-    /* HERO CAROUSEL FULL-SCREEN / FULL-BLEED STYLES */
+    /* HERO CAROUSEL FULL-SCREEN / FULL-BLEED LUXURY STYLES */
     #hero-slider {
         position: relative;
         width: 100%;
-        height: 72vh;
+        height: 74vh;
         min-height: 520px;
         border-radius: 0 !important;
         overflow: hidden;
-        background-color: #083F34;
+        background-color: #062922;
         user-select: none;
         display: block;
     }
     @media (min-width: 640px) {
         #hero-slider {
-            height: 78vh;
+            height: 80vh;
             min-height: 580px;
             border-radius: 0 !important;
         }
     }
     @media (min-width: 1024px) {
         #hero-slider {
-            height: calc(100vh - 76px);
-            min-height: 640px;
+            height: calc(100vh - 72px);
+            min-height: 660px;
             max-height: 920px;
             border-radius: 0 !important;
         }
@@ -99,39 +99,55 @@
         inset: 0;
         width: 100%;
         height: 100%;
-        transition: opacity 0.75s ease-in-out, transform 0.75s ease-in-out;
-        will-change: opacity, transform;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: opacity;
+        z-index: 1;
     }
     .hero-slide-item.active {
         opacity: 1 !important;
-        transform: scale(1) !important;
         pointer-events: auto !important;
         z-index: 10 !important;
     }
     .hero-slide-item.inactive {
         opacity: 0 !important;
-        transform: scale(1.04) !important;
         pointer-events: none !important;
-        z-index: 0 !important;
+        z-index: 1 !important;
     }
+    /* Ken Burns Slow Cinematic Drift Zoom on Active Slide */
+    .hero-slide-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transform: scale(1);
+        transition: transform 7.5s cubic-bezier(0.25, 1, 0.5, 1), filter 0.8s ease;
+        will-change: transform;
+    }
+    .hero-slide-item.active img {
+        transform: scale(1.06);
+    }
+
+    /* Luxury Slide Nav Tab / Dot */
     .hero-dot-btn {
-        height: 8px;
-        border-radius: 9999px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
-        padding: 0;
         border: none;
+        outline: none;
     }
     .hero-dot-btn.active {
-        width: 26px;
-        background-color: #C9A86A;
+        background-color: #C9A86A !important;
+        color: #083F34 !important;
+        box-shadow: 0 4px 14px rgba(201, 168, 106, 0.4);
     }
     .hero-dot-btn.inactive {
-        width: 8px;
-        background-color: rgba(255, 255, 255, 0.45);
+        background-color: transparent !important;
+        color: rgba(255, 255, 255, 0.7) !important;
     }
     .hero-dot-btn.inactive:hover {
-        background-color: rgba(255, 255, 255, 0.85);
+        background-color: rgba(255, 255, 255, 0.15) !important;
+        color: #FFFFFF !important;
     }
 </style>
 @endpush
@@ -150,20 +166,20 @@
         <div id="hero-slides-track">
             @foreach($heroSlidesList as $sIdx => $slide)
                 <div class="hero-slide-item {{ $sIdx === 0 ? 'active' : 'inactive' }}" data-index="{{ $sIdx }}">
-                    <!-- Background High-Res Image -->
+                    <!-- Background High-Res Image with Ken Burns zoom -->
                     <img src="{{ $slide['image'] }}" 
                          alt="{{ $slide['title'] }} — Krishna Cottages Kerala" 
-                         class="w-full h-full object-cover object-center brightness-[0.78] transition-transform duration-1000 ease-out" 
+                         class="w-full h-full object-cover object-center brightness-[0.78]" 
                          {!! $sIdx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"' !!}
                          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1920&q=85';" />
                     
-                    <!-- Ambient Gradients -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30"></div>
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60"></div>
+                    <!-- Ambient Vignette & Cinema Gradients -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#062922]/95 via-black/45 to-black/30"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/55 via-transparent to-black/55"></div>
 
                     <!-- Top Destination Tag -->
                     <div class="absolute top-5 left-5 sm:top-8 sm:left-10 z-20 flex items-center gap-2">
-                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-md text-white text-[11px] sm:text-xs font-semibold tracking-wider uppercase border border-white/20 shadow-xs">
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-black/45 backdrop-blur-md text-white text-[11px] sm:text-xs font-semibold tracking-wider uppercase border border-white/20 shadow-xs">
                             <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brass"></i>
                             <span>{{ $slide['tag'] ?? ($slide['subtitle'] ?? 'Krishna Cottages') }}</span>
                         </span>
@@ -175,7 +191,7 @@
                     </div>
 
                     <!-- Slide Counter Indicator -->
-                    <div class="absolute top-5 right-5 sm:top-8 sm:right-10 z-20 text-white/90 bg-black/50 backdrop-blur-md px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-mono border border-white/15">
+                    <div class="absolute top-5 right-5 sm:top-8 sm:right-10 z-20 text-white/90 bg-black/45 backdrop-blur-md px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-mono border border-white/15">
                         <span class="text-brass font-bold">0{{ $sIdx + 1 }}</span> / 0{{ count($heroSlidesList) }}
                     </div>
 
@@ -187,7 +203,7 @@
                         </p>
 
                         <!-- Master Headline -->
-                        <h1 class="serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.08] text-white drop-shadow-lg max-w-4xl">
+                        <h1 class="serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.08] text-white drop-shadow-xl max-w-4xl">
                             {{ $slide['title'] }}
                         </h1>
 
@@ -198,11 +214,11 @@
 
                         <!-- Hero CTAs -->
                         <div class="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-                            <a href="{{ $slide['link'] ?? route('rooms.index') }}" class="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full bg-forest hover:bg-emerald text-paper font-bold text-xs sm:text-sm shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 border border-emerald-400/30 cursor-pointer">
+                            <a href="{{ $slide['link'] ?? route('rooms.index') }}" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-brass hover:bg-white text-forest font-bold text-xs sm:text-sm shadow-xl hover:shadow-2xl transition duration-300 transform hover:-translate-y-0.5 cursor-pointer">
                                 <span>Explore Cottages</span>
-                                <i data-lucide="arrow-up-right" class="w-4 h-4 text-brass"></i>
+                                <i data-lucide="arrow-up-right" class="w-4 h-4 text-forest"></i>
                             </a>
-                            <button type="button" onclick="openChat()" class="inline-flex items-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-semibold text-xs sm:text-sm border border-white/30 transition duration-300 cursor-pointer">
+                            <button type="button" onclick="openChat()" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-semibold text-xs sm:text-sm border border-white/30 transition duration-300 transform hover:-translate-y-0.5 cursor-pointer">
                                 <i data-lucide="message-circle" class="w-4 h-4 text-brass"></i>
                                 <span>Chat with Concierge</span>
                             </button>
@@ -216,24 +232,27 @@
         <!-- Left & Right Arrow Navigation Controls -->
         <button type="button" 
                 onclick="prevHeroSlide()" 
-                class="absolute left-3 sm:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-30 grid h-11 w-11 sm:h-13 sm:w-13 place-items-center rounded-full bg-black/40 hover:bg-white text-white hover:text-forest backdrop-blur-md border border-white/30 transition-all duration-300 shadow-xl cursor-pointer hover:scale-105" 
+                class="absolute left-3 sm:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-30 grid h-11 w-11 sm:h-13 sm:w-13 place-items-center rounded-full bg-black/40 hover:bg-brass text-white hover:text-forest backdrop-blur-md border border-white/30 hover:border-brass transition-all duration-300 shadow-xl cursor-pointer hover:scale-105" 
                 aria-label="Previous Slide">
             <i data-lucide="chevron-left" class="w-5 h-5 sm:w-6 sm:h-6"></i>
         </button>
         <button type="button" 
                 onclick="nextHeroSlide()" 
-                class="absolute right-3 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-30 grid h-11 w-11 sm:h-13 sm:w-13 place-items-center rounded-full bg-black/40 hover:bg-white text-white hover:text-forest backdrop-blur-md border border-white/30 transition-all duration-300 shadow-xl cursor-pointer hover:scale-105" 
+                class="absolute right-3 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-30 grid h-11 w-11 sm:h-13 sm:w-13 place-items-center rounded-full bg-black/40 hover:bg-brass text-white hover:text-forest backdrop-blur-md border border-white/30 hover:border-brass transition-all duration-300 shadow-xl cursor-pointer hover:scale-105" 
                 aria-label="Next Slide">
             <i data-lucide="chevron-right" class="w-5 h-5 sm:w-6 sm:h-6"></i>
         </button>
 
-        <!-- Bottom Indicator Dots -->
-        <div class="absolute bottom-16 sm:bottom-20 lg:bottom-24 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15">
+        <!-- Bottom Luxury Navigation Bar (Responsive Luxury Tabs with Numbers & Names) -->
+        <div class="absolute bottom-16 sm:bottom-20 lg:bottom-24 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 sm:gap-2.5 bg-black/40 backdrop-blur-md p-1.5 sm:px-3 sm:py-2 rounded-full border border-white/15 shadow-xl">
             @foreach($heroSlidesList as $dIdx => $slide)
                 <button type="button" 
                         onclick="goToHeroSlide({{ $dIdx }})" 
-                        class="hero-dot-btn {{ $dIdx === 0 ? 'active' : 'inactive' }}" 
-                        aria-label="Slide {{ $dIdx + 1 }}"></button>
+                        class="hero-dot-btn {{ $dIdx === 0 ? 'active' : 'inactive' }} flex items-center gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold" 
+                        aria-label="Slide {{ $dIdx + 1 }}">
+                    <span class="font-mono font-bold text-xs">{{ sprintf('%02d', $dIdx + 1) }}</span>
+                    <span class="hidden md:inline whitespace-nowrap tracking-wide">{{ $slide['title'] }}</span>
+                </button>
             @endforeach
         </div>
 
@@ -269,12 +288,12 @@
                             <span>Check-In</span>
                         </label>
                         <input type="date" 
-                               name="check_in" 
-                               id="home-check-in"
-                               value="{{ date('Y-m-d', strtotime('+1 day')) }}" 
-                               min="{{ date('Y-m-d') }}"
-                               onchange="updateCheckOutMin()"
-                               class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer" />
+                                name="check_in" 
+                                id="home-check-in"
+                                value="{{ date('Y-m-d', strtotime('+1 day')) }}" 
+                                min="{{ date('Y-m-d') }}"
+                                onchange="updateCheckOutMin()"
+                                class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer" />
                     </div>
 
                     <!-- Check-Out -->
@@ -284,11 +303,11 @@
                             <span>Check-Out</span>
                         </label>
                         <input type="date" 
-                               name="check_out" 
-                               id="home-check-out"
-                               value="{{ date('Y-m-d', strtotime('+3 days')) }}" 
-                               min="{{ date('Y-m-d', strtotime('+2 days')) }}"
-                               class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer" />
+                                name="check_out" 
+                                id="home-check-out"
+                                value="{{ date('Y-m-d', strtotime('+3 days')) }}" 
+                                min="{{ date('Y-m-d', strtotime('+2 days')) }}"
+                                class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer" />
                     </div>
                 </div>
 
@@ -328,41 +347,162 @@
 
 
 <!-- =========================================================================
-     2. WELCOME & PHILOSOPHY: CLEAN STORY + 4 VALUE BADGES
+     2. WELCOME & PHILOSOPHY: EDITORIAL STORY & RESORT SHOWCASE
      ========================================================================= -->
-<section class="py-12 sm:py-16 bg-[#FAF7F0]">
-    <div class="mx-auto max-w-[1480px] px-4 md:px-6 lg:px-8">
+<section class="py-14 sm:py-20 lg:py-24 bg-[#FAF7F0] overflow-hidden">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        <!-- Section Heading & Narrative -->
-        <div class="max-w-3xl mx-auto text-center space-y-3">
-            <span class="eyebrow text-emerald font-bold tracking-[.25em]">{{ $hContent['welcome_eyebrow'] ?? 'WELCOME TO KRISHNA COTTAGES' }}</span>
-            <h2 class="serif text-2xl sm:text-3xl lg:text-4xl font-bold text-forest tracking-tight leading-snug">
-                {{ $hContent['welcome_heading'] ?? 'A Sanctuary of Slow Living & Hillside Serenity' }}
-            </h2>
-            <div class="w-12 h-0.5 bg-brass mx-auto my-2"></div>
-            <p class="text-xs sm:text-sm md:text-base text-forest/75 leading-relaxed font-normal max-w-2xl mx-auto">
-                {{ $hContent['welcome_description'] ?? 'Tucked into the misty slopes of Rajakkad, Idukki, and nearby Munnar, Krishna Cottages provides handcrafted private wooden residences surrounded by aromatic tea plantations, cardamoms, and cool mountain air.' }}
-            </p>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            
+            <!-- Left Column: Rich Narrative & Signature Experiences (7 Cols) -->
+            <div class="lg:col-span-7 space-y-6 sm:space-y-8">
+                
+                <!-- Eyebrow & Brand Seal -->
+                <div class="space-y-2.5">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-forest/5 border border-forest/15 text-forest text-xs font-bold uppercase tracking-[0.22em] shadow-2xs">
+                        <i data-lucide="compass" class="w-3.5 h-3.5 text-brass"></i>
+                        <span>{{ $hContent['welcome_eyebrow'] ?? 'Slow Living In Kerala · Est. 2024' }}</span>
+                    </div>
+                    <h2 class="serif text-3xl sm:text-4xl lg:text-5xl font-bold text-forest tracking-tight leading-[1.14]">
+                        {{ $hContent['welcome_heading'] ?? 'A Sanctuary of Hillside Serenity, Pure Mist & Handcrafted Wooden Cottages' }}
+                    </h2>
+                </div>
 
-            <!-- 4 Minimal Clean Highlight Badges in a Single Horizontal Row -->
-            <div class="pt-3 sm:pt-5 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 text-xs font-semibold text-forest/80">
-                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-forest/10 shadow-2xs">
-                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-brass"></i>
-                    <span>★ 4.9 Guest Rating</span>
-                </span>
-                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-forest/10 shadow-2xs">
-                    <i data-lucide="home" class="w-3.5 h-3.5 text-emerald"></i>
-                    <span>Private Wooden Verandahs</span>
-                </span>
-                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-forest/10 shadow-2xs">
-                    <i data-lucide="utensils" class="w-3.5 h-3.5 text-emerald"></i>
-                    <span>Clay-Pot Farm Dining</span>
-                </span>
-                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-forest/10 shadow-2xs">
-                    <i data-lucide="trees" class="w-3.5 h-3.5 text-emerald"></i>
-                    <span>Cardamom Estate Trails</span>
-                </span>
+                <!-- Narrative Story -->
+                <div class="space-y-3.5 text-forest/80 text-sm sm:text-base leading-relaxed font-normal">
+                    <p>
+                        {{ $hContent['welcome_description'] ?? 'Tucked into the misty emerald slopes of Rajakkad, Idukki, and neighboring Munnar, Krishna Cottages was conceived as a timeless sanctuary where hurry gives way to stillness. Surrounded by towering silver oaks, organic cardamom valleys, and rolling tea estates, our private wooden residences invite you to breathe deeply and reconnect with what matters.' }}
+                    </p>
+                    <p class="hidden sm:block text-forest/70 text-xs sm:text-sm">
+                        From the gentle clatter of earthenware clay pots simmering with authentic Kerala heirloom spices to quiet sunset hours on cedar verandas, every detail is considered for restorative, peaceful slow living.
+                    </p>
+                </div>
+
+                <!-- 4 Signature Experience Cards (2x2 Grid) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 pt-1">
+                    <!-- Card 1: Handcrafted Cottages -->
+                    <div class="p-4 rounded-2xl bg-white border border-forest/10 shadow-2xs hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-forest/5 group-hover:bg-forest group-hover:text-brass text-emerald flex items-center justify-center mb-3 transition">
+                            <i data-lucide="home" class="w-5 h-5"></i>
+                        </div>
+                        <h4 class="font-bold text-forest text-sm">Private Wooden Cottages</h4>
+                        <p class="text-xs text-forest/70 mt-1 leading-relaxed">Handcrafted teak &amp; cedar residences featuring wide open verandas overlooking misty valleys.</p>
+                    </div>
+
+                    <!-- Card 2: Clay-Pot Farm Dining -->
+                    <div class="p-4 rounded-2xl bg-white border border-forest/10 shadow-2xs hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-forest/5 group-hover:bg-forest group-hover:text-brass text-emerald flex items-center justify-center mb-3 transition">
+                            <i data-lucide="utensils" class="w-5 h-5"></i>
+                        </div>
+                        <h4 class="font-bold text-forest text-sm">Clay-Pot Estate Kitchen</h4>
+                        <p class="text-xs text-forest/70 mt-1 leading-relaxed">Authentic slow-cooked Kerala recipes made in traditional earthenware with single-origin spices.</p>
+                    </div>
+
+                    <!-- Card 3: Cardamom Trails -->
+                    <div class="p-4 rounded-2xl bg-white border border-forest/10 shadow-2xs hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-forest/5 group-hover:bg-forest group-hover:text-brass text-emerald flex items-center justify-center mb-3 transition">
+                            <i data-lucide="trees" class="w-5 h-5"></i>
+                        </div>
+                        <h4 class="font-bold text-forest text-sm">Estate Trails &amp; Waterfalls</h4>
+                        <p class="text-xs text-forest/70 mt-1 leading-relaxed">Guided morning walks through tea, cardamom, and clove groves leading to secret hillside streams.</p>
+                    </div>
+
+                    <!-- Card 4: Dedicated Butler & Concierge -->
+                    <div class="p-4 rounded-2xl bg-white border border-forest/10 shadow-2xs hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-forest/5 group-hover:bg-forest group-hover:text-brass text-emerald flex items-center justify-center mb-3 transition">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                        </div>
+                        <h4 class="font-bold text-forest text-sm">24/7 Dedicated Concierge</h4>
+                        <p class="text-xs text-forest/70 mt-1 leading-relaxed">Attentive in-cottage hosts, private jeep safaris, bonfire evenings, and custom excursions.</p>
+                    </div>
+                </div>
+
+                <!-- Host Welcome Quote Card -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-white border-l-4 border-brass border border-forest/10 shadow-2xs flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-forest text-brass flex items-center justify-center shrink-0 mt-0.5">
+                        <i data-lucide="quote" class="w-4 h-4"></i>
+                    </div>
+                    <div class="space-y-1 text-xs sm:text-sm text-forest/80 leading-relaxed">
+                        <p class="serif italic">
+                            "We created Krishna Cottages as a haven where time gently pauses, hot spiced chai is poured by the rain, and mist greets you each sunrise."
+                        </p>
+                        <span class="block text-[11px] font-bold text-forest/60 uppercase tracking-wider">— The Resident Hosts &middot; Krishna Cottages, Rajakkad &amp; Munnar</span>
+                    </div>
+                </div>
+
+                <!-- Action Links -->
+                <div class="flex flex-wrap items-center gap-3.5 pt-2">
+                    <a href="#cottages" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-forest hover:bg-emerald text-paper font-bold text-xs sm:text-sm shadow-md transition cursor-pointer">
+                        <span>Explore Accommodations</span>
+                        <i data-lucide="arrow-down" class="w-3.5 h-3.5 text-brass"></i>
+                    </a>
+                    <button type="button" onclick="openChat()" class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white hover:bg-paper text-forest font-semibold text-xs sm:text-sm border border-forest/15 shadow-2xs transition cursor-pointer">
+                        <i data-lucide="message-circle" class="w-4 h-4 text-emerald"></i>
+                        <span>Ask Concierge Desk</span>
+                    </button>
+                </div>
+
             </div>
+
+            <!-- Right Column: Editorial Multi-Layer Photography Showcase (5 Cols) -->
+            <div class="lg:col-span-5 relative mt-6 lg:mt-0">
+                <div class="relative mx-auto max-w-md lg:max-w-none">
+                    
+                    <!-- Main Cottage Veranda Photo -->
+                    <div class="relative overflow-hidden rounded-3xl shadow-2xl border-4 border-white bg-forest/10 aspect-[4/5] sm:h-[490px]">
+                        <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=85" 
+                             alt="Krishna Cottages Hillside Wooden Veranda" 
+                             class="w-full h-full object-cover object-center hover:scale-105 transition duration-700" 
+                             loading="lazy" 
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=85';" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 right-4 text-white">
+                            <p class="text-[11px] uppercase tracking-wider text-brass font-bold">Hillside Sanctuaries</p>
+                            <h3 class="serif text-lg font-bold text-white leading-snug">Private Verandas &amp; Cool Mist</h3>
+                        </div>
+                    </div>
+
+                    <!-- Floating Overlapping Culinary / Farm Inset Photo (Bottom Left) -->
+                    <div class="absolute -bottom-6 -left-4 sm:-left-8 w-44 sm:w-52 h-36 sm:h-44 rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-forest/10 group">
+                        <img src="https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=85" 
+                             alt="Authentic Kerala Clay Pot Dining at Krishna Cottages" 
+                             class="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
+                             loading="lazy" 
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=600&q=85';" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-2.5 left-2.5 right-2.5 text-white">
+                            <span class="text-[10px] font-bold block leading-tight text-white">Farm Clay-Pot Kitchen</span>
+                            <span class="text-[9px] text-brass block">Authentic Heirloom Spices</span>
+                        </div>
+                    </div>
+
+                    <!-- Floating Gold Rating Seal Badge (Top Right) -->
+                    <div class="absolute -top-5 -right-2 sm:-right-6 bg-forest text-paper p-3.5 sm:p-4 rounded-2xl shadow-xl border border-brass/30 flex items-center gap-3 backdrop-blur-md">
+                        <div class="text-brass">
+                            <div class="flex items-center gap-0.5 text-brass">
+                                <i data-lucide="star" class="w-3.5 h-3.5 fill-brass text-brass"></i>
+                                <i data-lucide="star" class="w-3.5 h-3.5 fill-brass text-brass"></i>
+                                <i data-lucide="star" class="w-3.5 h-3.5 fill-brass text-brass"></i>
+                                <i data-lucide="star" class="w-3.5 h-3.5 fill-brass text-brass"></i>
+                                <i data-lucide="star" class="w-3.5 h-3.5 fill-brass text-brass"></i>
+                            </div>
+                            <span class="text-base sm:text-lg font-black text-white">4.95 / 5</span>
+                        </div>
+                        <div class="border-l border-white/20 pl-3">
+                            <span class="block text-[11px] font-bold text-white uppercase tracking-wider">Verified Stays</span>
+                            <span class="block text-[9px] text-paper/70">500+ Guests &middot; Rajakkad &amp; Munnar</span>
+                        </div>
+                    </div>
+
+                    <!-- Floating Micro-Stats Strip (Bottom Right) -->
+                    <div class="hidden sm:flex absolute bottom-3 right-3 bg-white/95 backdrop-blur-md text-forest px-3.5 py-2 rounded-xl shadow-lg border border-forest/10 items-center gap-2 text-[11px] font-bold">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald"></i>
+                        <span>100% Organic Plantation &middot; 24/7 Butler</span>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
 
     </div>
