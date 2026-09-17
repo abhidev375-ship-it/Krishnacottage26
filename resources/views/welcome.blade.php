@@ -77,26 +77,105 @@
 @section('title', 'Krishna Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar, Kerala')
 @section('meta_description', 'Discover Krishna Cottages in Rajakkad, Idukki. Book handcrafted wooden cottages, authentic plantation dining, and nature homestays near Munnar with cardamom plantation views.')
 
+@push('styles')
+<style>
+    /* HERO CAROUSEL BULLETPROOF ENGINE STYLES */
+    #hero-slider {
+        position: relative;
+        width: 100%;
+        height: 480px;
+        min-height: 440px;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        background-color: #083F34;
+        box-shadow: 0 25px 50px -12px rgba(6, 63, 52, 0.28);
+        user-select: none;
+        display: block;
+    }
+    @media (min-width: 640px) {
+        #hero-slider {
+            height: 520px;
+            min-height: 500px;
+            border-radius: 1.75rem;
+        }
+    }
+    @media (min-width: 1024px) {
+        #hero-slider {
+            height: 580px;
+            min-height: 560px;
+            border-radius: 2.25rem;
+        }
+    }
+    #hero-slides-track {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    .hero-slide-item {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity 0.75s ease-in-out, transform 0.75s ease-in-out;
+        will-change: opacity, transform;
+    }
+    .hero-slide-item.active {
+        opacity: 1 !important;
+        transform: scale(1) !important;
+        pointer-events: auto !important;
+        z-index: 10 !important;
+    }
+    .hero-slide-item.inactive {
+        opacity: 0 !important;
+        transform: scale(1.04) !important;
+        pointer-events: none !important;
+        z-index: 0 !important;
+    }
+    .hero-dot-btn {
+        height: 8px;
+        border-radius: 9999px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        padding: 0;
+        border: none;
+    }
+    .hero-dot-btn.active {
+        width: 26px;
+        background-color: #C9A86A;
+    }
+    .hero-dot-btn.inactive {
+        width: 8px;
+        background-color: rgba(255, 255, 255, 0.45);
+    }
+    .hero-dot-btn.inactive:hover {
+        background-color: rgba(255, 255, 255, 0.85);
+    }
+</style>
+@endpush
+
 @section('content')
 
 <!-- =========================================================================
      1. HERO SECTION: CLASSIC HOTEL CARD CAROUSEL & DYNAMIC DESTINATIONS
      ========================================================================= -->
 <section class="relative w-full pt-2 sm:pt-4 pb-6 lg:pb-10 overflow-hidden">
-    <div class="mx-auto max-w-[1480px] px-3 xs:px-4 md:px-6 lg:px-8">
+    <div class="mx-auto max-w-[1480px] px-3 md:px-6 lg:px-8">
         
         <!-- Large-Format Framed Card Carousel Canvas -->
-        <div id="hero-slider" class="relative w-full min-h-[440px] xs:min-h-[480px] sm:min-h-[520px] lg:h-[580px] rounded-2xl sm:rounded-3xl lg:rounded-[36px] overflow-hidden shadow-2xl bg-forest group select-none flex flex-col justify-between">
+        <div id="hero-slider" class="relative w-full rounded-2xl sm:rounded-3xl lg:rounded-[36px] overflow-hidden shadow-2xl bg-forest group select-none">
             
             <!-- Slides Track -->
-            <div id="hero-slides-track" class="relative w-full h-full flex-1">
+            <div id="hero-slides-track">
                 @foreach($heroSlidesList as $sIdx => $slide)
-                    <div class="hero-slide-item absolute inset-0 transition-all duration-700 ease-in-out {{ $sIdx === 0 ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 pointer-events-none z-0' }}" data-index="{{ $sIdx }}">
+                    <div class="hero-slide-item {{ $sIdx === 0 ? 'active' : 'inactive' }}" data-index="{{ $sIdx }}">
                         <!-- Background High-Res Image -->
                         <img src="{{ $slide['image'] }}" 
                              alt="{{ $slide['title'] }} — Krishna Cottages Kerala" 
                              class="w-full h-full object-cover brightness-[0.78] transition-transform duration-1000 ease-out" 
-                             {{ $sIdx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"' }} />
+                             {!! $sIdx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"' !!}
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=85';" />
                         
                         <!-- Rich Dark Ambient Gradients for Typography Contrast -->
                         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/30"></div>
@@ -105,11 +184,11 @@
                         <!-- Top Floating Destination Tag -->
                         <div class="absolute top-4 left-4 sm:top-6 sm:left-7 z-20 flex items-center gap-2">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold tracking-wider uppercase border border-white/20 shadow-xs">
-                                <i data-lucide="map-pin" class="w-3 h-3 text-brass"></i>
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brass"></i>
                                 <span>{{ $slide['tag'] ?? ($slide['subtitle'] ?? 'Krishna Cottages') }}</span>
                             </span>
                             @if(!empty($slide['badge']))
-                                <span class="hidden xs:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brass/25 backdrop-blur-md text-brass text-[10px] font-bold border border-brass/30">
+                                <span class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brass/25 backdrop-blur-md text-brass text-[10px] font-bold border border-brass/30">
                                     {{ $slide['badge'] }}
                                 </span>
                             @endif
@@ -123,12 +202,12 @@
                         <!-- Centered Main Typography & Hero CTAs (Dynamic per slide) -->
                         <div class="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 sm:px-8 max-w-4xl mx-auto text-white">
                             <!-- Eyebrow -->
-                            <p class="eyebrow text-brass text-[10px] sm:text-xs tracking-[.25em] mb-2 drop-shadow-xs font-bold uppercase">
+                            <p class="eyebrow text-brass text-[10.5px] sm:text-xs tracking-[.25em] mb-2 drop-shadow-xs font-bold uppercase">
                                 {{ $slide['subtitle'] ?? ($slide['tag'] ?? 'PEACEFUL NATURE SANCTUARY') }}
                             </p>
 
                             <!-- Master Headline (Dynamic per slide) -->
-                            <h1 class="serif text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md max-w-3xl">
+                            <h1 class="serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md max-w-3xl">
                                 {{ $slide['title'] }}
                             </h1>
 
@@ -157,23 +236,23 @@
             <!-- Left & Right Arrow Navigation Controls -->
             <button type="button" 
                     onclick="prevHeroSlide()" 
-                    class="absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 z-30 grid h-9 w-9 sm:h-12 sm:w-12 place-items-center rounded-full bg-black/30 hover:bg-white text-white hover:text-forest backdrop-blur-md border border-white/30 transition-all duration-300 shadow-md cursor-pointer hover:scale-105" 
+                    class="absolute left-2.5 sm:left-5 top-1/2 -translate-y-1/2 z-30 grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-full bg-black/40 hover:bg-white text-white hover:text-forest backdrop-blur-md border border-white/30 transition-all duration-300 shadow-md cursor-pointer hover:scale-105" 
                     aria-label="Previous Slide">
-                <i data-lucide="chevron-left" class="w-4 h-4 sm:w-6 sm:h-6"></i>
+                <i data-lucide="chevron-left" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </button>
             <button type="button" 
                     onclick="nextHeroSlide()" 
-                    class="absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 z-30 grid h-9 w-9 sm:h-12 sm:w-12 place-items-center rounded-full bg-black/30 hover:bg-white text-white hover:text-forest backdrop-blur-md border border-white/30 transition-all duration-300 shadow-md cursor-pointer hover:scale-105" 
+                    class="absolute right-2.5 sm:right-5 top-1/2 -translate-y-1/2 z-30 grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-full bg-black/40 hover:bg-white text-white hover:text-forest backdrop-blur-md border border-white/30 transition-all duration-300 shadow-md cursor-pointer hover:scale-105" 
                     aria-label="Next Slide">
-                <i data-lucide="chevron-right" class="w-4 h-4 sm:w-6 sm:h-6"></i>
+                <i data-lucide="chevron-right" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </button>
 
             <!-- Bottom Indicator Dots -->
-            <div class="absolute bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15">
+            <div class="absolute bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15">
                 @foreach($heroSlidesList as $dIdx => $slide)
                     <button type="button" 
                             onclick="goToHeroSlide({{ $dIdx }})" 
-                            class="hero-dot h-2 rounded-full transition-all duration-300 cursor-pointer {{ $dIdx === 0 ? 'w-6 bg-brass' : 'w-2 bg-white/40 hover:bg-white/80' }}" 
+                            class="hero-dot-btn {{ $dIdx === 0 ? 'active' : 'inactive' }}" 
                             aria-label="Slide {{ $dIdx + 1 }}"></button>
                 @endforeach
             </div>
@@ -824,191 +903,240 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        if (window.lucide) lucide.createIcons();
+(function() {
+    /* =====================================================================
+       HERO IMAGE CAROUSEL ENGINE (Rock-Solid Self-Contained)
+       ===================================================================== */
+    let currentHero = 0;
+    let heroTimer = null;
+    let isHeroInitialized = false;
 
-        /* =====================================================================
-           HERO IMAGE CAROUSEL ENGINE
-           ===================================================================== */
-        let currentHero = 0;
-        const heroSlides = document.querySelectorAll('.hero-slide-item');
-        const heroDots = document.querySelectorAll('.hero-dot');
-        const totalHero = heroSlides.length;
-        let heroTimer = null;
+    function getHeroSlides() {
+        return document.querySelectorAll('#hero-slider .hero-slide-item');
+    }
 
-        function showHero(index) {
-            if (totalHero === 0) return;
-            currentHero = (index + totalHero) % totalHero;
+    function getHeroDots() {
+        return document.querySelectorAll('#hero-slider .hero-dot-btn');
+    }
 
-            heroSlides.forEach((slide, idx) => {
-                if (idx === currentHero) {
-                    slide.classList.remove('opacity-0', 'scale-105', 'pointer-events-none', 'z-0');
-                    slide.classList.add('opacity-100', 'scale-100', 'z-10');
-                } else {
-                    slide.classList.remove('opacity-100', 'scale-100', 'z-10');
-                    slide.classList.add('opacity-0', 'scale-105', 'pointer-events-none', 'z-0');
-                }
-            });
+    function showHero(index) {
+        const slides = getHeroSlides();
+        const dots = getHeroDots();
+        const total = slides.length;
+        if (total === 0) return;
 
-            heroDots.forEach((dot, idx) => {
-                if (idx === currentHero) {
-                    dot.className = 'hero-dot h-2 rounded-full transition-all duration-300 cursor-pointer w-6 bg-brass';
-                } else {
-                    dot.className = 'hero-dot h-2 rounded-full transition-all duration-300 cursor-pointer w-2 bg-white/40 hover:bg-white/80';
-                }
-            });
-        }
+        currentHero = (index + total) % total;
 
-        window.nextHeroSlide = function() {
-            showHero(currentHero + 1);
-        };
-
-        window.prevHeroSlide = function() {
-            showHero(currentHero - 1);
-        };
-
-        window.goToHeroSlide = function(idx) {
-            showHero(idx);
-            resetHeroTimer();
-        };
-
-        function startHeroTimer() {
-            if (totalHero > 1 && !heroTimer) {
-                heroTimer = setInterval(window.nextHeroSlide, 5500);
+        slides.forEach((slide, idx) => {
+            if (idx === currentHero) {
+                slide.classList.remove('inactive');
+                slide.classList.add('active');
+            } else {
+                slide.classList.remove('active');
+                slide.classList.add('inactive');
             }
-        }
+        });
 
-        function stopHeroTimer() {
-            if (heroTimer) {
-                clearInterval(heroTimer);
-                heroTimer = null;
+        dots.forEach((dot, idx) => {
+            if (idx === currentHero) {
+                dot.classList.remove('inactive');
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+                dot.classList.add('inactive');
             }
-        }
+        });
+    }
 
-        function resetHeroTimer() {
-            stopHeroTimer();
-            startHeroTimer();
-        }
+    window.nextHeroSlide = function() {
+        showHero(currentHero + 1);
+        resetHeroTimer();
+    };
 
+    window.prevHeroSlide = function() {
+        showHero(currentHero - 1);
+        resetHeroTimer();
+    };
+
+    window.goToHeroSlide = function(idx) {
+        showHero(idx);
+        resetHeroTimer();
+    };
+
+    function startHeroTimer() {
+        const slides = getHeroSlides();
+        if (slides.length > 1 && !heroTimer) {
+            heroTimer = setInterval(() => {
+                showHero(currentHero + 1);
+            }, 5500);
+        }
+    }
+
+    function stopHeroTimer() {
+        if (heroTimer) {
+            clearInterval(heroTimer);
+            heroTimer = null;
+        }
+    }
+
+    function resetHeroTimer() {
+        stopHeroTimer();
+        startHeroTimer();
+    }
+
+    function initHeroCarousel() {
+        if (isHeroInitialized) return;
         const sliderEl = document.getElementById('hero-slider');
-        if (sliderEl) {
-            sliderEl.addEventListener('mouseenter', stopHeroTimer);
-            sliderEl.addEventListener('mouseleave', startHeroTimer);
+        if (!sliderEl) return;
+        isHeroInitialized = true;
 
-            // Mobile Touch Swipe
-            let touchStartX = 0;
-            sliderEl.addEventListener('touchstart', (e) => {
-                if (e.changedTouches && e.changedTouches[0]) {
-                    touchStartX = e.changedTouches[0].screenX;
-                }
-                stopHeroTimer();
-            }, { passive: true });
-
-            sliderEl.addEventListener('touchend', (e) => {
-                if (e.changedTouches && e.changedTouches[0]) {
-                    const diff = touchStartX - e.changedTouches[0].screenX;
-                    if (diff > 45) window.nextHeroSlide();
-                    else if (diff < -45) window.prevHeroSlide();
-                }
-                startHeroTimer();
-            }, { passive: true });
-        }
-
+        showHero(0);
         startHeroTimer();
 
-        /* =====================================================================
-           COTTAGES CAROUSEL HORIZONTAL TRACK
-           ===================================================================== */
+        sliderEl.addEventListener('mouseenter', stopHeroTimer);
+        sliderEl.addEventListener('mouseleave', startHeroTimer);
+
+        // Mobile Touch Swipe
+        let touchStartX = 0;
+        sliderEl.addEventListener('touchstart', (e) => {
+            if (e.changedTouches && e.changedTouches[0]) {
+                touchStartX = e.changedTouches[0].screenX;
+            }
+            stopHeroTimer();
+        }, { passive: true });
+
+        sliderEl.addEventListener('touchend', (e) => {
+            if (e.changedTouches && e.changedTouches[0]) {
+                const diff = touchStartX - e.changedTouches[0].screenX;
+                if (diff > 40) window.nextHeroSlide();
+                else if (diff < -40) window.prevHeroSlide();
+            }
+            startHeroTimer();
+        }, { passive: true });
+    }
+
+    /* =====================================================================
+       COTTAGES CAROUSEL HORIZONTAL TRACK
+       ===================================================================== */
+    window.scrollCottagesTrack = function(direction) {
         const cottagesTrack = document.getElementById('cottages-track');
-        window.scrollCottagesTrack = function(direction) {
-            if (!cottagesTrack) return;
-            const cardWidth = 360;
-            const scrollAmount = direction === 'left' ? -cardWidth : cardWidth;
-            cottagesTrack.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        };
+        if (!cottagesTrack) return;
+        const cardWidth = 360;
+        const scrollAmount = direction === 'left' ? -cardWidth : cardWidth;
+        cottagesTrack.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    };
 
-        /* =====================================================================
-           TESTIMONIALS QUOTES SLIDER
-           ===================================================================== */
-        let currentTestimonial = 0;
+    /* =====================================================================
+       TESTIMONIALS QUOTES SLIDER
+       ===================================================================== */
+    let currentTestimonial = 0;
+    let testTimer = null;
+
+    function getTestDots() {
+        return document.querySelectorAll('.testimonial-dot');
+    }
+
+    function showTestimonial(idx) {
         const testTrack = document.getElementById('testimonial-track');
-        const testDots = document.querySelectorAll('.testimonial-dot');
+        const testDots = getTestDots();
         const totalTestimonials = {{ count($reviewsList) }};
-        let testTimer = null;
+        if (totalTestimonials === 0 || !testTrack) return;
 
-        function showTestimonial(idx) {
-            if (totalTestimonials === 0 || !testTrack) return;
-            currentTestimonial = (idx + totalTestimonials) % totalTestimonials;
-            testTrack.style.transform = `translateX(-${currentTestimonial * 100}%)`;
+        currentTestimonial = (idx + totalTestimonials) % totalTestimonials;
+        testTrack.style.transform = `translateX(-${currentTestimonial * 100}%)`;
 
-            testDots.forEach((d, i) => {
-                d.className = i === currentTestimonial 
-                    ? 'testimonial-dot h-1.5 rounded-full transition-all duration-300 w-5 bg-forest' 
-                    : 'testimonial-dot h-1.5 rounded-full transition-all duration-300 w-1.5 bg-forest/20';
-            });
+        testDots.forEach((d, i) => {
+            d.className = i === currentTestimonial 
+                ? 'testimonial-dot h-1.5 rounded-full transition-all duration-300 w-5 bg-forest' 
+                : 'testimonial-dot h-1.5 rounded-full transition-all duration-300 w-1.5 bg-forest/20';
+        });
+    }
+
+    window.nextTestimonial = function() {
+        showTestimonial(currentTestimonial + 1);
+        resetTestTimer();
+    };
+
+    window.prevTestimonial = function() {
+        showTestimonial(currentTestimonial - 1);
+        resetTestTimer();
+    };
+
+    window.goToTestimonial = function(idx) {
+        showTestimonial(idx);
+        resetTestTimer();
+    };
+
+    function startTestTimer() {
+        const totalTestimonials = {{ count($reviewsList) }};
+        if (totalTestimonials > 1 && !testTimer) {
+            testTimer = setInterval(() => {
+                showTestimonial(currentTestimonial + 1);
+            }, 6000);
         }
+    }
 
-        window.nextTestimonial = function() {
-            showTestimonial(currentTestimonial + 1);
-        };
+    function stopTestTimer() {
+        if (testTimer) {
+            clearInterval(testTimer);
+            testTimer = null;
+        }
+    }
 
-        window.prevTestimonial = function() {
-            showTestimonial(currentTestimonial - 1);
-        };
+    function resetTestTimer() {
+        stopTestTimer();
+        startTestTimer();
+    }
 
-        window.goToTestimonial = function(idx) {
-            showTestimonial(idx);
-            resetTestTimer();
-        };
+    /* =====================================================================
+       BOOKING DATE SYNCHRONIZATION
+       ===================================================================== */
+    window.updateCheckOutMin = function() {
+        const checkInInput = document.getElementById('home-check-in');
+        const checkOutInput = document.getElementById('home-check-out');
+        if (!checkInInput || !checkOutInput) return;
 
-        function startTestTimer() {
-            if (totalTestimonials > 1 && !testTimer) {
-                testTimer = setInterval(window.nextTestimonial, 6000);
+        const checkInDate = new Date(checkInInput.value);
+        if (!isNaN(checkInDate.getTime())) {
+            const nextDay = new Date(checkInDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const minStr = nextDay.toISOString().split('T')[0];
+            checkOutInput.min = minStr;
+
+            if (new Date(checkOutInput.value) <= checkInDate) {
+                const defaultEnd = new Date(checkInDate);
+                defaultEnd.setDate(defaultEnd.getDate() + 2);
+                checkOutInput.value = defaultEnd.toISOString().split('T')[0];
             }
         }
+    };
 
-        function stopTestTimer() {
-            if (testTimer) {
-                clearInterval(testTimer);
-                testTimer = null;
-            }
-        }
-
-        function resetTestTimer() {
-            stopTestTimer();
-            startTestTimer();
-        }
+    function initPageFeatures() {
+        initHeroCarousel();
 
         const testContainer = document.getElementById('testimonials-carousel');
         if (testContainer) {
             testContainer.addEventListener('mouseenter', stopTestTimer);
             testContainer.addEventListener('mouseleave', startTestTimer);
+            startTestTimer();
         }
 
-        startTestTimer();
-
-        /* =====================================================================
-           BOOKING DATE SYNCHRONIZATION
-           ===================================================================== */
-        window.updateCheckOutMin = function() {
-            const checkInInput = document.getElementById('home-check-in');
-            const checkOutInput = document.getElementById('home-check-out');
-            if (!checkInInput || !checkOutInput) return;
-
-            const checkInDate = new Date(checkInInput.value);
-            if (!isNaN(checkInDate.getTime())) {
-                const nextDay = new Date(checkInDate);
-                nextDay.setDate(nextDay.getDate() + 1);
-                const minStr = nextDay.toISOString().split('T')[0];
-                checkOutInput.min = minStr;
-
-                if (new Date(checkOutInput.value) <= checkInDate) {
-                    const defaultEnd = new Date(checkInDate);
-                    defaultEnd.setDate(defaultEnd.getDate() + 2);
-                    checkOutInput.value = defaultEnd.toISOString().split('T')[0];
-                }
+        // Periodic Lucide icon check in case Lucide loaded after scripts
+        let iconTries = 0;
+        const iconInterval = setInterval(() => {
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons();
+                iconTries++;
+                if (iconTries > 3) clearInterval(iconInterval);
             }
-        };
-    });
+        }, 300);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPageFeatures);
+    } else {
+        initPageFeatures();
+    }
+})();
 </script>
 @endpush

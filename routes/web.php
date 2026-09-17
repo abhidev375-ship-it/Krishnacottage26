@@ -35,6 +35,10 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage (Cached for sub-3-second high performance)
 Route::get('/', function () {
+    if (request()->has('fresh') || request()->has('clear_cache')) {
+        \Illuminate\Support\Facades\Cache::forget('homepage_payload');
+    }
+
     $data = \Illuminate\Support\Facades\Cache::remember('homepage_payload', now()->addMinutes(15), function () {
         $adminController = app(AdminController::class);
         $branches = Branch::where('status', 'active')->orderBy('sort_order')->get();
