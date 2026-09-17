@@ -60,31 +60,31 @@
 
 @push('styles')
 <style>
-    /* HERO CAROUSEL BULLETPROOF ENGINE STYLES */
+    /* HERO CAROUSEL FULL-SCREEN / FULL-BLEED STYLES */
     #hero-slider {
         position: relative;
         width: 100%;
-        height: 520px;
-        min-height: 480px;
-        border-radius: 1.25rem;
+        height: 72vh;
+        min-height: 520px;
+        border-radius: 0 !important;
         overflow: hidden;
         background-color: #083F34;
-        box-shadow: 0 25px 50px -12px rgba(6, 63, 52, 0.28);
         user-select: none;
         display: block;
     }
     @media (min-width: 640px) {
         #hero-slider {
-            height: 580px;
-            min-height: 540px;
-            border-radius: 1.75rem;
+            height: 78vh;
+            min-height: 580px;
+            border-radius: 0 !important;
         }
     }
     @media (min-width: 1024px) {
         #hero-slider {
-            height: 640px;
-            min-height: 600px;
-            border-radius: 2rem;
+            height: calc(100vh - 76px);
+            min-height: 640px;
+            max-height: 920px;
+            border-radius: 0 !important;
         }
     }
     #hero-slides-track {
@@ -139,192 +139,190 @@
 @section('content')
 
 <!-- =========================================================================
-     1. HERO SECTION: CLASSIC HOTEL CARD CAROUSEL & DYNAMIC DESTINATIONS
+     1. HERO SECTION: FULL-SCREEN IMMERSIVE CAROUSEL & LUXURY BOOKING STRIP
      ========================================================================= -->
-<section class="relative w-full pt-2 sm:pt-4 pb-6 lg:pb-10 overflow-hidden">
-    <div class="mx-auto max-w-[1480px] px-3 md:px-6 lg:px-8">
+<section class="relative w-full overflow-hidden bg-[#FAF7F0]">
+    
+    <!-- Full-Bleed Edge-to-Edge Carousel Canvas (No Card/Box Framing) -->
+    <div id="hero-slider" class="relative w-full overflow-hidden group select-none">
         
-        <!-- Large-Format Framed Card Carousel Canvas -->
-        <div id="hero-slider" class="relative w-full rounded-2xl sm:rounded-3xl lg:rounded-[32px] overflow-hidden shadow-2xl bg-forest group select-none">
-            
-            <!-- Slides Track -->
-            <div id="hero-slides-track">
-                @foreach($heroSlidesList as $sIdx => $slide)
-                    <div class="hero-slide-item {{ $sIdx === 0 ? 'active' : 'inactive' }}" data-index="{{ $sIdx }}">
-                        <!-- Background High-Res Image -->
-                        <img src="{{ $slide['image'] }}" 
-                             alt="{{ $slide['title'] }} — Krishna Cottages Kerala" 
-                             class="w-full h-full object-cover object-center brightness-[0.80] transition-transform duration-1000 ease-out" 
-                             {!! $sIdx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"' !!}
-                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1920&q=85';" />
-                        
-                        <!-- Rich Dark Ambient Gradients for Typography Contrast -->
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/30"></div>
-                        <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-black/50"></div>
-
-                        <!-- Top Floating Destination Tag -->
-                        <div class="absolute top-4 left-4 sm:top-6 sm:left-7 z-20 flex items-center gap-2">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold tracking-wider uppercase border border-white/20 shadow-xs">
-                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brass"></i>
-                                <span>{{ $slide['tag'] ?? ($slide['subtitle'] ?? 'Krishna Cottages') }}</span>
-                            </span>
-                            @if(!empty($slide['badge']))
-                                <span class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brass/25 backdrop-blur-md text-brass text-[10px] font-bold border border-brass/30">
-                                    {{ $slide['badge'] }}
-                                </span>
-                            @endif
-                        </div>
-
-                        <!-- Slide Counter Indicator -->
-                        <div class="absolute top-4 right-4 sm:top-6 sm:right-7 z-20 text-white/80 bg-black/50 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-mono border border-white/15">
-                            <span class="text-white font-bold">0{{ $sIdx + 1 }}</span> / 0{{ count($heroSlidesList) }}
-                        </div>
-
-                        <!-- Centered Main Typography & Hero CTAs (Dynamic per slide) -->
-                        <div class="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 sm:px-8 max-w-4xl mx-auto text-white">
-                            <!-- Eyebrow -->
-                            <p class="eyebrow text-brass text-[10.5px] sm:text-xs tracking-[.25em] mb-2 drop-shadow-xs font-bold uppercase">
-                                {{ $slide['subtitle'] ?? ($slide['tag'] ?? 'PEACEFUL NATURE SANCTUARY') }}
-                            </p>
-
-                            <!-- Master Headline (Dynamic per slide) -->
-                            <h1 class="serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md max-w-3xl">
-                                {{ $slide['title'] }}
-                            </h1>
-
-                            <!-- Description (Dynamic per slide) -->
-                            <p class="mt-2.5 sm:mt-4 text-xs sm:text-sm lg:text-base text-white/90 max-w-2xl leading-relaxed drop-shadow-xs font-normal line-clamp-2 sm:line-clamp-3">
-                                {{ $slide['description'] }}
-                            </p>
-
-                            <!-- Hero Buttons (Dynamic per slide) -->
-                            <div class="mt-5 sm:mt-7 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5">
-                                <a href="{{ $slide['link'] ?? route('rooms.index') }}" class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-forest hover:bg-emerald text-paper font-bold text-xs sm:text-sm shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 border border-emerald-400/30 cursor-pointer">
-                                    <span>Explore Cottages</span>
-                                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-brass"></i>
-                                </a>
-                                <button type="button" onclick="openChat()" class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-semibold text-xs sm:text-sm border border-white/30 transition duration-300 cursor-pointer">
-                                    <i data-lucide="message-circle" class="w-4 h-4 text-brass"></i>
-                                    <span>Chat with Concierge</span>
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Left & Right Arrow Navigation Controls -->
-            <button type="button" 
-                    onclick="prevHeroSlide()" 
-                    class="absolute left-2.5 sm:left-5 top-1/2 -translate-y-1/2 z-30 grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-full bg-black/40 hover:bg-white text-white hover:text-forest backdrop-blur-md border border-white/30 transition-all duration-300 shadow-md cursor-pointer hover:scale-105" 
-                    aria-label="Previous Slide">
-                <i data-lucide="chevron-left" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-            </button>
-            <button type="button" 
-                    onclick="nextHeroSlide()" 
-                    class="absolute right-2.5 sm:right-5 top-1/2 -translate-y-1/2 z-30 grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-full bg-black/40 hover:bg-white text-white hover:text-forest backdrop-blur-md border border-white/30 transition-all duration-300 shadow-md cursor-pointer hover:scale-105" 
-                    aria-label="Next Slide">
-                <i data-lucide="chevron-right" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-            </button>
-
-            <!-- Bottom Indicator Dots -->
-            <div class="absolute bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15">
-                @foreach($heroSlidesList as $dIdx => $slide)
-                    <button type="button" 
-                            onclick="goToHeroSlide({{ $dIdx }})" 
-                            class="hero-dot-btn {{ $dIdx === 0 ? 'active' : 'inactive' }}" 
-                            aria-label="Slide {{ $dIdx + 1 }}"></button>
-                @endforeach
-            </div>
-
-        </div>
-
-        <!-- =====================================================================
-             CLASSIC HOTEL BOOKING ENGINE SEARCH BAR (Drives directly to /stay)
-             ===================================================================== -->
-        <div class="relative mt-4 sm:-mt-8 lg:-mt-10 z-40 max-w-5xl mx-auto">
-            <form action="{{ route('rooms.index') }}" method="GET" class="w-full bg-white text-forest rounded-2xl lg:rounded-full p-3 lg:p-4 shadow-[0_16px_40px_rgba(6,63,52,0.12)] border border-forest/15">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-3 items-center">
+        <!-- Slides Track -->
+        <div id="hero-slides-track">
+            @foreach($heroSlidesList as $sIdx => $slide)
+                <div class="hero-slide-item {{ $sIdx === 0 ? 'active' : 'inactive' }}" data-index="{{ $sIdx }}">
+                    <!-- Background High-Res Image -->
+                    <img src="{{ $slide['image'] }}" 
+                         alt="{{ $slide['title'] }} — Krishna Cottages Kerala" 
+                         class="w-full h-full object-cover object-center brightness-[0.78] transition-transform duration-1000 ease-out" 
+                         {!! $sIdx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"' !!}
+                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1920&q=85';" />
                     
-                    <!-- Field 1: Destination / Branch (lg:col-span-4) -->
-                    <div class="lg:col-span-4 px-3.5 py-2 bg-paper/60 rounded-xl lg:rounded-l-full border border-forest/10 hover:border-forest/30 transition">
-                        <label class="block text-[9px] uppercase tracking-wider font-bold text-forest/50 flex items-center gap-1.5 mb-0.5">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald shrink-0"></i>
-                            <span>Destination</span>
-                        </label>
-                        <select name="branch_id" class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer truncate">
-                            <option value="">All Branches (Cottages Central)</option>
-                            @foreach($branchesList as $b)
-                                <option value="{{ $b->id }}">{{ $b->name }} ({{ $b->city }})</option>
-                            @endforeach
-                        </select>
+                    <!-- Ambient Gradients -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60"></div>
+
+                    <!-- Top Destination Tag -->
+                    <div class="absolute top-5 left-5 sm:top-8 sm:left-10 z-20 flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-md text-white text-[11px] sm:text-xs font-semibold tracking-wider uppercase border border-white/20 shadow-xs">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brass"></i>
+                            <span>{{ $slide['tag'] ?? ($slide['subtitle'] ?? 'Krishna Cottages') }}</span>
+                        </span>
+                        @if(!empty($slide['badge']))
+                            <span class="hidden sm:inline-flex items-center gap-1 px-3 py-1 rounded-full bg-brass/25 backdrop-blur-md text-brass text-[11px] font-bold border border-brass/30">
+                                {{ $slide['badge'] }}
+                            </span>
+                        @endif
                     </div>
 
-                    <!-- Field 2: Check-In & Check-Out (lg:col-span-4, 2 equal columns side-by-side) -->
-                    <div class="lg:col-span-4 grid grid-cols-2 gap-2">
-                        <!-- Check-In -->
-                        <div class="px-3 py-2 bg-paper/60 rounded-xl border border-forest/10 hover:border-forest/30 transition">
-                            <label class="block text-[9px] uppercase tracking-wider font-bold text-forest/50 flex items-center gap-1 mb-0.5">
-                                <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald shrink-0"></i>
-                                <span>Check-In</span>
-                            </label>
-                            <input type="date" 
-                                   name="check_in" 
-                                   id="home-check-in"
-                                   value="{{ date('Y-m-d', strtotime('+1 day')) }}" 
-                                   min="{{ date('Y-m-d') }}"
-                                   onchange="updateCheckOutMin()"
-                                   class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer" />
-                        </div>
-
-                        <!-- Check-Out -->
-                        <div class="px-3 py-2 bg-paper/60 rounded-xl border border-forest/10 hover:border-forest/30 transition">
-                            <label class="block text-[9px] uppercase tracking-wider font-bold text-forest/50 flex items-center gap-1 mb-0.5">
-                                <i data-lucide="calendar-check-2" class="w-3.5 h-3.5 text-emerald shrink-0"></i>
-                                <span>Check-Out</span>
-                            </label>
-                            <input type="date" 
-                                   name="check_out" 
-                                   id="home-check-out"
-                                   value="{{ date('Y-m-d', strtotime('+3 days')) }}" 
-                                   min="{{ date('Y-m-d', strtotime('+2 days')) }}"
-                                   class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer" />
-                        </div>
+                    <!-- Slide Counter Indicator -->
+                    <div class="absolute top-5 right-5 sm:top-8 sm:right-10 z-20 text-white/90 bg-black/50 backdrop-blur-md px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-mono border border-white/15">
+                        <span class="text-brass font-bold">0{{ $sIdx + 1 }}</span> / 0{{ count($heroSlidesList) }}
                     </div>
 
-                    <!-- Field 3: Guests & Submit Action (lg:col-span-4, 2 equal columns side-by-side on mobile) -->
-                    <div class="lg:col-span-4 grid grid-cols-2 gap-2">
-                        <!-- Guests -->
-                        <div class="px-3 py-2 bg-paper/60 rounded-xl border border-forest/10 hover:border-forest/30 transition">
-                            <label class="block text-[9px] uppercase tracking-wider font-bold text-forest/50 flex items-center gap-1 mb-0.5">
-                                <i data-lucide="users" class="w-3.5 h-3.5 text-emerald shrink-0"></i>
-                                <span>Guests</span>
-                            </label>
-                            <select name="adults" class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer">
-                                <option value="1">1 Guest</option>
-                                <option value="2" selected>2 Guests</option>
-                                <option value="3">3 Guests</option>
-                                <option value="4">4 Guests</option>
-                                <option value="5">5+ Guests</option>
-                            </select>
-                            <input type="hidden" name="children" value="0">
-                        </div>
+                    <!-- Centered Main Typography & Hero CTAs -->
+                    <div class="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 sm:px-8 max-w-5xl mx-auto text-white">
+                        <!-- Eyebrow -->
+                        <p class="eyebrow text-brass text-xs sm:text-sm tracking-[.28em] mb-2.5 sm:mb-3.5 drop-shadow-xs font-bold uppercase">
+                            {{ $slide['subtitle'] ?? ($slide['tag'] ?? 'PEACEFUL NATURE SANCTUARY') }}
+                        </p>
 
-                        <!-- Search Button -->
-                        <div class="flex items-center">
-                            <button type="submit" class="w-full h-full min-h-[44px] py-2.5 px-3 rounded-xl lg:rounded-r-full bg-brass hover:brightness-105 text-forest font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg transition cursor-pointer">
-                                <i data-lucide="search" class="w-4 h-4 shrink-0"></i>
-                                <span class="whitespace-nowrap">Check Stays</span>
+                        <!-- Master Headline -->
+                        <h1 class="serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.08] text-white drop-shadow-lg max-w-4xl">
+                            {{ $slide['title'] }}
+                        </h1>
+
+                        <!-- Description -->
+                        <p class="mt-3 sm:mt-5 text-sm sm:text-base lg:text-lg text-white/90 max-w-2xl leading-relaxed drop-shadow-xs font-normal line-clamp-2 sm:line-clamp-3">
+                            {{ $slide['description'] }}
+                        </p>
+
+                        <!-- Hero CTAs -->
+                        <div class="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+                            <a href="{{ $slide['link'] ?? route('rooms.index') }}" class="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full bg-forest hover:bg-emerald text-paper font-bold text-xs sm:text-sm shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 border border-emerald-400/30 cursor-pointer">
+                                <span>Explore Cottages</span>
+                                <i data-lucide="arrow-up-right" class="w-4 h-4 text-brass"></i>
+                            </a>
+                            <button type="button" onclick="openChat()" class="inline-flex items-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-semibold text-xs sm:text-sm border border-white/30 transition duration-300 cursor-pointer">
+                                <i data-lucide="message-circle" class="w-4 h-4 text-brass"></i>
+                                <span>Chat with Concierge</span>
                             </button>
                         </div>
                     </div>
 
                 </div>
-            </form>
+            @endforeach
+        </div>
+
+        <!-- Left & Right Arrow Navigation Controls -->
+        <button type="button" 
+                onclick="prevHeroSlide()" 
+                class="absolute left-3 sm:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-30 grid h-11 w-11 sm:h-13 sm:w-13 place-items-center rounded-full bg-black/40 hover:bg-white text-white hover:text-forest backdrop-blur-md border border-white/30 transition-all duration-300 shadow-xl cursor-pointer hover:scale-105" 
+                aria-label="Previous Slide">
+            <i data-lucide="chevron-left" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+        </button>
+        <button type="button" 
+                onclick="nextHeroSlide()" 
+                class="absolute right-3 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-30 grid h-11 w-11 sm:h-13 sm:w-13 place-items-center rounded-full bg-black/40 hover:bg-white text-white hover:text-forest backdrop-blur-md border border-white/30 transition-all duration-300 shadow-xl cursor-pointer hover:scale-105" 
+                aria-label="Next Slide">
+            <i data-lucide="chevron-right" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+        </button>
+
+        <!-- Bottom Indicator Dots -->
+        <div class="absolute bottom-16 sm:bottom-20 lg:bottom-24 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15">
+            @foreach($heroSlidesList as $dIdx => $slide)
+                <button type="button" 
+                        onclick="goToHeroSlide({{ $dIdx }})" 
+                        class="hero-dot-btn {{ $dIdx === 0 ? 'active' : 'inactive' }}" 
+                        aria-label="Slide {{ $dIdx + 1 }}"></button>
+            @endforeach
         </div>
 
     </div>
+
+    <!-- =====================================================================
+         CLASSIC HOTEL BOOKING ENGINE SEARCH BAR (Clean Floating Pill)
+         ===================================================================== -->
+    <div class="relative z-40 -mt-8 sm:-mt-10 lg:-mt-12 max-w-5xl mx-auto px-4 mb-6 sm:mb-10">
+        <form action="{{ route('rooms.index') }}" method="GET" class="w-full bg-white text-forest rounded-2xl lg:rounded-full p-2.5 sm:p-3 lg:p-3.5 shadow-[0_20px_50px_rgba(6,63,52,0.18)] border border-forest/15">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 sm:gap-2.5 items-center">
+                
+                <!-- Field 1: Destination / Branch (lg:col-span-4) -->
+                <div class="lg:col-span-4 px-3.5 py-2 bg-paper/60 rounded-xl lg:rounded-l-full border border-forest/10 hover:border-forest/30 transition">
+                    <label class="block text-[9px] uppercase tracking-wider font-bold text-forest/50 flex items-center gap-1.5 mb-0.5">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald shrink-0"></i>
+                        <span>Destination</span>
+                    </label>
+                    <select name="branch_id" class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer truncate">
+                        <option value="">All Branches (Cottages Central)</option>
+                        @foreach($branchesList as $b)
+                            <option value="{{ $b->id }}">{{ $b->name }} ({{ $b->city }})</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Field 2: Check-In & Check-Out (lg:col-span-4, 2 equal columns side-by-side) -->
+                <div class="lg:col-span-4 grid grid-cols-2 gap-2">
+                    <!-- Check-In -->
+                    <div class="px-3 py-2 bg-paper/60 rounded-xl border border-forest/10 hover:border-forest/30 transition">
+                        <label class="block text-[9px] uppercase tracking-wider font-bold text-forest/50 flex items-center gap-1 mb-0.5">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald shrink-0"></i>
+                            <span>Check-In</span>
+                        </label>
+                        <input type="date" 
+                               name="check_in" 
+                               id="home-check-in"
+                               value="{{ date('Y-m-d', strtotime('+1 day')) }}" 
+                               min="{{ date('Y-m-d') }}"
+                               onchange="updateCheckOutMin()"
+                               class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer" />
+                    </div>
+
+                    <!-- Check-Out -->
+                    <div class="px-3 py-2 bg-paper/60 rounded-xl border border-forest/10 hover:border-forest/30 transition">
+                        <label class="block text-[9px] uppercase tracking-wider font-bold text-forest/50 flex items-center gap-1 mb-0.5">
+                            <i data-lucide="calendar-check-2" class="w-3.5 h-3.5 text-emerald shrink-0"></i>
+                            <span>Check-Out</span>
+                        </label>
+                        <input type="date" 
+                               name="check_out" 
+                               id="home-check-out"
+                               value="{{ date('Y-m-d', strtotime('+3 days')) }}" 
+                               min="{{ date('Y-m-d', strtotime('+2 days')) }}"
+                               class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer" />
+                    </div>
+                </div>
+
+                <!-- Field 3: Guests & Submit Action (lg:col-span-4) -->
+                <div class="lg:col-span-4 grid grid-cols-2 gap-2">
+                    <!-- Guests -->
+                    <div class="px-3 py-2 bg-paper/60 rounded-xl border border-forest/10 hover:border-forest/30 transition">
+                        <label class="block text-[9px] uppercase tracking-wider font-bold text-forest/50 flex items-center gap-1 mb-0.5">
+                            <i data-lucide="users" class="w-3.5 h-3.5 text-emerald shrink-0"></i>
+                            <span>Guests</span>
+                        </label>
+                        <select name="adults" class="w-full bg-transparent text-xs sm:text-sm font-bold text-forest focus:outline-hidden cursor-pointer">
+                            <option value="1">1 Guest</option>
+                            <option value="2" selected>2 Guests</option>
+                            <option value="3">3 Guests</option>
+                            <option value="4">4 Guests</option>
+                            <option value="5">5+ Guests</option>
+                        </select>
+                        <input type="hidden" name="children" value="0">
+                    </div>
+
+                    <!-- Search Button -->
+                    <div class="flex items-center">
+                        <button type="submit" class="w-full h-full min-h-[44px] py-2.5 px-3 rounded-xl lg:rounded-r-full bg-brass hover:brightness-105 text-forest font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg transition cursor-pointer">
+                            <i data-lucide="search" class="w-4 h-4 shrink-0"></i>
+                            <span class="whitespace-nowrap">Check Stays</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
 </section>
 
 
