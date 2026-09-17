@@ -152,6 +152,10 @@
                     <div class="flex items-center gap-3"><i data-lucide="map-pin" class="w-4 h-4"></i> Destinations & Travel</div>
                     <span class="px-1.5 py-0.2 rounded text-[10px] bg-brand-primary text-white font-bold">{{ $branches->count() }}</span>
                 </a>
+                <a href="#slides" data-section="slides" onclick="navigateTo('slides')" class="nav-item flex items-center justify-between px-3 py-2 rounded-r-md text-white/70 cursor-pointer">
+                    <div class="flex items-center gap-3"><i data-lucide="presentation" class="w-4 h-4 text-brass"></i> Hero & Menu Slides</div>
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-brand-accent text-brand-deep font-bold" id="sidebar-slides-count">{{ count($homepageContent['hero_slides'] ?? $branches) }}</span>
+                </a>
                 <a href="#cms" data-section="cms" onclick="navigateTo('cms')" class="nav-item flex items-center gap-3 px-3 py-2 rounded-r-md text-white/70 cursor-pointer">
                     <i data-lucide="globe" class="w-4 h-4"></i> Website Studio & CMS
                 </a>
@@ -379,6 +383,9 @@
             <!-- 14. CMS (ADM-22 to ADM-24) -->
             @include('admin.sections.cms')
 
+            <!-- 14B. HERO & MENU CAROUSEL SLIDES CRUD (ADM-12B) -->
+            @include('admin.sections.slides')
+
             <!-- 15. REPORTS (ADM-25) -->
             @include('admin.sections.reports')
 
@@ -555,6 +562,9 @@
             'navigation': { hub: 'cms', tab: () => switchCmsTab('nav') },
             'homepage': { hub: 'cms', tab: () => switchCmsTab('home') },
             'visual-editor': { hub: 'cms', tab: () => switchCmsTab('visual') },
+            'slides': { hub: 'slides' },
+            'menu-slides': { hub: 'slides' },
+            'hero-slides': { hub: 'slides' },
         };
 
         function navigateTo(sectionId) {
@@ -4463,6 +4473,9 @@
                     hero_image_secondary: document.getElementById('edit-hero-img-sec')?.src || '',
                     hero_card_title: document.getElementById('edit-hero-card-title')?.innerText.trim() || '',
                     hero_card_description: document.getElementById('edit-hero-card-desc')?.innerText.trim() || '',
+                    welcome_eyebrow: document.getElementById('edit-welcome-eyebrow')?.innerText.trim() || '',
+                    welcome_heading: document.getElementById('edit-welcome-heading')?.innerText.trim() || '',
+                    welcome_description: document.getElementById('edit-welcome-desc')?.innerText.trim() || '',
                     branch_section_eyebrow: document.getElementById('edit-branch-eyebrow')?.innerText.trim() || '',
                     branches: Array.from(document.querySelectorAll('[id^="branch-card-container-"]')).map((container, idx) => {
                         const select = container.querySelector('select');
@@ -4713,75 +4726,224 @@
             refreshIcons();
         }
 
+        window.currentSlidesCrudIdx = 0;
+
         function refreshHeroSlidesManagerList() {
-            const listContainer = document.getElementById('hero-slides-manager-list');
-            if (!listContainer || !window.heroSlidesData) return;
-
+            if (!window.heroSlidesData) return;
             const slides = window.heroSlidesData;
-            listContainer.innerHTML = slides.map((s, idx) => `
-                <div class="hero-slide-item rounded-2xl border border-gray-200 bg-[#F7F5EF]/60 p-3 flex flex-col justify-between space-y-3 hover:border-[#0B5D4B]/40 hover:shadow-md transition group" data-slide-index="${idx}">
-                    <div class="space-y-2.5">
-                        <!-- Thumbnail with Order & Tag -->
-                        <div class="relative h-36 rounded-xl overflow-hidden bg-black/5 border border-gray-200 shadow-2xs">
-                            <img src="${escapeAdminHtml(s.image)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${escapeAdminHtml(s.title)}">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
-                            
-                            <!-- Order Badge -->
-                            <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-[#063F34] text-white text-[10px] font-bold shadow-xs">
-                                Slide #${s.sort_order ?? (idx + 1)}
-                            </span>
 
-                            <!-- Status Badge -->
-                            <span class="absolute top-2 right-2 px-2 py-0.5 rounded-md text-[10px] font-bold ${s.status === 'active' ? 'bg-emerald-600 text-white' : 'bg-gray-500 text-white'}">
-                                ${s.status === 'active' ? 'Active' : 'Hidden'}
-                            </span>
+            // 1. Refresh count badges
+            const sidebarBadge = document.getElementById('sidebar-slides-count');
+            if (sidebarBadge) sidebarBadge.innerText = slides.length;
+            const crudCounter = document.getElementById('slides-crud-counter-badge');
+            if (crudCounter) crudCounter.innerText = `${slides.length} Active Slides`;
+            const heroCounter = document.getElementById('hero-slides-counter-badge');
+            if (heroCounter) heroCounter.innerText = `${slides.length} Slides`;
 
-                            <!-- Tag (Bottom Left) -->
-                            <span class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-white/90 text-[#063F34] text-[9px] font-bold backdrop-blur-xs">
-                                ${escapeAdminHtml(s.tag || 'Kerala')}
-                            </span>
-
-                            ${s.badge ? `
-                                <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-[#C7A76A] text-[#063F34] text-[9px] font-bold">
-                                    ${escapeAdminHtml(s.badge)}
+            // 2. Render Visual Editor slides manager list
+            const listContainer = document.getElementById('hero-slides-manager-list');
+            if (listContainer) {
+                listContainer.innerHTML = slides.map((s, idx) => `
+                    <div class="hero-slide-item rounded-2xl border border-gray-200 bg-[#F7F5EF]/60 p-3 flex flex-col justify-between space-y-3 hover:border-[#0B5D4B]/40 hover:shadow-md transition group" data-slide-index="${idx}">
+                        <div class="space-y-2.5">
+                            <div class="relative h-36 rounded-xl overflow-hidden bg-black/5 border border-gray-200 shadow-2xs">
+                                <img src="${escapeAdminHtml(s.image)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${escapeAdminHtml(s.title)}">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
+                                <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-[#063F34] text-white text-[10px] font-bold shadow-xs">
+                                    Slide #${s.sort_order ?? (idx + 1)}
                                 </span>
-                            ` : ''}
+                                <button type="button" onclick="toggleHeroSlideStatus(${idx})" class="absolute top-2 right-2 px-2 py-0.5 rounded-md text-[10px] font-bold cursor-pointer transition ${s.status === 'active' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-gray-500 hover:bg-gray-600 text-white'}">
+                                    ${s.status === 'active' ? 'Active' : 'Hidden'}
+                                </button>
+                                <span class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-white/90 text-[#063F34] text-[9px] font-bold backdrop-blur-xs">
+                                    ${escapeAdminHtml(s.tag || 'Kerala')}
+                                </span>
+                                ${s.badge ? `<span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-[#C7A76A] text-[#063F34] text-[9px] font-bold">${escapeAdminHtml(s.badge)}</span>` : ''}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xs text-[#063F34] line-clamp-1">${escapeAdminHtml(s.title)}</h4>
+                                ${s.subtitle ? `<p class="text-[10px] font-semibold text-[#0B5D4B] mt-0.5">${escapeAdminHtml(s.subtitle)}</p>` : ''}
+                                <p class="text-[10px] text-[#5A6B65] mt-1 line-clamp-2 leading-relaxed">${escapeAdminHtml(s.description)}</p>
+                            </div>
                         </div>
-
-                        <!-- Content Info -->
-                        <div>
-                            <h4 class="font-bold text-xs text-[#063F34] line-clamp-1">${escapeAdminHtml(s.title)}</h4>
-                            ${s.subtitle ? `<p class="text-[10px] font-semibold text-[#0B5D4B] mt-0.5">${escapeAdminHtml(s.subtitle)}</p>` : ''}
-                            <p class="text-[10px] text-[#5A6B65] mt-1 line-clamp-2 leading-relaxed">${escapeAdminHtml(s.description)}</p>
+                        <div class="pt-2 border-t border-gray-200/70 flex items-center justify-between gap-1">
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="moveHeroSlide(${idx}, -1)" class="p-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 text-gray-700 transition cursor-pointer disabled:opacity-40 disabled:pointer-events-none" title="Move Slide Earlier" ${idx === 0 ? 'disabled' : ''}>
+                                    <i data-lucide="chevron-up" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button type="button" onclick="moveHeroSlide(${idx}, 1)" class="p-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 text-gray-700 transition cursor-pointer disabled:opacity-40 disabled:pointer-events-none" title="Move Slide Later" ${idx === slides.length - 1 ? 'disabled' : ''}>
+                                    <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="openHeroSlideModal(${idx})" class="px-2.5 py-1 rounded-lg border border-[#0B5D4B]/30 bg-emerald-50/60 hover:bg-emerald-100 text-[#0B5D4B] text-[11px] font-bold transition flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="edit-2" class="w-3 h-3"></i> Edit & Crop
+                                </button>
+                                <button type="button" onclick="deleteHeroSlide(${idx})" class="p-1 rounded-lg border border-red-200 bg-red-50/50 hover:bg-red-100 text-red-700 transition cursor-pointer" title="Delete Slide">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
+                `).join('');
+            }
 
-                    <!-- Action Toolbar: Reorder Up/Down, Edit with Cropper, Delete -->
-                    <div class="pt-2 border-t border-gray-200/70 flex items-center justify-between gap-1">
-                        <!-- Move Order Controls -->
-                        <div class="flex items-center gap-1">
-                            <button type="button" onclick="moveHeroSlide(${idx}, -1)" class="p-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 text-gray-700 transition cursor-pointer disabled:opacity-40 disabled:pointer-events-none" title="Move Slide Earlier" ${idx === 0 ? 'disabled' : ''}>
-                                <i data-lucide="chevron-up" class="w-3.5 h-3.5"></i>
-                            </button>
-                            <button type="button" onclick="moveHeroSlide(${idx}, 1)" class="p-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 text-gray-700 transition cursor-pointer disabled:opacity-40 disabled:pointer-events-none" title="Move Slide Later" ${idx === slides.length - 1 ? 'disabled' : ''}>
-                                <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
-                            </button>
+            // 3. Render Dedicated Slides CRUD Section list
+            const crudList = document.getElementById('slides-crud-manager-list');
+            if (crudList) {
+                crudList.innerHTML = slides.map((s, idx) => `
+                    <div class="slide-crud-card rounded-2xl border border-gray-200 bg-[#FAF7F0]/70 p-4 flex flex-col justify-between space-y-3.5 hover:border-brand-primary/40 hover:shadow-lg transition duration-200 group" data-slide-index="${idx}">
+                        <div class="space-y-3">
+                            <div class="relative h-44 rounded-xl overflow-hidden bg-black/10 border border-gray-200 shadow-2xs">
+                                <img src="${escapeAdminHtml(s.image)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${escapeAdminHtml(s.title)}">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30"></div>
+                                <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-brand-deep text-white text-[11px] font-bold shadow-xs">
+                                    #${s.sort_order ?? (idx + 1)}
+                                </span>
+                                <button type="button" onclick="toggleHeroSlideStatus(${idx})" class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-xs cursor-pointer flex items-center gap-1 ${s.status === 'active' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'}" title="Click to toggle Active/Hidden">
+                                    <span class="w-1.5 h-1.5 rounded-full ${s.status === 'active' ? 'bg-emerald-300' : 'bg-gray-300'}"></span>
+                                    <span>${s.status === 'active' ? 'Active' : 'Hidden'}</span>
+                                </button>
+                                <span class="absolute bottom-2.5 left-2.5 px-3 py-1 rounded-full bg-white/95 text-brand-deep text-[10px] font-bold shadow-xs flex items-center gap-1">
+                                    <i data-lucide="map-pin" class="w-3 h-3 text-brand-accent"></i>
+                                    <span>${escapeAdminHtml(s.tag || 'Kerala Retreat')}</span>
+                                </span>
+                                ${s.badge ? `<span class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-full bg-brand-accent text-brand-deep text-[10px] font-bold shadow-xs">${escapeAdminHtml(s.badge)}</span>` : ''}
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-sm text-brand-deep line-clamp-1">${escapeAdminHtml(s.title)}</h4>
+                                ${s.subtitle ? `<p class="text-[11px] font-semibold text-brand-primary line-clamp-1">${escapeAdminHtml(s.subtitle)}</p>` : ''}
+                                <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed pt-1">${escapeAdminHtml(s.description)}</p>
+                            </div>
+                            <div class="pt-2 border-t border-gray-200/60 flex items-center justify-between text-[11px] text-gray-500 font-mono">
+                                <span class="truncate max-w-[200px]" title="${escapeAdminHtml(s.link || '/rooms')}">
+                                    <i data-lucide="link" class="w-3 h-3 inline mr-1 text-gray-400"></i>
+                                    ${escapeAdminHtml(s.link || '/rooms')}
+                                </span>
+                            </div>
                         </div>
-
-                        <!-- Edit & Delete -->
-                        <div class="flex items-center gap-1.5">
-                            <button type="button" onclick="openHeroSlideModal(${idx})" class="px-2.5 py-1 rounded-lg border border-[#0B5D4B]/30 bg-emerald-50/60 hover:bg-emerald-100 text-[#0B5D4B] text-[11px] font-bold transition flex items-center gap-1 cursor-pointer">
-                                <i data-lucide="edit-2" class="w-3 h-3"></i> Edit & Crop
-                            </button>
-                            <button type="button" onclick="deleteHeroSlide(${idx})" class="p-1 rounded-lg border border-red-200 bg-red-50/50 hover:bg-red-100 text-red-700 transition cursor-pointer" title="Delete Slide">
-                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                            </button>
+                        <div class="pt-3 border-t border-gray-200/80 flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="moveHeroSlide(${idx}, -1)" class="p-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-100 text-gray-700 transition cursor-pointer disabled:opacity-30 disabled:pointer-events-none shadow-2xs" title="Move Slide Earlier" ${idx === 0 ? 'disabled' : ''}>
+                                    <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button type="button" onclick="moveHeroSlide(${idx}, 1)" class="p-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-100 text-gray-700 transition cursor-pointer disabled:opacity-30 disabled:pointer-events-none shadow-2xs" title="Move Slide Later" ${idx === slides.length - 1 ? 'disabled' : ''}>
+                                    <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="openHeroSlideModal(${idx})" class="px-3 py-1.5 rounded-xl border border-brand-primary/30 bg-emerald-50 hover:bg-emerald-100 text-brand-primary text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                                    <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                                    <span>Edit & Crop</span>
+                                </button>
+                                <button type="button" onclick="deleteHeroSlide(${idx})" class="p-2 rounded-xl border border-red-200 bg-red-50/70 hover:bg-red-100 text-red-700 transition cursor-pointer shadow-2xs" title="Delete Slide">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
+
+            // 4. Render Dedicated Slides CRUD preview track
+            const crudTrack = document.getElementById('slides-crud-preview-track');
+            const crudDots = document.getElementById('slides-crud-preview-dots');
+            if (crudTrack) {
+                crudTrack.innerHTML = slides.map((s, sIdx) => `
+                    <div class="slides-crud-slide absolute inset-0 transition-all duration-700 ease-in-out ${sIdx === window.currentSlidesCrudIdx ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 pointer-events-none z-0'}" data-slide-index="${sIdx}">
+                        <img src="${escapeAdminHtml(s.image)}" alt="${escapeAdminHtml(s.title)}" class="w-full h-full object-cover brightness-[0.78]" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/30"></div>
+                        <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-black/50"></div>
+                        <div class="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 flex items-center gap-2">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold uppercase tracking-wider border border-white/20">
+                                <i data-lucide="map-pin" class="w-3 h-3 text-brand-accent"></i>
+                                <span>${escapeAdminHtml(s.tag || s.subtitle || 'Krishna Cottages')}</span>
+                            </span>
+                            ${s.badge ? `<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-brand-accent/25 backdrop-blur-md text-brand-accent text-[10px] font-bold border border-brand-accent/30">${escapeAdminHtml(s.badge)}</span>` : ''}
+                        </div>
+                        <div class="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-2">
+                            <div class="text-white/80 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs font-mono border border-white/15">
+                                <span class="text-white font-bold">0${sIdx + 1}</span> / 0${slides.length}
+                            </div>
+                            <button type="button" onclick="openHeroSlideModal(${sIdx})" class="p-1.5 rounded-full bg-white text-brand-deep hover:bg-brand-accent hover:text-white shadow-md transition cursor-pointer" title="Edit this slide">
+                                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                        <div class="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 sm:px-8 max-w-2xl mx-auto text-white">
+                            <p class="text-brand-accent text-[10px] sm:text-xs tracking-[.25em] mb-2 font-bold uppercase">
+                                ${escapeAdminHtml(s.subtitle || s.tag || 'HERITAGE SANCTUARY')}
+                            </p>
+                            <h3 class="serif text-2xl sm:text-4xl font-bold tracking-tight text-white drop-shadow-md">
+                                ${escapeAdminHtml(s.title)}
+                            </h3>
+                            <p class="mt-2 text-xs sm:text-sm text-white/90 leading-relaxed line-clamp-2">
+                                ${escapeAdminHtml(s.description)}
+                            </p>
+                            <div class="mt-4 flex items-center gap-2.5">
+                                <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand-primary text-white font-bold text-xs shadow-md">
+                                    <span>Explore Cottages</span>
+                                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-brand-accent"></i>
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/20 backdrop-blur-md text-white font-semibold text-xs border border-white/20">
+                                    <i data-lucide="message-circle" class="w-3.5 h-3.5 text-brand-accent"></i>
+                                    <span>Concierge</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (crudDots) {
+                crudDots.innerHTML = slides.map((_, dIdx) => `
+                    <button type="button" onclick="goToSlidesCrudSlide(${dIdx})" class="slides-crud-dot h-2 rounded-full transition-all duration-300 cursor-pointer ${dIdx === window.currentSlidesCrudIdx ? 'w-6 bg-brand-accent' : 'w-2 bg-white/40'}"></button>
+                `).join('');
+            }
 
             refreshIcons();
+        }
+
+        async function toggleHeroSlideStatus(idx) {
+            if (!window.heroSlidesData || !window.heroSlidesData[idx]) return;
+            const s = window.heroSlidesData[idx];
+            s.status = (s.status === 'active') ? 'hidden' : 'active';
+            await persistHeroSlidesBackend();
+            refreshAdminCarouselPreview();
+            refreshHeroSlidesManagerList();
+            showToast(`Slide "${s.title}" is now ${s.status === 'active' ? 'Active' : 'Hidden'}`, 'info');
+        }
+
+        function cycleSlidesCrudSlide(delta) {
+            const total = window.heroSlidesData.length;
+            if (total <= 1) return;
+            window.currentSlidesCrudIdx = (window.currentSlidesCrudIdx + delta + total) % total;
+            updateSlidesCrudActiveSlide();
+        }
+
+        function goToSlidesCrudSlide(idx) {
+            window.currentSlidesCrudIdx = idx;
+            updateSlidesCrudActiveSlide();
+        }
+
+        function updateSlidesCrudActiveSlide() {
+            const slides = document.querySelectorAll('.slides-crud-slide');
+            const dots = document.querySelectorAll('.slides-crud-dot');
+            slides.forEach((s, i) => {
+                if (i === window.currentSlidesCrudIdx) {
+                    s.classList.remove('opacity-0', 'scale-105', 'pointer-events-none', 'z-0');
+                    s.classList.add('opacity-100', 'scale-100', 'z-10');
+                } else {
+                    s.classList.remove('opacity-100', 'scale-100', 'z-10');
+                    s.classList.add('opacity-0', 'scale-105', 'pointer-events-none', 'z-0');
+                }
+            });
+            dots.forEach((d, i) => {
+                if (i === window.currentSlidesCrudIdx) {
+                    d.className = 'slides-crud-dot h-2 rounded-full transition-all duration-300 cursor-pointer w-6 bg-brand-accent';
+                } else {
+                    d.className = 'slides-crud-dot h-2 rounded-full transition-all duration-300 cursor-pointer w-2 bg-white/40';
+                }
+            });
         }
 
         function cycleAdminPreviewSlide(delta) {
