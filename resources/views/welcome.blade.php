@@ -4,12 +4,11 @@
     $hContent = $homepageContent ?? app(\App\Http\Controllers\Admin\AdminController::class)->getHomepageContent();
     $branchesList = $branches ?? \App\Models\Branch::where('status', 'active')->orderBy('sort_order')->get();
     
-    // Featured Cottage Rooms for the Accommodations Carousel
+    // Featured Cottage Rooms for the Accommodations Carousel (All Branches)
     $roomsList = $featuredRooms ?? \App\Models\RoomType::with(['branch', 'category', 'amenitiesList'])
         ->where('is_active', true)
         ->where('is_bookable', true)
         ->orderBy('sort_order')
-        ->take(8)
         ->get();
 
     // Hero Slides from dynamic settings or active branches
@@ -22,7 +21,7 @@
                 'title' => $b->display_name ?: $b->name,
                 'subtitle' => $b->city ? ($b->city . ' Retreat') : 'Kerala Retreat',
                 'description' => $b->tagline ?: 'Private wooden cottages, lush gardens & tranquil verandas.',
-                'image' => $b->cover_image_url ?: ($b->hero_image_url ?: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=85'),
+                'image' => $b->cover_image_url ?: ($b->hero_image_url ?: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=85'),
                 'tag' => ($b->city ?: 'Kerala') . ' · ' . ($idx === 0 ? 'Hillside Cottages' : ($idx === 1 ? 'Backwater Haven' : 'Coastal Living')),
                 'badge' => '★ 4.9 Rating',
                 'link' => route('rooms.index', ['branch_id' => $b->id], false),
@@ -46,32 +45,14 @@
             ]
         ]);
 
-    // Curated Gallery Images
-    $galleryPhotos = [];
-    if (isset($galleryAlbums) && $galleryAlbums->isNotEmpty()) {
-        foreach ($galleryAlbums as $album) {
-            if ($album->images && $album->images->isNotEmpty()) {
-                foreach ($album->images->take(2) as $img) {
-                    $galleryPhotos[] = [
-                        'url' => $img->image_url,
-                        'caption' => $album->name,
-                        'branch' => $album->branch?->city ?? 'Kerala'
-                    ];
-                }
-            }
-        }
-    }
-    if (empty($galleryPhotos)) {
-        $galleryPhotos = [
-            ['url' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=85', 'caption' => 'Private Wooden Cottage', 'branch' => 'Rajakkad'],
-            ['url' => 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=85', 'caption' => 'Misty Morning Tea Estate', 'branch' => 'Munnar'],
-            ['url' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=800&q=85', 'caption' => 'Clay-Pot Heritage Dining', 'branch' => 'Plantation Kitchen'],
-            ['url' => 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=85', 'caption' => 'Verandah Living & Nature', 'branch' => 'Idukki'],
-            ['url' => 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=800&q=85', 'caption' => 'Estate Harvest Spices', 'branch' => 'Cardamom Hills'],
-            ['url' => 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=800&q=85', 'caption' => 'Tranquil Sunset Trails', 'branch' => 'Rajakkad'],
-        ];
-    }
-    $galleryPhotos = array_slice($galleryPhotos, 0, 6);
+    // Curated Gallery Albums (Published with High-Res Photo Collections)
+    $galleryAlbumsList = (isset($galleryAlbums) && $galleryAlbums->isNotEmpty())
+        ? $galleryAlbums
+        : \App\Models\GalleryAlbum::with(['images' => fn($q) => $q->orderBy('sort_order'), 'branch'])
+            ->where('is_published', true)
+            ->orderBy('sort_order')
+            ->get();
+    $galleryAlbumsList = $galleryAlbumsList->filter(fn($a) => $a->images && $a->images->isNotEmpty())->take(6);
 @endphp
 
 @section('title', 'Krishna Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar, Kerala')
@@ -83,8 +64,8 @@
     #hero-slider {
         position: relative;
         width: 100%;
-        height: 480px;
-        min-height: 440px;
+        height: 520px;
+        min-height: 480px;
         border-radius: 1.25rem;
         overflow: hidden;
         background-color: #083F34;
@@ -94,16 +75,16 @@
     }
     @media (min-width: 640px) {
         #hero-slider {
-            height: 520px;
-            min-height: 500px;
+            height: 580px;
+            min-height: 540px;
             border-radius: 1.75rem;
         }
     }
     @media (min-width: 1024px) {
         #hero-slider {
-            height: 580px;
-            min-height: 560px;
-            border-radius: 2.25rem;
+            height: 640px;
+            min-height: 600px;
+            border-radius: 2rem;
         }
     }
     #hero-slides-track {
@@ -164,7 +145,7 @@
     <div class="mx-auto max-w-[1480px] px-3 md:px-6 lg:px-8">
         
         <!-- Large-Format Framed Card Carousel Canvas -->
-        <div id="hero-slider" class="relative w-full rounded-2xl sm:rounded-3xl lg:rounded-[36px] overflow-hidden shadow-2xl bg-forest group select-none">
+        <div id="hero-slider" class="relative w-full rounded-2xl sm:rounded-3xl lg:rounded-[32px] overflow-hidden shadow-2xl bg-forest group select-none">
             
             <!-- Slides Track -->
             <div id="hero-slides-track">
@@ -173,9 +154,9 @@
                         <!-- Background High-Res Image -->
                         <img src="{{ $slide['image'] }}" 
                              alt="{{ $slide['title'] }} — Krishna Cottages Kerala" 
-                             class="w-full h-full object-cover brightness-[0.78] transition-transform duration-1000 ease-out" 
+                             class="w-full h-full object-cover object-center brightness-[0.80] transition-transform duration-1000 ease-out" 
                              {!! $sIdx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"' !!}
-                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=85';" />
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1920&q=85';" />
                         
                         <!-- Rich Dark Ambient Gradients for Typography Contrast -->
                         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/30"></div>
@@ -356,63 +337,34 @@
         
         <!-- Section Heading & Narrative -->
         <div class="max-w-3xl mx-auto text-center space-y-3">
-            <span class="eyebrow text-emerald font-bold">{{ $hContent['welcome_eyebrow'] ?? 'WELCOME TO KRISHNA COTTAGES' }}</span>
-            <h2 class="serif text-3xl sm:text-4xl lg:text-5xl font-bold text-forest tracking-tight">
-                {{ $hContent['welcome_heading'] ?? 'A Sanctuary of Slow Living & Serenity' }}
+            <span class="eyebrow text-emerald font-bold tracking-[.25em]">{{ $hContent['welcome_eyebrow'] ?? 'WELCOME TO KRISHNA COTTAGES' }}</span>
+            <h2 class="serif text-2xl sm:text-3xl lg:text-4xl font-bold text-forest tracking-tight leading-snug">
+                {{ $hContent['welcome_heading'] ?? 'A Sanctuary of Slow Living & Hillside Serenity' }}
             </h2>
-            <div class="w-16 h-0.5 bg-brass mx-auto my-3"></div>
-            <p class="text-sm sm:text-base text-forest/75 leading-relaxed font-normal">
+            <div class="w-12 h-0.5 bg-brass mx-auto my-2"></div>
+            <p class="text-xs sm:text-sm md:text-base text-forest/75 leading-relaxed font-normal max-w-2xl mx-auto">
                 {{ $hContent['welcome_description'] ?? 'Tucked into the misty slopes of Rajakkad, Idukki, and nearby Munnar, Krishna Cottages provides handcrafted private wooden residences surrounded by aromatic tea plantations, cardamoms, and cool mountain air.' }}
             </p>
-        </div>
 
-        <!-- 4 Clean Hotel Highlight Cards -->
-        <div class="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-            
-            <!-- Highlight 1 -->
-            <div class="p-6 rounded-2xl bg-white border border-forest/10 shadow-xs hover:shadow-md hover:-translate-y-1 transition duration-300 space-y-3 text-center sm:text-left">
-                <div class="w-12 h-12 rounded-xl bg-forest/5 flex items-center justify-center text-emerald mx-auto sm:mx-0">
-                    <i data-lucide="home" class="w-6 h-6"></i>
-                </div>
-                <h3 class="serif text-lg font-bold text-forest">Wooden Cottages</h3>
-                <p class="text-xs text-forest/70 leading-relaxed">
-                    Handcrafted teak verandas, private sit-outs, and panoramic valley views designed for deep rest.
-                </p>
+            <!-- 4 Minimal Clean Highlight Badges in a Single Horizontal Row -->
+            <div class="pt-3 sm:pt-5 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 text-xs font-semibold text-forest/80">
+                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-forest/10 shadow-2xs">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-brass"></i>
+                    <span>★ 4.9 Guest Rating</span>
+                </span>
+                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-forest/10 shadow-2xs">
+                    <i data-lucide="home" class="w-3.5 h-3.5 text-emerald"></i>
+                    <span>Private Wooden Verandahs</span>
+                </span>
+                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-forest/10 shadow-2xs">
+                    <i data-lucide="utensils" class="w-3.5 h-3.5 text-emerald"></i>
+                    <span>Clay-Pot Farm Dining</span>
+                </span>
+                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-forest/10 shadow-2xs">
+                    <i data-lucide="trees" class="w-3.5 h-3.5 text-emerald"></i>
+                    <span>Cardamom Estate Trails</span>
+                </span>
             </div>
-
-            <!-- Highlight 2 -->
-            <div class="p-6 rounded-2xl bg-white border border-forest/10 shadow-xs hover:shadow-md hover:-translate-y-1 transition duration-300 space-y-3 text-center sm:text-left">
-                <div class="w-12 h-12 rounded-xl bg-forest/5 flex items-center justify-center text-emerald mx-auto sm:mx-0">
-                    <i data-lucide="utensils" class="w-6 h-6"></i>
-                </div>
-                <h3 class="serif text-lg font-bold text-forest">Clay-Pot Dining</h3>
-                <p class="text-xs text-forest/70 leading-relaxed">
-                    Authentic Kerala culinary recipes prepared in earthen pots with garden-fresh organic ingredients.
-                </p>
-            </div>
-
-            <!-- Highlight 3 -->
-            <div class="p-6 rounded-2xl bg-white border border-forest/10 shadow-xs hover:shadow-md hover:-translate-y-1 transition duration-300 space-y-3 text-center sm:text-left">
-                <div class="w-12 h-12 rounded-xl bg-forest/5 flex items-center justify-center text-emerald mx-auto sm:mx-0">
-                    <i data-lucide="sparkles" class="w-6 h-6"></i>
-                </div>
-                <h3 class="serif text-lg font-bold text-forest">Estate Spices</h3>
-                <p class="text-xs text-forest/70 leading-relaxed">
-                    Cardamom, black pepper, and clove trails. Hand-harvested spices available directly from our farm.
-                </p>
-            </div>
-
-            <!-- Highlight 4 -->
-            <div class="p-6 rounded-2xl bg-white border border-forest/10 shadow-xs hover:shadow-md hover:-translate-y-1 transition duration-300 space-y-3 text-center sm:text-left">
-                <div class="w-12 h-12 rounded-xl bg-forest/5 flex items-center justify-center text-emerald mx-auto sm:mx-0">
-                    <i data-lucide="shield-check" class="w-6 h-6"></i>
-                </div>
-                <h3 class="serif text-lg font-bold text-forest">Peaceful Sanctuary</h3>
-                <p class="text-xs text-forest/70 leading-relaxed">
-                    Strictly quiet and undisturbed nature. No loud pool parties — pure stillness, mist, and serenity.
-                </p>
-            </div>
-
         </div>
 
     </div>
@@ -420,13 +372,13 @@
 
 
 <!-- =========================================================================
-     3. FEATURED COTTAGES CAROUSEL (ACCOMMODATIONS SLIDER)
+     3. FEATURED COTTAGES CAROUSEL (WITH LIVE BRANCH FILTER)
      ========================================================================= -->
 <section id="cottages" class="py-12 sm:py-16 bg-[#F4F1E8]">
     <div class="mx-auto max-w-[1480px] px-4 md:px-6 lg:px-8">
         
         <!-- Section Header with Prev/Next Controls -->
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
             <div class="space-y-1">
                 <span class="eyebrow text-emerald font-bold">ACCOMMODATIONS</span>
                 <h2 class="serif text-3xl sm:text-4xl lg:text-5xl font-bold text-forest tracking-tight">
@@ -450,10 +402,39 @@
                         aria-label="Scroll Right">
                     <i data-lucide="chevron-right" class="w-5 h-5"></i>
                 </button>
-                <a href="{{ route('rooms.index') }}" class="ml-2 hidden sm:inline-flex items-center gap-1 text-xs font-bold text-emerald hover:text-forest underline transition">
+                <a id="cottages-view-all-link" href="{{ route('rooms.index') }}" class="ml-2 hidden sm:inline-flex items-center gap-1 text-xs font-bold text-emerald hover:text-forest underline transition">
                     View All
                 </a>
             </div>
+        </div>
+
+        <!-- Branch Filter Pills Row -->
+        <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-3 mb-6 border-b border-forest/10">
+            <button type="button" 
+                    onclick="filterCottagesByBranch('all')" 
+                    id="branch-pill-all"
+                    class="cottage-branch-pill px-4 py-2 rounded-full text-xs font-bold transition shadow-xs bg-forest text-paper cursor-pointer shrink-0">
+                All Retreats ({{ $roomsList->count() }})
+            </button>
+            @foreach($branchesList as $b)
+                @php $bRoomCount = $roomsList->where('branch_id', $b->id)->count(); @endphp
+                <button type="button" 
+                        onclick="filterCottagesByBranch({{ $b->id }})" 
+                        id="branch-pill-{{ $b->id }}"
+                        class="cottage-branch-pill px-4 py-2 rounded-full text-xs font-semibold transition bg-white text-forest/70 hover:text-forest hover:bg-forest/5 border border-forest/15 cursor-pointer shrink-0">
+                    {{ $b->city ?: $b->name }} ({{ $bRoomCount }})
+                </button>
+            @endforeach
+        </div>
+
+        <!-- Empty State Container -->
+        <div id="cottages-empty-state" class="hidden w-full text-center py-12 px-4 rounded-3xl bg-white border border-forest/10 my-4 space-y-2">
+            <i data-lucide="bed" class="w-10 h-10 text-brass mx-auto mb-2 opacity-60"></i>
+            <h3 class="serif text-lg font-bold text-forest">No Cottages Found</h3>
+            <p class="text-xs text-forest/60 max-w-sm mx-auto">There are no cottages currently listed for this location. Please select "All Retreats".</p>
+            <button type="button" onclick="filterCottagesByBranch('all')" class="mt-2 inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-forest text-paper text-xs font-bold cursor-pointer">
+                View All Retreats
+            </button>
         </div>
 
         <!-- Cottages Horizontal Carousel Track -->
@@ -466,7 +447,8 @@
                         $amenities = json_decode($amenities, true) ?: [$amenities];
                     }
                 @endphp
-                <div class="snap-start shrink-0 w-[290px] sm:w-[340px] lg:w-[380px] rounded-2xl sm:rounded-3xl bg-white border border-forest/10 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group">
+                <div class="cottage-card snap-start shrink-0 w-[290px] sm:w-[340px] lg:w-[380px] rounded-2xl sm:rounded-3xl bg-white border border-forest/10 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group"
+                     data-branch-id="{{ $room->branch_id }}">
                     
                     <div>
                         <!-- Cottage Photo -->
@@ -475,7 +457,8 @@
                                 <img src="{{ $roomCover }}" 
                                      alt="{{ $room->name }} — Krishna Cottages" 
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
-                                     loading="lazy" />
+                                     loading="lazy" 
+                                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=85';" />
                             </a>
                             
                             <!-- Destination Chip -->
@@ -556,6 +539,7 @@
                 </div>
             @endforelse
         </div>
+
 
         <!-- Mobile View All CTA -->
         <div class="mt-4 text-center sm:hidden">
@@ -678,46 +662,123 @@
 
 
 <!-- =========================================================================
-     5. PHOTO GALLERY: CLEAN 6-IMAGE GRID WITH LIGHTBOX PREVIEW
+     5. PHOTO GALLERY ALBUMS: OPENABLE COLLECTIONS & LIGHTBOX PREVIEW
      ========================================================================= -->
 <section class="py-12 sm:py-16 bg-[#F4F1E8]">
     <div class="mx-auto max-w-[1480px] px-4 md:px-6 lg:px-8">
         
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div class="space-y-1">
-                <span class="eyebrow text-emerald font-bold">VISUAL GALLERY</span>
+                <span class="eyebrow text-emerald font-bold">VISUAL ALBUMS</span>
                 <h2 class="serif text-3xl sm:text-4xl lg:text-5xl font-bold text-forest tracking-tight">
                     Moments in the Mist
                 </h2>
                 <p class="text-xs sm:text-sm text-forest/70">
-                    Click any photograph to view in full resolution.
+                    Click any album to explore high-resolution photograph collections.
                 </p>
             </div>
             <a href="{{ route('gallery.index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-forest text-paper text-xs font-bold hover:bg-emerald transition shadow-xs">
-                <span>View Full Gallery</span>
+                <span>View All Albums</span>
                 <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-brass"></i>
             </a>
         </div>
 
-        <!-- 6-Photo Clean Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-5">
-            @foreach($galleryPhotos as $photo)
-                <div onclick="openLightbox('{{ $photo['url'] }}')" 
-                     class="group relative h-44 sm:h-56 lg:h-64 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition duration-500 cursor-pointer bg-forest/5">
-                    <img src="{{ $photo['url'] }}" 
-                         alt="{{ $photo['caption'] }}" 
-                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
-                         loading="lazy" />
-                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/35 transition duration-300 flex items-center justify-center">
-                        <span class="grid h-10 w-10 place-items-center rounded-full bg-white/90 text-forest opacity-0 group-hover:opacity-100 transition duration-300 shadow-md">
-                            <i data-lucide="maximize-2" class="w-4 h-4"></i>
-                        </span>
+        <!-- 6 Real Gallery Album Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            @forelse($galleryAlbumsList as $album)
+                @php
+                    $coverImg = $album->cover_image_url ?: ($album->images->first()->image_url ?? 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80');
+                    $photoCount = $album->images->count();
+                @endphp
+                <div onclick="openAlbumViewer({{ $album->id }})" 
+                     class="group bg-white rounded-3xl overflow-hidden border border-forest/10 shadow-xs hover:shadow-xl transition duration-500 cursor-pointer flex flex-col justify-between">
+                    
+                    <!-- Cover Image Container -->
+                    <div class="relative h-56 sm:h-60 w-full overflow-hidden bg-forest/5">
+                        <img src="{{ $coverImg }}" 
+                             alt="{{ $album->name }}" 
+                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80';"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                             loading="lazy" />
+                        
+                        <!-- Gradient Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
+
+                        <!-- Top Badges -->
+                        <div class="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] font-bold">
+                                <i data-lucide="map-pin" class="w-3 h-3 text-brass"></i>
+                                <span>{{ $album->branch ? $album->branch->name : 'All Retreats' }}</span>
+                            </span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-paper text-[10px] font-bold">
+                                <i data-lucide="images" class="w-3 h-3 text-brass"></i>
+                                <span>{{ $photoCount }} {{ \Illuminate\Support\Str::plural('Photo', $photoCount) }}</span>
+                            </span>
+                        </div>
+
+                        <!-- Center Hover Indicator -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none">
+                            <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/95 text-forest text-xs font-bold shadow-lg transform translate-y-2 group-hover:translate-y-0 transition duration-300">
+                                <span>Open Album</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-emerald"></i>
+                            </span>
+                        </div>
+
+                        <!-- Bottom Title in Cover -->
+                        <div class="absolute bottom-3 left-3.5 right-3.5 text-white">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-brass block mb-0.5 capitalize">
+                                {{ $album->category ?: 'Sanctuary' }}
+                            </span>
+                            <h3 class="serif text-lg sm:text-xl font-bold text-white leading-snug line-clamp-1">
+                                {{ $album->name }}
+                            </h3>
+                        </div>
                     </div>
-                    <div class="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 px-2.5 py-1 rounded-lg bg-black/40 backdrop-blur-md text-white text-[10px] font-medium truncate opacity-90">
-                        {{ $photo['caption'] }} &middot; {{ $photo['branch'] }}
+
+                    <!-- Album Card Body & Thumbnails Preview -->
+                    <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
+                        <p class="text-xs text-forest/70 leading-relaxed line-clamp-2">
+                            {{ $album->description ?: 'Explore high-resolution photographs from this curated resort collection.' }}
+                        </p>
+
+                        <!-- Thumbnail Strip (up to 4 thumbnails) -->
+                        @if($album->images->isNotEmpty())
+                            <div class="grid grid-cols-4 gap-1.5 pt-1">
+                                @foreach($album->images->take(4) as $tIdx => $tImg)
+                                    <div class="relative h-12 rounded-lg overflow-hidden bg-forest/5 border border-forest/10">
+                                        <img src="{{ $tImg->image_url }}" 
+                                             alt="{{ $tImg->title ?? 'Photo' }}" 
+                                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=300&q=70';"
+                                             class="w-full h-full object-cover"
+                                             loading="lazy" />
+                                        @if($tIdx === 3 && $photoCount > 4)
+                                            <div class="absolute inset-0 bg-black/60 backdrop-blur-2xs flex items-center justify-center text-white text-[10px] font-bold">
+                                                +{{ $photoCount - 4 }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <!-- Card Footer CTA -->
+                        <div class="pt-2 border-t border-forest/10 flex items-center justify-between text-xs font-bold text-forest">
+                            <span class="inline-flex items-center gap-1 text-emerald group-hover:text-forest transition">
+                                <span>Browse {{ $photoCount }} Photos</span>
+                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-brass"></i>
+                            </span>
+                            <span class="text-[10px] text-forest/40 font-normal">Click to open</span>
+                        </div>
                     </div>
+
                 </div>
-            @endforeach
+            @empty
+                <div class="col-span-full text-center py-12 bg-white rounded-3xl border border-forest/10">
+                    <i data-lucide="image" class="w-10 h-10 text-brass mx-auto mb-2 opacity-60"></i>
+                    <h3 class="serif text-lg font-bold text-forest">Visual Album Collection</h3>
+                    <p class="text-xs text-forest/60 mt-1">Our curated albums are currently being refreshed.</p>
+                </div>
+            @endforelse
         </div>
 
     </div>
@@ -893,11 +954,87 @@
                     </button>
                 </div>
             </div>
-
         </div>
-
     </div>
 </section>
+
+<!-- =========================================================================
+     INTERACTIVE ALBUM VIEWER MODAL
+     ========================================================================= -->
+<div id="album-viewer-modal" class="hidden fixed inset-0 z-[95] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="bg-[#FAF7F0] w-full max-w-5xl rounded-3xl shadow-2xl border border-forest/10 overflow-hidden flex flex-col max-h-[92vh] my-auto">
+        <!-- MODAL HEADER -->
+        <div class="bg-forest text-paper p-5 sm:p-6 relative shrink-0">
+            <button type="button" onclick="closeAlbumViewer()" class="absolute top-4 sm:top-5 right-4 sm:right-5 text-paper/80 hover:text-paper bg-white/10 hover:bg-white/20 p-2 rounded-full transition cursor-pointer" aria-label="Close modal">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="max-w-2xl pr-8">
+                <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <span id="viewer-branch" class="eyebrow text-brass bg-white/10 px-2.5 py-0.5 rounded-full text-[10px]"></span>
+                    <span id="viewer-category" class="text-[10px] uppercase font-bold tracking-wider text-paper/70 bg-white/5 px-2 py-0.5 rounded-full"></span>
+                    <span id="viewer-count" class="text-[10px] font-bold text-brass bg-brass/20 px-2 py-0.5 rounded-full"></span>
+                </div>
+                <h2 id="viewer-title" class="serif text-2xl sm:text-3xl font-bold text-paper"></h2>
+                <p id="viewer-desc" class="text-xs sm:text-sm text-paper/70 mt-2 leading-relaxed"></p>
+            </div>
+        </div>
+
+        <!-- MODAL BODY: PHOTO GRID -->
+        <div class="p-5 sm:p-6 overflow-y-auto flex-1">
+            <div id="viewer-photos-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- Populated dynamically via JS -->
+            </div>
+            <div id="viewer-empty-state" class="hidden py-12 text-center text-forest/50 text-xs">
+                No photographs in this album yet.
+            </div>
+        </div>
+
+        <!-- MODAL FOOTER -->
+        <div class="p-4 bg-white border-t border-forest/10 flex items-center justify-between text-xs text-forest/60 shrink-0">
+            <span>Click any photograph to view in full resolution</span>
+            <button type="button" onclick="closeAlbumViewer()" class="px-4 py-1.5 rounded-full bg-forest/10 hover:bg-forest/20 text-forest font-semibold transition cursor-pointer">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     FULLSCREEN LIGHTBOX SLIDESHOW MODAL
+     ========================================================================= -->
+<div id="lightbox-modal" class="hidden fixed inset-0 z-[120] bg-black/95 flex flex-col justify-between p-4 sm:p-6 select-none">
+    <!-- Top toolbar -->
+    <div class="flex items-center justify-between text-white z-50">
+        <div class="flex items-center gap-3">
+            <span id="lightbox-counter" class="text-xs font-mono bg-white/15 px-3 py-1 rounded-full text-brass">1 / 1</span>
+            <span id="lightbox-album-tag" class="text-xs text-white/70 hidden sm:inline"></span>
+        </div>
+        <button type="button" onclick="closeLightbox()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-2.5 rounded-full transition cursor-pointer" aria-label="Close lightbox">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <!-- Main display with Prev / Next Navigation -->
+    <div class="relative flex-1 flex items-center justify-center my-2 overflow-hidden">
+        <!-- Prev button -->
+        <button id="lightbox-prev-btn" type="button" onclick="lightboxPrev(event)" class="absolute left-2 sm:left-6 z-40 text-white/80 hover:text-white bg-black/60 hover:bg-black/80 p-3 rounded-full backdrop-blur-xs transition shadow-lg cursor-pointer" aria-label="Previous photo">
+            <i data-lucide="chevron-left" class="w-6 h-6 sm:w-8 sm:h-8"></i>
+        </button>
+
+        <img id="lightbox-img" src="" alt="Cottage Photograph" class="max-h-[75vh] max-w-[92vw] sm:max-w-[85vw] rounded-xl sm:rounded-2xl object-contain shadow-2xl transition duration-200">
+
+        <!-- Next button -->
+        <button id="lightbox-next-btn" type="button" onclick="lightboxNext(event)" class="absolute right-2 sm:right-6 z-40 text-white/80 hover:text-white bg-black/60 hover:bg-black/80 p-3 rounded-full backdrop-blur-xs transition shadow-lg cursor-pointer" aria-label="Next photo">
+            <i data-lucide="chevron-right" class="w-6 h-6 sm:w-8 sm:h-8"></i>
+        </button>
+    </div>
+
+    <!-- Bottom Caption Bar -->
+    <div class="text-center py-2 z-50">
+        <p id="lightbox-caption" class="serif text-base sm:text-lg font-bold text-white max-w-2xl mx-auto"></p>
+        <p class="text-[11px] text-white/40 mt-1">Use Left / Right arrow keys to navigate &middot; Esc to close</p>
+    </div>
+</div>
 
 @endsection
 
@@ -1027,6 +1164,221 @@
     };
 
     /* =====================================================================
+       BRANCH COTTAGES DYNAMIC FILTER ENGINE
+       ===================================================================== */
+    window.filterCottagesByBranch = function(branchId) {
+        const targetBranch = String(branchId);
+        const cards = document.querySelectorAll('.cottage-card');
+        const emptyState = document.getElementById('cottages-empty-state');
+        const viewAllLink = document.getElementById('cottages-view-all-link');
+        const pills = document.querySelectorAll('.cottage-branch-pill');
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const cardBranch = card.getAttribute('data-branch-id');
+            if (targetBranch === 'all' || cardBranch === targetBranch) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (emptyState) {
+            if (visibleCount === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+            }
+        }
+
+        const cottagesTrack = document.getElementById('cottages-track');
+        if (cottagesTrack) {
+            cottagesTrack.scrollTo({ left: 0, behavior: 'smooth' });
+        }
+
+        pills.forEach(pill => {
+            const pillId = pill.id;
+            const isMatch = (targetBranch === 'all' && pillId === 'branch-pill-all') || 
+                            (pillId === 'branch-pill-' + targetBranch);
+            if (isMatch) {
+                pill.className = 'cottage-branch-pill px-4 py-2 rounded-full text-xs font-bold transition shadow-xs bg-forest text-paper cursor-pointer shrink-0';
+            } else {
+                pill.className = 'cottage-branch-pill px-4 py-2 rounded-full text-xs font-semibold transition bg-white text-forest/70 hover:text-forest hover:bg-forest/5 border border-forest/15 cursor-pointer shrink-0';
+            }
+        });
+
+        if (viewAllLink) {
+            if (targetBranch === 'all') {
+                viewAllLink.href = '{{ route('rooms.index') }}';
+            } else {
+                viewAllLink.href = '{{ route('rooms.index') }}?branch_id=' + targetBranch;
+            }
+        }
+    };
+
+    /* =====================================================================
+       GALLERY ALBUMS & FULLSCREEN LIGHTBOX VIEWER
+       ===================================================================== */
+    const homeAlbums = {!! json_encode($galleryAlbumsList->map(function($a) {
+        return [
+            'id' => $a->id,
+            'name' => $a->name ?: 'Cottage Album',
+            'branch' => $a->branch ? $a->branch->name : 'All Retreats',
+            'category' => ucfirst($a->category ?: 'Sanctuary'),
+            'description' => $a->description ?: 'Visual moments captured at Krishna Cottages.',
+            'cover_url' => $a->cover_image_url ?: ($a->images->first()->image_url ?? 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'),
+            'images' => $a->images->values()->map(function($img) {
+                return [
+                    'id' => $img->id,
+                    'url' => $img->image_url,
+                    'title' => $img->title ?: 'Photograph'
+                ];
+            })
+        ];
+    })->values()) !!};
+
+    let currentLightboxList = [];
+    let currentLightboxIndex = 0;
+
+    window.openAlbumViewer = function(albumId) {
+        const album = homeAlbums.find(a => a.id === Number(albumId));
+        if (!album) return;
+
+        const branchEl = document.getElementById('viewer-branch');
+        const catEl = document.getElementById('viewer-category');
+        const countEl = document.getElementById('viewer-count');
+        const titleEl = document.getElementById('viewer-title');
+        const descEl = document.getElementById('viewer-desc');
+
+        if (branchEl) branchEl.textContent = album.branch;
+        if (catEl) catEl.textContent = album.category;
+        if (countEl) countEl.textContent = `${album.images.length} Photos`;
+        if (titleEl) titleEl.textContent = album.name;
+        if (descEl) descEl.textContent = album.description;
+
+        const grid = document.getElementById('viewer-photos-grid');
+        const emptyEl = document.getElementById('viewer-empty-state');
+        if (grid) {
+            grid.innerHTML = '';
+            if (album.images.length === 0) {
+                if (emptyEl) emptyEl.classList.remove('hidden');
+            } else {
+                if (emptyEl) emptyEl.classList.add('hidden');
+                album.images.forEach((img, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'group relative rounded-2xl overflow-hidden bg-forest/5 shadow-xs cursor-pointer h-48 sm:h-52 transition hover:shadow-lg border border-forest/10';
+                    item.onclick = function() { window.openLightboxForAlbum(albumId, idx); };
+                    item.innerHTML = `
+                        <img src="${img.url}" alt="${img.title}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=600&q=80';" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-3.5 text-white">
+                            <span class="text-xs font-bold leading-tight line-clamp-1">${img.title}</span>
+                            <span class="text-[10px] text-brass mt-0.5 flex items-center gap-1"><i data-lucide="zoom-in" class="w-3 h-3"></i> Full Resolution</span>
+                        </div>
+                    `;
+                    grid.appendChild(item);
+                });
+            }
+        }
+
+        const modal = document.getElementById('album-viewer-modal');
+        if (modal) modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    };
+
+    window.closeAlbumViewer = function() {
+        const modal = document.getElementById('album-viewer-modal');
+        if (modal) modal.classList.add('hidden');
+        const lbModal = document.getElementById('lightbox-modal');
+        if (!lbModal || lbModal.classList.contains('hidden')) {
+            document.body.style.overflow = '';
+        }
+    };
+
+    window.openLightboxForAlbum = function(albumId, photoIndex) {
+        const album = homeAlbums.find(a => a.id === Number(albumId));
+        if (!album || !album.images.length) return;
+
+        currentLightboxList = album.images;
+        currentLightboxIndex = photoIndex;
+        const tagEl = document.getElementById('lightbox-album-tag');
+        if (tagEl) tagEl.textContent = `${album.name} · ${album.branch}`;
+
+        renderLightboxCurrent();
+        const lbModal = document.getElementById('lightbox-modal');
+        if (lbModal) lbModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    };
+
+    window.openLightbox = function(url, caption) {
+        currentLightboxList = [{ url: url, title: caption || 'Cottage Photograph' }];
+        currentLightboxIndex = 0;
+        const tagEl = document.getElementById('lightbox-album-tag');
+        if (tagEl) tagEl.textContent = '';
+        renderLightboxCurrent();
+        const lbModal = document.getElementById('lightbox-modal');
+        if (lbModal) lbModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    };
+
+    function renderLightboxCurrent() {
+        if (!currentLightboxList.length) return;
+        const photo = currentLightboxList[currentLightboxIndex];
+        const imgEl = document.getElementById('lightbox-img');
+        const capEl = document.getElementById('lightbox-caption');
+        const counterEl = document.getElementById('lightbox-counter');
+        const prevBtn = document.getElementById('lightbox-prev-btn');
+        const nextBtn = document.getElementById('lightbox-next-btn');
+
+        if (imgEl) {
+            imgEl.src = photo.url;
+            imgEl.alt = photo.title || 'Cottage Photograph';
+        }
+        if (capEl) capEl.textContent = photo.title || '';
+        if (counterEl) counterEl.textContent = `${currentLightboxIndex + 1} / ${currentLightboxList.length}`;
+
+        if (currentLightboxList.length <= 1) {
+            if (prevBtn) prevBtn.classList.add('hidden');
+            if (nextBtn) nextBtn.classList.add('hidden');
+        } else {
+            if (prevBtn) prevBtn.classList.remove('hidden');
+            if (nextBtn) nextBtn.classList.remove('hidden');
+        }
+    }
+
+    window.lightboxPrev = function(e) {
+        if (e) e.stopPropagation();
+        if (currentLightboxList.length <= 1) return;
+        currentLightboxIndex = (currentLightboxIndex - 1 + currentLightboxList.length) % currentLightboxList.length;
+        renderLightboxCurrent();
+    };
+
+    window.lightboxNext = function(e) {
+        if (e) e.stopPropagation();
+        if (currentLightboxList.length <= 1) return;
+        currentLightboxIndex = (currentLightboxIndex + 1) % currentLightboxList.length;
+        renderLightboxCurrent();
+    };
+
+    window.closeLightbox = function() {
+        const lbModal = document.getElementById('lightbox-modal');
+        if (lbModal) lbModal.classList.add('hidden');
+        const avModal = document.getElementById('album-viewer-modal');
+        if (!avModal || avModal.classList.contains('hidden')) {
+            document.body.style.overflow = '';
+        }
+    };
+
+    /* =====================================================================
        TESTIMONIALS QUOTES SLIDER
        ===================================================================== */
     let currentTestimonial = 0;
@@ -1120,6 +1472,41 @@
             testContainer.addEventListener('mouseleave', startTestTimer);
             startTestTimer();
         }
+
+        // Modal backdrop click listeners
+        const avModal = document.getElementById('album-viewer-modal');
+        if (avModal) {
+            avModal.addEventListener('click', function(e) {
+                if (e.target.id === 'album-viewer-modal') window.closeAlbumViewer();
+            });
+        }
+
+        const lbModal = document.getElementById('lightbox-modal');
+        if (lbModal) {
+            lbModal.addEventListener('click', function(e) {
+                if (e.target.id === 'lightbox-modal') window.closeLightbox();
+            });
+        }
+
+        // Global keydown listeners for escape and arrows
+        document.addEventListener('keydown', function(e) {
+            const lb = document.getElementById('lightbox-modal');
+            const av = document.getElementById('album-viewer-modal');
+
+            if (lb && !lb.classList.contains('hidden')) {
+                if (e.key === 'Escape') {
+                    window.closeLightbox();
+                } else if (e.key === 'ArrowLeft') {
+                    window.lightboxPrev();
+                } else if (e.key === 'ArrowRight') {
+                    window.lightboxNext();
+                }
+            } else if (av && !av.classList.contains('hidden')) {
+                if (e.key === 'Escape') {
+                    window.closeAlbumViewer();
+                }
+            }
+        });
 
         // Periodic Lucide icon check in case Lucide loaded after scripts
         let iconTries = 0;
