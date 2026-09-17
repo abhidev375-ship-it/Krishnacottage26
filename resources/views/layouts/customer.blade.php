@@ -326,18 +326,8 @@
             </div>
             @endguest
 
-            <!-- PROMINENT INPUT BAR (Placed First At Top as Requested) -->
-            <div class="p-3 sm:p-3.5 bg-white border-b border-forest/15 shrink-0 shadow-xs z-10">
-                <form id="chatMessageForm" onsubmit="handleSendChatMessage(event)" class="flex items-center gap-2">
-                    <input type="text" id="chatTextInput" autocomplete="off" placeholder="Ask anything: cottage availability, dining, travel..." class="flex-1 text-xs py-2.5 px-3.5 rounded-xl border border-forest/20 bg-paper/60 text-forest placeholder-forest/50 focus:outline-none focus:ring-2 focus:ring-emerald focus:border-transparent font-medium">
-                    <button type="submit" id="chatSendBtn" class="h-9 w-9 rounded-xl bg-forest hover:bg-emerald text-paper flex items-center justify-center shadow-md transition shrink-0 cursor-pointer" title="Send Message">
-                        <i data-lucide="send" class="w-4 h-4 text-brass"></i>
-                    </button>
-                </form>
-            </div>
-
-            <!-- Quick Suggestions Pills -->
-            <div id="chatQuickPillsContainer" class="px-3 py-2 bg-white/80 border-b border-forest/10 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+            <!-- Quick Suggestions Pills (Placed at the TOP as Requested) -->
+            <div id="chatQuickPillsContainer" class="px-3 py-2.5 bg-white/90 border-b border-forest/10 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 shadow-2xs">
                 <span class="text-[9px] uppercase font-bold text-forest/40 tracking-wider shrink-0 mr-1">Quick:</span>
                 <div id="quickPillsList" class="flex items-center gap-1.5">
                     <button type="button" onclick="sendQuickPrompt('Where all do you have cottage branches?')" class="text-[10px] whitespace-nowrap bg-paper hover:bg-white text-forest px-2.5 py-1 rounded-full border border-forest/15 font-semibold transition">
@@ -355,8 +345,16 @@
                 </div>
             </div>
 
+            <!-- Messages Stream Container (Middle Scrollable Area) -->
+            <div id="chatMessagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3 bg-[#F7F5EE]">
+                <div id="chatLoadingSpinner" class="flex items-center justify-center py-8 text-xs text-forest/40 gap-2">
+                    <div class="w-4 h-4 rounded-full border-2 border-forest/30 border-t-forest animate-spin"></div>
+                    <span>Connecting to Concierge Desk...</span>
+                </div>
+            </div>
+
             <!-- Multi-Room Target Selector (Shown if multiple rooms booked) -->
-            <div id="roomTargetChipsBar" class="hidden px-3 py-1.5 bg-[#FAF8F5] border-b border-forest/10 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 text-xs">
+            <div id="roomTargetChipsBar" class="hidden px-3 py-1.5 bg-[#FAF8F5] border-t border-forest/10 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 text-xs">
                 <span class="text-[9px] uppercase font-bold text-forest/50 tracking-wider shrink-0 mr-1 flex items-center gap-1">
                     <i data-lucide="door-open" class="w-3 h-3 text-forest/60"></i> Room:
                 </span>
@@ -366,7 +364,7 @@
             </div>
 
             <!-- In-Villa Dining 1-Tap Ordering Drawer (In-House Guests) -->
-            <div id="chatFoodCarousel" class="hidden px-3 py-2.5 bg-[#F3F8F5] border-b border-forest/15 shrink-0 transition-all">
+            <div id="chatFoodCarousel" class="hidden px-3 py-2.5 bg-[#F3F8F5] border-t border-forest/15 shrink-0 transition-all">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-1.5">
                         <span class="text-xs">🍽️</span>
@@ -382,12 +380,14 @@
                 </div>
             </div>
 
-            <!-- Messages Stream Container -->
-            <div id="chatMessagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3 bg-[#F7F5EE]">
-                <div id="chatLoadingSpinner" class="flex items-center justify-center py-8 text-xs text-forest/40 gap-2">
-                    <div class="w-4 h-4 rounded-full border-2 border-forest/30 border-t-forest animate-spin"></div>
-                    <span>Connecting to Concierge Desk...</span>
-                </div>
+            <!-- Chat Text Input Bar (Placed at BOTTOM as Requested) -->
+            <div class="p-3 sm:p-3.5 bg-white border-t border-forest/15 shrink-0 shadow-xs z-10">
+                <form id="chatMessageForm" onsubmit="handleSendChatMessage(event)" class="flex items-center gap-2">
+                    <input type="text" id="chatTextInput" autocomplete="off" placeholder="Ask anything: cottage availability, dining, travel..." class="flex-1 text-xs py-2.5 px-3.5 rounded-xl border border-forest/20 bg-paper/60 text-forest placeholder-forest/50 focus:outline-none focus:ring-2 focus:ring-emerald focus:border-transparent font-medium">
+                    <button type="submit" id="chatSendBtn" class="h-9 w-9 rounded-xl bg-forest hover:bg-emerald text-paper flex items-center justify-center shadow-md transition shrink-0 cursor-pointer" title="Send Message">
+                        <i data-lucide="send" class="w-4 h-4 text-brass"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
