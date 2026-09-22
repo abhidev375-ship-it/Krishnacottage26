@@ -23,8 +23,15 @@ return new class extends Migration
             }
         });
 
-        DB::statement("ALTER TABLE facilities MODIFY branch_id BIGINT UNSIGNED NULL");
-        DB::statement("ALTER TABLE facilities MODIFY category VARCHAR(100) NULL DEFAULT NULL");
+        if (DB::getDriverName() === 'sqlite') {
+            Schema::table('facilities', function (Blueprint $table) {
+                $table->unsignedBigInteger('branch_id')->nullable()->change();
+                $table->string('category', 100)->nullable()->change();
+            });
+        } else {
+            DB::statement("ALTER TABLE facilities MODIFY branch_id BIGINT UNSIGNED NULL");
+            DB::statement("ALTER TABLE facilities MODIFY category VARCHAR(100) NULL DEFAULT NULL");
+        }
 
         // Re-add foreign key with set null on delete
         Schema::table('facilities', function (Blueprint $table) {
