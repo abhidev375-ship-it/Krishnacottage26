@@ -343,6 +343,35 @@ class ChatController extends Controller
             \Illuminate\Support\Facades\Log::warning("Failed to dispatch chat SMS: " . $e->getMessage());
         }
 
+        // 4. Smart WhatsApp alert — only fires when genuinely needed, not on every message.
+        // Triggers: (a) very first customer message in this thread
+        //           (b) guest re-opens a previously resolved/closed thread
+        //           (c) message contains urgent/escalation keywords
+        $urgentKeywords = [
+            'urgent', 'emergency', 'help', 'fire', 'medical', 'accident',
+            'cancel', 'cancellation', 'refund', 'complaint', 'problem',
+            'not working', 'broken', 'leak', 'flood', 'pain', 'police',
+        ];
+
+        // Count all customer messages in this thread (our new msg is already saved, so 1 = first)
+        $customerMessageCount = $enquiry->messages()
+            ->where('sender_type', 'customer')
+            ->where('is_internal_note', false)
+            ->count();
+
+        $isFirstMessage   = $customerMessageCount === 1;
+        $isReopened       = in_array($enquiry->getOriginal('status') ?? '', ['resolved', 'closed']);
+        $msgLower         = mb_strtolower($validated['message']);
+        $hasUrgentKeyword = collect($urgentKeywords)->contains(fn($kw) => str_contains($msgLower, $kw));
+
+        if ($isFirstMessage || $isReopened || $hasUrgentKeyword) {
+            try {
+                app(\App\Services\WhatsAppNotificationService::class)->sendEnquiryAlert($enquiry, $validated['message']);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("WhatsApp Chat Alert failed: " . $e->getMessage());
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => $msg,
