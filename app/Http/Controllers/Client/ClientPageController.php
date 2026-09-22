@@ -171,11 +171,16 @@ class ClientPageController extends Controller
             'sent_at' => $now,
         ]);
 
-        // Dispatch real-time CallMeBot WhatsApp alert to admin
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
         try {
-            app(\App\Services\WhatsAppNotificationService::class)->sendEnquiryAlert($enquiry, $validated['message']);
+            app(\App\Services\EmailNotificationService::class)->sendEnquiryAlert($enquiry, $validated['message']);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("WhatsApp Enquiry Alert failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Email Enquiry Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendEnquiryAlert($enquiry, $validated['message']);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Enquiry Alert failed: " . $e->getMessage());
         }
 
         AuditLog::create([

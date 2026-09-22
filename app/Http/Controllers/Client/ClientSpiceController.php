@@ -370,11 +370,16 @@ class ClientSpiceController extends Controller
             'created_at' => Carbon::now(),
         ]);
 
-        // Dispatch real-time CallMeBot WhatsApp alert to spices fulfillment manager
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
         try {
-            app(\App\Services\WhatsAppNotificationService::class)->sendSpiceOrderAlert($order);
+            app(\App\Services\EmailNotificationService::class)->sendSpiceOrderAlert($order);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("WhatsApp Spice Order Alert failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Email Spice Order Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendSpiceOrderAlert($order);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Spice Order Alert failed: " . $e->getMessage());
         }
 
         return redirect()->route('spices.index')->with('order_success', [
@@ -482,11 +487,16 @@ class ClientSpiceController extends Controller
             'sent_at' => Carbon::now(),
         ]);
 
-        // Dispatch real-time CallMeBot WhatsApp alert for spice return
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
         try {
-            app(\App\Services\WhatsAppNotificationService::class)->sendSpiceReturnAlert($order);
+            app(\App\Services\EmailNotificationService::class)->sendSpiceReturnAlert($order);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("WhatsApp Spice Return Alert failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Email Spice Return Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendSpiceReturnAlert($order);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Spice Return Alert failed: " . $e->getMessage());
         }
 
         AuditLog::create([

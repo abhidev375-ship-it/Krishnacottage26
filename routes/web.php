@@ -370,8 +370,10 @@ Route::prefix('admin')->middleware(AdminAuthMiddleware::class)->group(function (
     Route::post('/settings/razorpay/test', [AdminActionController::class, 'testRazorpayConnection'])->name('admin.settings.razorpay.test');
     Route::get('/api/notifications', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'getNotificationsFeed'])->name('admin.api.notifications');
     Route::post('/api/notifications/mark-read', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'markAllRead'])->name('admin.api.notifications.mark-read');
-    Route::post('/settings/whatsapp', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'saveWhatsAppSettings'])->name('admin.settings.whatsapp');
-    Route::post('/settings/whatsapp/test', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'testWhatsApp'])->name('admin.settings.whatsapp.test');
+    Route::post('/settings/email-notifications', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'saveEmailSettings'])->name('admin.settings.email');
+    Route::post('/settings/email-notifications/test', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'testEmail'])->name('admin.settings.email.test');
+    Route::post('/settings/telegram', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'saveTelegramSettings'])->name('admin.settings.telegram');
+    Route::post('/settings/telegram/test', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'testTelegram'])->name('admin.settings.telegram.test');
     Route::post('/staff', [AdminActionController::class, 'storeStaff'])->name('admin.staff.store');
     Route::post('/staff/{id}', [AdminActionController::class, 'updateStaff'])->name('admin.staff.update');
     Route::delete('/staff/{id}', [AdminActionController::class, 'deleteStaff'])->name('admin.staff.delete');

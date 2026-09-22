@@ -13,7 +13,8 @@ use App\Models\Setting;
 use App\Models\SpiceOrder;
 use App\Models\StayExtensionRequest;
 use App\Models\TaxiRequest;
-use App\Services\WhatsAppNotificationService;
+use App\Services\EmailNotificationService;
+use App\Services\TelegramNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -358,38 +359,111 @@ class AdminNotificationController extends Controller
     }
 
     /**
-     * Save CallMeBot WhatsApp settings.
+     * Save SMTP Email notification settings.
      */
-    public function saveWhatsAppSettings(Request $request): JsonResponse
+     public function saveEmailSettings(Request $request): JsonResponse
+     {
+         $validated = $request->validate([
+             'smtp_notifications_enabled' => 'nullable|boolean',
+             'smtp_host' => 'nullable|string|max:190',
+             'smtp_port' => 'nullable|integer',
+             'smtp_encryption' => 'nullable|string|in:tls,ssl,none',
+             'smtp_username' => 'nullable|string|max:190',
+             'smtp_password' => 'nullable|string|max:190',
+             'smtp_from_address' => 'nullable|string|email|max:190',
+             'smtp_from_name' => 'nullable|string|max:120',
+             'smtp_recipient_email' => 'nullable|string|email|max:190',
+         ]);
+
+         Setting::set('smtp_notifications_enabled', (bool) ($validated['smtp_notifications_enabled'] ?? false), 'system', 'Enable/disable automated SMTP email notifications');
+         Setting::set('smtp_host', trim($validated['smtp_host'] ?? ''), 'system', 'SMTP Host address');
+         Setting::set('smtp_port', (int) ($validated['smtp_port'] ?? 587), 'system', 'SMTP Port');
+         Setting::set('smtp_encryption', trim($validated['smtp_encryption'] ?? 'tls'), 'system', 'SMTP Encryption (tls/ssl/none)');
+         Setting::set('smtp_username', trim($validated['smtp_username'] ?? ''), 'system', 'SMTP Username');
+         if (!empty($validated['smtp_password'])) {
+             Setting::set('smtp_password', trim($validated['smtp_password']), 'system', 'SMTP Password');
+         }
+         Setting::set('smtp_from_address', trim($validated['smtp_from_address'] ?? ''), 'system', 'SMTP Outbound From Address');
+         Setting::set('smtp_from_name', trim($validated['smtp_from_name'] ?? 'Krishna Cottages'), 'system', 'SMTP Outbound Sender Name');
+         Setting::set('smtp_recipient_email', trim($validated['smtp_recipient_email'] ?? ''), 'system', 'Admin Recipient Email for Operational Alerts');
+
+         return response()->json([
+             'success' => true,
+             'message' => 'SMTP Email configuration saved successfully.',
+         ]);
+     }
+
+    /**
+     * Test SMTP Email sending.
+     */
+    public function testEmail(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'whatsapp_notifications_enabled' => 'nullable|boolean',
-            'callmebot_phone' => 'nullable|string|max:40',
-            'callmebot_apikey' => 'nullable|string|max:100',
+            'smtp_host' => 'required|string|max:190',
+            'smtp_port' => 'required|integer',
+            'smtp_encryption' => 'nullable|string|in:tls,ssl,none',
+            'smtp_username' => 'required|string|max:190',
+            'smtp_password' => 'nullable|string|max:190',
+            'smtp_from_address' => 'nullable|string|email|max:190',
+            'smtp_from_name' => 'nullable|string|max:120',
+            'recipient_email' => 'required|string|email|max:190',
         ]);
 
-        Setting::set('whatsapp_notifications_enabled', (bool) ($validated['whatsapp_notifications_enabled'] ?? false), 'resort', 'Enable/disable CallMeBot WhatsApp alerts');
-        Setting::set('callmebot_phone', trim($validated['callmebot_phone'] ?? ''), 'resort', 'Destination WhatsApp phone number with country code');
-        Setting::set('callmebot_apikey', trim($validated['callmebot_apikey'] ?? ''), 'resort', 'CallMeBot API Key');
+        if (empty($validated['smtp_password'])) {
+            $validated['smtp_password'] = Setting::get('smtp_password', env('MAIL_PASSWORD', ''));
+        }
+
+        $service = app(EmailNotificationService::class);
+        $result = $service->sendTestEmail($validated, $validated['recipient_email']);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Save Telegram Bot notification settings.
+     */
+    public function saveTelegramSettings(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'telegram_notifications_enabled' => 'nullable|boolean',
+            'telegram_bot_token' => 'nullable|string|max:190',
+            'telegram_chat_id' => 'nullable|string|max:100',
+        ]);
+
+        Setting::set('telegram_notifications_enabled', (bool) ($validated['telegram_notifications_enabled'] ?? false), 'system', 'Enable/disable automated Telegram Bot notifications');
+        if (!empty($validated['telegram_bot_token'])) {
+            Setting::set('telegram_bot_token', trim($validated['telegram_bot_token']), 'system', 'Telegram Bot Token');
+        }
+        Setting::set('telegram_chat_id', trim($validated['telegram_chat_id'] ?? ''), 'system', 'Admin Telegram Chat ID / Channel ID');
 
         return response()->json([
             'success' => true,
-            'message' => 'WhatsApp CallMeBot configuration saved successfully.',
+            'message' => 'Telegram Bot configuration saved successfully.',
         ]);
     }
 
     /**
-     * Dispatch an instant test WhatsApp ping to verify CallMeBot credentials.
+     * Test Telegram Bot message dispatch.
      */
-    public function testWhatsApp(Request $request): JsonResponse
+    public function testTelegram(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'phone' => 'required|string|max:40',
-            'api_key' => 'required|string|max:100',
+            'bot_token' => 'nullable|string|max:190',
+            'chat_id' => 'required|string|max:100',
         ]);
 
-        $service = app(WhatsAppNotificationService::class);
-        $result = $service->sendTestMessage($validated['phone'], $validated['api_key']);
+        $botToken = !empty($validated['bot_token']) ? trim($validated['bot_token']) : Setting::get('telegram_bot_token', env('TELEGRAM_BOT_TOKEN', ''));
+
+        if (empty($botToken)) {
+            return response()->json([
+                'success' => false,
+                'status' => 'failed',
+                'error' => 'Telegram Bot Token is required to test connection.',
+            ]);
+        }
+
+        $service = app(TelegramNotificationService::class);
+        $result = $service->sendTestMessage($botToken, trim($validated['chat_id']));
 
         return response()->json($result);
     }

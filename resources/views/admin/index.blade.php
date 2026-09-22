@@ -2105,22 +2105,28 @@
             }, 4500);
         }
 
-        // WhatsApp (CallMeBot) Settings Form Handling
-        async function handleWhatsAppSettingsSubmit(e) {
+        // ================= SMTP EMAIL NOTIFICATIONS =================
+        async function handleEmailSettingsSubmit(e) {
             e.preventDefault();
-            const btn = document.getElementById('btn-save-whatsapp');
-            const text = document.getElementById('btn-save-wa-text');
+            const btn = document.getElementById('btn-save-email');
+            const text = document.getElementById('btn-save-email-text');
             if (btn) btn.disabled = true;
             if (text) text.textContent = 'Saving...';
 
             const payload = {
-                whatsapp_notifications_enabled: document.getElementById('wa_enabled').value === '1',
-                callmebot_phone: document.getElementById('wa_phone').value.trim(),
-                callmebot_apikey: document.getElementById('wa_apikey').value.trim(),
+                smtp_notifications_enabled: document.getElementById('smtp_enabled').value === '1',
+                smtp_host: document.getElementById('smtp_host').value.trim(),
+                smtp_port: parseInt(document.getElementById('smtp_port').value) || 587,
+                smtp_encryption: document.getElementById('smtp_encryption').value,
+                smtp_username: document.getElementById('smtp_username').value.trim(),
+                smtp_password: document.getElementById('smtp_password').value.trim(),
+                smtp_from_address: document.getElementById('smtp_from_address').value.trim(),
+                smtp_from_name: document.getElementById('smtp_from_name').value.trim(),
+                smtp_recipient_email: document.getElementById('smtp_recipient_email').value.trim(),
             };
 
             try {
-                const res = await fetch('/admin/settings/whatsapp', {
+                const res = await fetch('/admin/settings/email-notifications', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2133,61 +2139,164 @@
                 if (data.success) {
                     showToastNotification('✓ Saved', data.message);
                 } else {
-                    alert(data.message || 'Failed to save WhatsApp settings.');
+                    alert(data.message || 'Failed to save SMTP settings.');
                 }
             } catch (err) {
-                alert('Network error saving WhatsApp settings.');
+                alert('Network error saving SMTP settings.');
             } finally {
                 if (btn) btn.disabled = false;
-                if (text) text.textContent = 'Save WhatsApp Configuration';
+                if (text) text.textContent = 'Save Email Configuration';
             }
         }
 
-        async function testWhatsAppConnectionAdmin() {
-            const phone = document.getElementById('wa_phone') ? document.getElementById('wa_phone').value.trim() : '';
-            const apiKey = document.getElementById('wa_apikey') ? document.getElementById('wa_apikey').value.trim() : '';
-            const resultBox = document.getElementById('whatsapp-test-result');
-            const btn = document.getElementById('btn-test-whatsapp');
-            const btnText = document.getElementById('btn-test-wa-text');
+        async function testEmailConnectionAdmin() {
+            const host = document.getElementById('smtp_host')?.value.trim();
+            const port = parseInt(document.getElementById('smtp_port')?.value) || 587;
+            const encryption = document.getElementById('smtp_encryption')?.value;
+            const username = document.getElementById('smtp_username')?.value.trim();
+            const password = document.getElementById('smtp_password')?.value.trim();
+            const fromAddress = document.getElementById('smtp_from_address')?.value.trim();
+            const fromName = document.getElementById('smtp_from_name')?.value.trim();
+            const recipient = document.getElementById('smtp_recipient_email')?.value.trim();
 
-            if (!phone || !apiKey) {
-                alert('Please enter your WhatsApp Phone number and CallMeBot API Key before testing.');
+            const resultBox = document.getElementById('email-test-result');
+            const btn = document.getElementById('btn-test-email');
+            const btnText = document.getElementById('btn-test-email-text');
+
+            if (!host || !username || !recipient) {
+                alert('Please enter SMTP Host, Username, and Recipient Email before testing.');
                 return;
             }
 
             if (btn) btn.disabled = true;
-            if (btnText) btnText.textContent = 'Pinging...';
+            if (btnText) btnText.textContent = 'Sending Test Email...';
             if (resultBox) {
                 resultBox.className = 'p-3 rounded-lg text-xs font-medium border flex items-center gap-2 bg-blue-50 text-blue-800 border-blue-200';
-                resultBox.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-600"></i> Dispatching test WhatsApp ping via CallMeBot gateway...';
+                resultBox.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-600"></i> Dispatching test email via SMTP server...';
                 resultBox.classList.remove('hidden');
                 if (window.lucide) window.lucide.createIcons();
             }
 
             try {
-                const res = await fetch('/admin/settings/whatsapp/test', {
+                const res = await fetch('/admin/settings/email-notifications/test', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({ phone, api_key: apiKey })
+                    body: JSON.stringify({
+                        smtp_host: host,
+                        smtp_port: port,
+                        smtp_encryption: encryption,
+                        smtp_username: username,
+                        smtp_password: password,
+                        smtp_from_address: fromAddress,
+                        smtp_from_name: fromName,
+                        recipient_email: recipient,
+                    })
                 });
                 const data = await res.json();
                 if (data.success) {
                     resultBox.className = 'p-3 rounded-lg text-xs font-medium border flex items-center gap-2 bg-emerald-50 text-emerald-800 border-emerald-300';
-                    resultBox.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Test message queued/delivered successfully! Check WhatsApp on ' + escapeHtml(phone);
+                    resultBox.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Test email delivered successfully to ' + escapeHtml(recipient) + '! Check your inbox / spam.';
                 } else {
                     resultBox.className = 'p-3 rounded-lg text-xs font-medium border flex items-center gap-2 bg-rose-50 text-rose-800 border-rose-300';
-                    resultBox.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i> Test failed: ' + escapeHtml(data.error || 'Check your phone and API key.');
+                    resultBox.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i> SMTP Error: ' + escapeHtml(data.error || 'Check host, port and password.');
                 }
             } catch (err) {
                 resultBox.className = 'p-3 rounded-lg text-xs font-medium border flex items-center gap-2 bg-rose-50 text-rose-800 border-rose-300';
-                resultBox.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i> Network connection error while calling CallMeBot gateway.';
+                resultBox.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i> Network connection error while calling email test endpoint.';
             } finally {
                 if (btn) btn.disabled = false;
-                if (btnText) btnText.textContent = 'Test WhatsApp Ping';
+                if (btnText) btnText.textContent = 'Send Test Email';
+                if (window.lucide) window.lucide.createIcons();
+            }
+        }
+
+        // ================= TELEGRAM BOT NOTIFICATIONS =================
+        async function handleTelegramSettingsSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-telegram');
+            const text = document.getElementById('btn-save-telegram-text');
+            if (btn) btn.disabled = true;
+            if (text) text.textContent = 'Saving...';
+
+            const payload = {
+                telegram_notifications_enabled: document.getElementById('tg_enabled').value === '1',
+                telegram_bot_token: document.getElementById('tg_bot_token').value.trim(),
+                telegram_chat_id: document.getElementById('tg_chat_id').value.trim(),
+            };
+
+            try {
+                const res = await fetch('/admin/settings/telegram', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToastNotification('✓ Saved', data.message);
+                } else {
+                    alert(data.message || 'Failed to save Telegram settings.');
+                }
+            } catch (err) {
+                alert('Network error saving Telegram settings.');
+            } finally {
+                if (btn) btn.disabled = false;
+                if (text) text.textContent = 'Save Telegram Configuration';
+            }
+        }
+
+        async function testTelegramConnectionAdmin() {
+            const token = document.getElementById('tg_bot_token')?.value.trim();
+            const chatId = document.getElementById('tg_chat_id')?.value.trim();
+            const resultBox = document.getElementById('telegram-test-result');
+            const btn = document.getElementById('btn-test-telegram');
+            const btnText = document.getElementById('btn-test-telegram-text');
+
+            if (!chatId) {
+                alert('Please enter your Telegram Chat ID / Channel ID before testing.');
+                return;
+            }
+
+            if (btn) btn.disabled = true;
+            if (btnText) btnText.textContent = 'Pinging Telegram...';
+            if (resultBox) {
+                resultBox.className = 'p-3 rounded-lg text-xs font-medium border flex items-center gap-2 bg-blue-50 text-blue-800 border-blue-200';
+                resultBox.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-600"></i> Dispatching test message via Telegram Bot API...';
+                resultBox.classList.remove('hidden');
+                if (window.lucide) window.lucide.createIcons();
+            }
+
+            try {
+                const res = await fetch('/admin/settings/telegram/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ bot_token: token, chat_id: chatId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    resultBox.className = 'p-3 rounded-lg text-xs font-medium border flex items-center gap-2 bg-emerald-50 text-emerald-800 border-emerald-300';
+                    resultBox.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Test alert sent successfully to Telegram Chat ' + escapeHtml(chatId) + '! Check your Telegram app.';
+                } else {
+                    resultBox.className = 'p-3 rounded-lg text-xs font-medium border flex items-center gap-2 bg-rose-50 text-rose-800 border-rose-300';
+                    resultBox.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i> Telegram Error: ' + escapeHtml(data.error || 'Check your Bot Token and Chat ID.');
+                }
+            } catch (err) {
+                resultBox.className = 'p-3 rounded-lg text-xs font-medium border flex items-center gap-2 bg-rose-50 text-rose-800 border-rose-300';
+                resultBox.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i> Network connection error while calling Telegram Bot API.';
+            } finally {
+                if (btn) btn.disabled = false;
+                if (btnText) btnText.textContent = 'Send Test Telegram Ping';
                 if (window.lucide) window.lucide.createIcons();
             }
         }

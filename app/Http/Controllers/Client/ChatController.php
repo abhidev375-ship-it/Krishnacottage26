@@ -366,9 +366,14 @@ class ChatController extends Controller
 
         if ($isFirstMessage || $isReopened || $hasUrgentKeyword) {
             try {
-                app(\App\Services\WhatsAppNotificationService::class)->sendEnquiryAlert($enquiry, $validated['message']);
+                app(\App\Services\EmailNotificationService::class)->sendEnquiryAlert($enquiry, $validated['message']);
             } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning("WhatsApp Chat Alert failed: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Email Chat Alert failed: " . $e->getMessage());
+            }
+            try {
+                app(\App\Services\TelegramNotificationService::class)->sendEnquiryAlert($enquiry, $validated['message']);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Telegram Chat Alert failed: " . $e->getMessage());
             }
         }
 

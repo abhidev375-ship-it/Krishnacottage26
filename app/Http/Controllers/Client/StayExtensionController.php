@@ -225,11 +225,16 @@ class StayExtensionController extends Controller
             'is_internal_note' => false,
         ]);
 
-        // Dispatch real-time CallMeBot WhatsApp alert to branch manager / admin
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
         try {
-            app(\App\Services\WhatsAppNotificationService::class)->sendStayExtensionAlert($ext, $reservation);
+            app(\App\Services\EmailNotificationService::class)->sendStayExtensionAlert($ext, $reservation);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("WhatsApp Stay Extension Alert failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Email Stay Extension Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendStayExtensionAlert($ext, $reservation);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Stay Extension Alert failed: " . $e->getMessage());
         }
 
         return response()->json([

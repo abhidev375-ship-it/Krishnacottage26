@@ -177,11 +177,16 @@ class ClientDiningController extends Controller
             'created_at' => Carbon::now(),
         ]);
 
-        // Dispatch real-time CallMeBot WhatsApp alert to restaurant / kitchen staff
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
         try {
-            app(\App\Services\WhatsAppNotificationService::class)->sendFoodOrderAlert($foodOrder);
+            app(\App\Services\EmailNotificationService::class)->sendFoodOrderAlert($foodOrder);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("WhatsApp Food Order Alert failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Email Food Order Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendFoodOrderAlert($foodOrder);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Food Order Alert failed: " . $e->getMessage());
         }
 
         return response()->json([

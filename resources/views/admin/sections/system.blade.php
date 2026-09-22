@@ -369,96 +369,237 @@
             </form>
         </div>
 
-        <!-- CALLMEBOT WHATSAPP OPERATIONAL GATEWAY -->
+        <!-- SMTP EMAIL OPERATIONAL GATEWAY -->
         @php
-            $whatsappEnabled = (bool) \App\Models\Setting::get('whatsapp_notifications_enabled', true);
-            $callmebotPhone = \App\Models\Setting::get('callmebot_phone', env('CALLMEBOT_PHONE', ''));
-            $callmebotApiKey = \App\Models\Setting::get('callmebot_apikey', env('CALLMEBOT_APIKEY', ''));
-            $isWaConfigured = !empty($callmebotPhone) && !empty($callmebotApiKey);
+            $smtpEnabled = (bool) \App\Models\Setting::get('smtp_notifications_enabled', true);
+            $smtpHost = \App\Models\Setting::get('smtp_host', env('MAIL_HOST', ''));
+            $smtpPort = (int) \App\Models\Setting::get('smtp_port', env('MAIL_PORT', 587));
+            $smtpEncryption = \App\Models\Setting::get('smtp_encryption', env('MAIL_ENCRYPTION', 'tls'));
+            $smtpUsername = \App\Models\Setting::get('smtp_username', env('MAIL_USERNAME', ''));
+            $smtpPassword = \App\Models\Setting::get('smtp_password', env('MAIL_PASSWORD', ''));
+            $smtpFromAddress = \App\Models\Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', ''));
+            $smtpFromName = \App\Models\Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Krishna Cottages'));
+            $smtpRecipient = \App\Models\Setting::get('smtp_recipient_email', env('ADMIN_NOTIFICATION_EMAIL', ''));
+            $isSmtpConfigured = !empty($smtpHost) && !empty($smtpUsername) && !empty($smtpRecipient);
+
+            $tgEnabled = (bool) \App\Models\Setting::get('telegram_notifications_enabled', true);
+            $tgBotToken = \App\Models\Setting::get('telegram_bot_token', env('TELEGRAM_BOT_TOKEN', ''));
+            $tgChatId = \App\Models\Setting::get('telegram_chat_id', env('TELEGRAM_CHAT_ID', ''));
+            $isTgConfigured = !empty($tgBotToken) && !empty($tgChatId);
         @endphp
+
         <div class="bg-brand-surface rounded-xl border border-gray-200/70 p-5 space-y-4 shadow-xs">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-700 flex items-center justify-center text-white shadow-xs">
-                        <i data-lucide="message-circle" class="w-4 h-4"></i>
+                    <div class="w-8 h-8 rounded-lg bg-blue-700 flex items-center justify-center text-white shadow-xs">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
                     </div>
                     <div>
                         <h3 class="font-bold text-sm text-brand-text flex items-center gap-2">
-                            CallMeBot WhatsApp Operational Gateway
-                            @if($isWaConfigured && $whatsappEnabled)
+                            SMTP Email Operational Gateway
+                            @if($isSmtpConfigured && $smtpEnabled)
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">● LIVE READY</span>
-                            @elseif(!$whatsappEnabled)
+                            @elseif(!$smtpEnabled)
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-700">PAUSED / DISABLED</span>
                             @else
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">NEEDS API KEY</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">NEEDS CREDENTIALS</span>
                             @endif
                         </h3>
-                        <p class="text-[11px] text-brand-muted">Automated real-time WhatsApp dispatches for Bookings, Enquiries, Kitchen Orders, Extensions & Concierge.</p>
+                        <p class="text-[11px] text-brand-muted">Automated HTML email dispatches to admin for Bookings, Kitchen Orders, Extensions, Concierge & Spices.</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="testWhatsAppConnectionAdmin()" id="btn-test-whatsapp" class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-brand-text text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer border border-gray-200">
-                        <i data-lucide="send" class="w-3.5 h-3.5 text-emerald-600"></i>
-                        <span id="btn-test-wa-text">Test WhatsApp Ping</span>
+                    <button type="button" onclick="testEmailConnectionAdmin()" id="btn-test-email" class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-brand-text text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer border border-gray-200">
+                        <i data-lucide="send" class="w-3.5 h-3.5 text-blue-600"></i>
+                        <span id="btn-test-email-text">Send Test Email</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Connection Status Box (hidden until tested) -->
-            <div id="whatsapp-test-result" class="hidden p-3 rounded-lg text-xs font-medium border flex items-center gap-2"></div>
+            <!-- Email Connection Status Box (hidden until tested) -->
+            <div id="email-test-result" class="hidden p-3 rounded-lg text-xs font-medium border flex items-center gap-2"></div>
 
-            <form id="form-whatsapp-settings" onsubmit="handleWhatsAppSettingsSubmit(event)" class="space-y-4 text-xs">
+            <form id="form-email-settings" onsubmit="handleEmailSettingsSubmit(event)" class="space-y-4 text-xs">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
                             Notification Delivery
                         </label>
-                        <select name="whatsapp_notifications_enabled" id="wa_enabled" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary text-xs bg-white">
-                            <option value="1" {{ $whatsappEnabled ? 'selected' : '' }}>Enabled (Instant WhatsApp Alerts Active)</option>
-                            <option value="0" {{ !$whatsappEnabled ? 'selected' : '' }}>Disabled (Temporarily Pause Alerts)</option>
+                        <select name="smtp_notifications_enabled" id="smtp_enabled" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary text-xs bg-white">
+                            <option value="1" {{ $smtpEnabled ? 'selected' : '' }}>Enabled (Instant Email Alerts Active)</option>
+                            <option value="0" {{ !$smtpEnabled ? 'selected' : '' }}>Disabled (Temporarily Pause Alerts)</option>
                         </select>
-                        <p class="text-[10px] text-brand-muted mt-1">Master switch to turn on/off all WhatsApp alerts.</p>
+                        <p class="text-[10px] text-brand-muted mt-1">Master toggle for outbound email notifications.</p>
                     </div>
 
                     <div>
                         <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
-                            Manager WhatsApp Phone <span class="text-rose-500">*</span>
+                            SMTP Server Host <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="callmebot_phone" id="wa_phone" required value="{{ $callmebotPhone }}" placeholder="+919447122334" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
-                        <p class="text-[10px] text-brand-muted mt-1">Include country code (e.g. +91 94471 22334).</p>
+                        <input type="text" name="smtp_host" id="smtp_host" required value="{{ $smtpHost }}" placeholder="smtp.gmail.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
+                        <p class="text-[10px] text-brand-muted mt-1">e.g. smtp.gmail.com, mail.yourdomain.com</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
+                                Port <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="number" name="smtp_port" id="smtp_port" required value="{{ $smtpPort }}" placeholder="587" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
+                                Encryption
+                            </label>
+                            <select name="smtp_encryption" id="smtp_encryption" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary text-xs bg-white">
+                                <option value="tls" {{ $smtpEncryption === 'tls' ? 'selected' : '' }}>TLS (587)</option>
+                                <option value="ssl" {{ $smtpEncryption === 'ssl' ? 'selected' : '' }}>SSL (465)</option>
+                                <option value="none" {{ $smtpEncryption === 'none' ? 'selected' : '' }}>None</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div>
                         <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
-                            CallMeBot API Key <span class="text-rose-500">*</span>
+                            SMTP Username / Account <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="smtp_username" id="smtp_username" required value="{{ $smtpUsername }}" placeholder="reservations@krishnacottages.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
+                        <p class="text-[10px] text-brand-muted mt-1">Your SMTP login username / email address.</p>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
+                            SMTP Password / App Password <span class="text-rose-500">*</span>
                         </label>
                         <div class="relative">
-                            <input type="password" name="callmebot_apikey" id="wa_apikey" required value="{{ $callmebotApiKey }}" placeholder="123456" class="w-full px-3 py-2 pr-10 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
-                            <button type="button" onclick="toggleSecretVisibility('wa_apikey', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer">
+                            <input type="password" name="smtp_password" id="smtp_password" value="{{ $smtpPassword }}" placeholder="••••••••••••" class="w-full px-3 py-2 pr-10 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
+                            <button type="button" onclick="toggleSecretVisibility('smtp_password', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer">
                                 <i data-lucide="eye" class="w-4 h-4"></i>
                             </button>
                         </div>
-                        <p class="text-[10px] text-brand-muted mt-1">Your free CallMeBot API authorization key.</p>
+                        <p class="text-[10px] text-brand-muted mt-1">For Gmail, use a 16-character Google App Password.</p>
+                    </div>
+
+                    <div class="bg-blue-50/60 p-2.5 rounded-lg border border-blue-200">
+                        <label class="block font-bold text-blue-900 mb-1 uppercase tracking-wider text-[10px]">
+                            Admin Receiving Email <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="email" name="smtp_recipient_email" id="smtp_recipient_email" required value="{{ $smtpRecipient }}" placeholder="manager@krishnacottages.com" class="w-full px-3 py-2 rounded-lg border border-blue-300 focus:ring-1 focus:ring-blue-500 font-mono text-xs bg-white">
+                        <p class="text-[10px] text-blue-700 mt-1 font-medium">All new booking & order alerts will be delivered here.</p>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
+                            Sender Email Address (From)
+                        </label>
+                        <input type="email" name="smtp_from_address" id="smtp_from_address" value="{{ $smtpFromAddress }}" placeholder="noreply@krishnacottages.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
+                        <p class="text-[10px] text-brand-muted mt-1">Display address for outgoing notification emails.</p>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
+                            Sender Display Name
+                        </label>
+                        <input type="text" name="smtp_from_name" id="smtp_from_name" value="{{ $smtpFromName }}" placeholder="Krishna Cottages" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary text-xs">
+                        <p class="text-[10px] text-brand-muted mt-1">Sender name shown in recipient inbox.</p>
                     </div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-950 flex items-start gap-2.5">
-                    <i data-lucide="info" class="w-4 h-4 text-emerald-700 shrink-0 mt-0.5"></i>
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button type="submit" id="btn-save-email" class="px-5 py-2.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition cursor-pointer">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        <span id="btn-save-email-text">Save Email Configuration</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TELEGRAM BOT OPERATIONAL GATEWAY -->
+        <div class="bg-brand-surface rounded-xl border border-gray-200/70 p-5 space-y-4 shadow-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center text-white shadow-xs">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm text-brand-text flex items-center gap-2">
+                            Telegram Bot Operational Gateway
+                            @if($isTgConfigured && $tgEnabled)
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">● LIVE READY</span>
+                            @elseif(!$tgEnabled)
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-700">PAUSED / DISABLED</span>
+                            @else
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">NEEDS BOT TOKEN</span>
+                            @endif
+                        </h3>
+                        <p class="text-[11px] text-brand-muted">Instant, secure Telegram alerts to management personal chats or staff group channels without phone limits.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="testTelegramConnectionAdmin()" id="btn-test-telegram" class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-brand-text text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer border border-gray-200">
+                        <i data-lucide="send" class="w-3.5 h-3.5 text-sky-600"></i>
+                        <span id="btn-test-telegram-text">Send Test Telegram Ping</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Telegram Test Result Box -->
+            <div id="telegram-test-result" class="hidden p-3 rounded-lg text-xs font-medium border flex items-center gap-2"></div>
+
+            <form id="form-telegram-settings" onsubmit="handleTelegramSettingsSubmit(event)" class="space-y-4 text-xs">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
+                            Notification Delivery
+                        </label>
+                        <select name="telegram_notifications_enabled" id="tg_enabled" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary text-xs bg-white">
+                            <option value="1" {{ $tgEnabled ? 'selected' : '' }}>Enabled (Instant Telegram Alerts Active)</option>
+                            <option value="0" {{ !$tgEnabled ? 'selected' : '' }}>Disabled (Temporarily Pause Alerts)</option>
+                        </select>
+                        <p class="text-[10px] text-brand-muted mt-1">Master toggle for Telegram dispatches.</p>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
+                            Telegram Bot Token <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="password" name="telegram_bot_token" id="tg_bot_token" value="{{ $tgBotToken }}" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ" class="w-full px-3 py-2 pr-10 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
+                            <button type="button" onclick="toggleSecretVisibility('tg_bot_token', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-brand-muted mt-1">From Telegram's official <b>@BotFather</b>.</p>
+                    </div>
+
+                    <div class="bg-sky-50/60 p-2.5 rounded-lg border border-sky-200">
+                        <label class="block font-bold text-sky-900 mb-1 uppercase tracking-wider text-[10px]">
+                            Receiving Chat ID / Channel ID <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="telegram_chat_id" id="tg_chat_id" required value="{{ $tgChatId }}" placeholder="987654321 or -100123456789" class="w-full px-3 py-2 rounded-lg border border-sky-300 focus:ring-1 focus:ring-sky-500 font-mono text-xs bg-white">
+                        <p class="text-[10px] text-sky-700 mt-1 font-medium">Your personal chat ID, group ID, or broadcast channel ID.</p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-sky-50/70 border border-sky-200 text-xs text-sky-950 flex items-start gap-2.5">
+                    <i data-lucide="info" class="w-4 h-4 text-sky-700 shrink-0 mt-0.5"></i>
                     <div class="space-y-1">
-                        <span class="font-bold block">How to get your free CallMeBot API Key:</span>
-                        <ol class="list-decimal list-inside text-[11px] text-emerald-900 space-y-0.5">
-                            <li>Add the phone number <code class="font-mono font-bold bg-white/80 px-1 py-0.5 rounded border border-emerald-300">+34 644 49 20 63</code> to your phone contacts (e.g. "CallMeBot").</li>
-                            <li>Open WhatsApp and send this exact text message to CallMeBot: <code class="font-mono font-bold bg-white/80 px-1 py-0.5 rounded border border-emerald-300">I allow callmebot to send me messages</code></li>
-                            <li>CallMeBot will reply immediately with your unique <code class="font-mono font-bold bg-white/80 px-1 py-0.5 rounded border border-emerald-300">apikey</code>. Paste it above and click Save.</li>
+                        <span class="font-bold block">How to get your free Telegram Bot Token & Chat ID in 2 minutes:</span>
+                        <ol class="list-decimal list-inside text-[11px] text-sky-900 space-y-0.5">
+                            <li>Open Telegram, search for <b>@BotFather</b>, send <code class="font-mono font-bold bg-white/80 px-1 py-0.5 rounded border border-sky-300">/newbot</code>, give it a name (e.g. <i>Krishna Alerts</i>), and copy the <b>HTTP API Token</b>.</li>
+                            <li>Open your new bot in Telegram and click <b>START</b> (or add the bot to your management group as an admin).</li>
+                            <li>To find your Chat ID: message <b>@userinfobot</b> in Telegram — it will reply with your numeric <b>Id</b> (e.g. <code class="font-mono font-bold bg-white/80 px-1 py-0.5 rounded border border-sky-300">123456789</code>). For groups, use <b>@GetIDsBot</b>.</li>
+                            <li>Paste the Token and Chat ID above, click <b>Save</b>, then hit <b>Send Test Telegram Ping</b>!</li>
                         </ol>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-2">
-                    <button type="submit" id="btn-save-whatsapp" class="px-5 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition cursor-pointer">
+                    <button type="submit" id="btn-save-telegram" class="px-5 py-2.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition cursor-pointer">
                         <i data-lucide="save" class="w-4 h-4"></i>
-                        <span id="btn-save-wa-text">Save WhatsApp Configuration</span>
+                        <span id="btn-save-telegram-text">Save Telegram Configuration</span>
                     </button>
                 </div>
             </form>

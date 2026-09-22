@@ -709,11 +709,16 @@ class BookingController extends Controller
                 'sent_at' => Carbon::now(),
             ]);
 
-            // Dispatch real-time CallMeBot WhatsApp alert to admin / branch manager
+            // Dispatch automated operational alerts via SMTP Email & Telegram Bot
             try {
-                app(\App\Services\WhatsAppNotificationService::class)->sendBookingAlert($reservation);
+                app(\App\Services\EmailNotificationService::class)->sendBookingAlert($reservation);
             } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning("WhatsApp Booking Alert failed: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Email Booking Alert failed: " . $e->getMessage());
+            }
+            try {
+                app(\App\Services\TelegramNotificationService::class)->sendBookingAlert($reservation);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Telegram Booking Alert failed: " . $e->getMessage());
             }
 
             return [

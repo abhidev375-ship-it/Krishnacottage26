@@ -807,11 +807,16 @@ class CustomerPortalController extends Controller
             'notes' => $validated['notes'] ?? null,
         ]);
 
-        // Dispatch real-time CallMeBot WhatsApp alert to concierge desk
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
         try {
-            app(\App\Services\WhatsAppNotificationService::class)->sendFacilityBookingAlert($booking);
+            app(\App\Services\EmailNotificationService::class)->sendFacilityBookingAlert($booking);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("WhatsApp Facility Alert failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Email Facility Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendFacilityBookingAlert($booking);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Facility Alert failed: " . $e->getMessage());
         }
 
         return response()->json([
@@ -948,11 +953,16 @@ class CustomerPortalController extends Controller
             'sent_at' => Carbon::now(),
         ]);
 
-        // Dispatch real-time CallMeBot WhatsApp alert to resort manager / concierge
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
         try {
-            app(\App\Services\WhatsAppNotificationService::class)->sendTaxiRequestAlert($taxi);
+            app(\App\Services\EmailNotificationService::class)->sendTaxiRequestAlert($taxi);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("WhatsApp Taxi Alert failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Email Taxi Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendTaxiRequestAlert($taxi);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Taxi Alert failed: " . $e->getMessage());
         }
 
         AuditLog::create([
