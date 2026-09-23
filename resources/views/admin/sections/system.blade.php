@@ -419,6 +419,14 @@
             <!-- Email Connection Status Box (hidden until tested) -->
             <div id="email-test-result" class="hidden p-3 rounded-lg text-xs font-medium border flex items-center gap-2"></div>
 
+            <!-- Railway Outbound Notice -->
+            <div class="p-3 rounded-lg bg-blue-50/70 border border-blue-200/80 text-blue-900 text-xs flex items-start gap-2.5">
+                <i data-lucide="info" class="w-4 h-4 text-blue-600 shrink-0 mt-0.5"></i>
+                <div class="leading-relaxed">
+                    <strong>Railway Cloud Notice:</strong> Cloud hosts like Railway block raw SMTP ports (25, 465, 587, 2525) to prevent spam. To bypass all port blocks, use <strong>Brevo HTTPS API (Port 443)</strong>: Enter <code class="font-bold text-blue-800">api.brevo.com</code> as Host, and your Brevo API Key (from Brevo → API Keys tab, starts with <code class="font-bold">xkeysib-</code>) as the Password!
+                </div>
+            </div>
+
             <form id="form-email-settings" onsubmit="handleEmailSettingsSubmit(event)" class="space-y-4 text-xs">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -435,10 +443,10 @@
 
                     <div>
                         <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
-                            SMTP Server Host <span class="text-rose-500">*</span>
+                            SMTP Server Host / API <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="smtp_host" id="smtp_host" required value="{{ $smtpHost }}" placeholder="smtp.gmail.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
-                        <p class="text-[10px] text-brand-muted mt-1">e.g. smtp.gmail.com, mail.yourdomain.com</p>
+                        <input type="text" name="smtp_host" id="smtp_host" required value="{{ $smtpHost }}" placeholder="api.brevo.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
+                        <p class="text-[10px] text-brand-muted mt-1">Use <strong>api.brevo.com</strong> for Railway, or standard smtp.gmail.com</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">

@@ -400,9 +400,9 @@ class AdminNotificationController extends Controller
     {
         $validated = $request->validate([
             'smtp_host' => 'required|string|max:190',
-            'smtp_port' => 'required|integer',
+            'smtp_port' => 'nullable|integer',
             'smtp_encryption' => 'nullable|string|in:tls,ssl,none',
-            'smtp_username' => 'required|string|max:190',
+            'smtp_username' => 'nullable|string|max:190',
             'smtp_password' => 'nullable|string|max:190',
             'smtp_from_address' => 'nullable|string|email|max:190',
             'smtp_from_name' => 'nullable|string|max:120',

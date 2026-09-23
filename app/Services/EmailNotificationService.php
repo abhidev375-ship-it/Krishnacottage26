@@ -12,6 +12,7 @@ use App\Models\SpiceOrder;
 use App\Models\StayExtensionRequest;
 use App\Models\TaxiRequest;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -359,10 +360,167 @@ class EmailNotificationService
     }
 
     /**
+     * Send email via Brevo REST API (HTTPS Port 443 - 100% cloud firewall proof on Railway).
+     */
+    public function sendViaBrevoApi(string $apiKey, string $recipient, string $subject, string $htmlBody, ?string $fromAddress = null, ?string $fromName = null): array
+    {
+        $senderEmail = $fromAddress ?: Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', 'krishnacottage2023@gmail.com'));
+        $senderName = $fromName ?: Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Krishna Cottages'));
+
+        $payload = [
+            'sender' => [
+                'name' => $senderName,
+                'email' => $senderEmail,
+            ],
+            'to' => [
+                [
+                    'email' => $recipient,
+                    'name' => 'Admin Recipient',
+                ],
+            ],
+            'subject' => $subject,
+            'htmlContent' => $htmlBody,
+        ];
+
+        try {
+            $response = Http::timeout(15)
+                ->withHeaders([
+                    'api-key' => trim($apiKey),
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->post('https://api.brevo.com/v3/smtp/email', $payload);
+
+            if ($response->successful()) {
+                return [
+                    'success' => true,
+                    'status' => 'delivered',
+                    'error' => null,
+                    'recipient' => $recipient,
+                    'message_id' => $response->json('messageId'),
+                ];
+            }
+
+            $msg = $response->json('message') ?? ('Brevo API error (' . $response->status() . '): ' . $response->body());
+            Log::warning("Brevo API Email Error: " . $msg);
+            return [
+                'success' => false,
+                'status' => 'failed',
+                'error' => $msg,
+            ];
+        } catch (\Throwable $e) {
+            Log::warning("Brevo API Connection Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'status' => 'failed',
+                'error' => 'Brevo HTTPS API Connection Error: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Send email via Resend REST API (HTTPS Port 443).
+     */
+    public function sendViaResendApi(string $apiKey, string $recipient, string $subject, string $htmlBody, ?string $fromAddress = null, ?string $fromName = null): array
+    {
+        $senderEmail = $fromAddress ?: 'onboarding@resend.dev';
+        $senderName = $fromName ?: 'Krishna Cottages';
+
+        $payload = [
+            'from' => "{$senderName} <{$senderEmail}>",
+            'to' => [$recipient],
+            'subject' => $subject,
+            'html' => $htmlBody,
+        ];
+
+        try {
+            $response = Http::timeout(15)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . trim($apiKey),
+                    'Content-Type' => 'application/json',
+                ])
+                ->post('https://api.resend.com/emails', $payload);
+
+            if ($response->successful()) {
+                return [
+                    'success' => true,
+                    'status' => 'delivered',
+                    'error' => null,
+                    'recipient' => $recipient,
+                    'message_id' => $response->json('id'),
+                ];
+            }
+
+            $msg = $response->json('message') ?? ('Resend API error (' . $response->status() . '): ' . $response->body());
+            Log::warning("Resend API Email Error: " . $msg);
+            return [
+                'success' => false,
+                'status' => 'failed',
+                'error' => $msg,
+            ];
+        } catch (\Throwable $e) {
+            Log::warning("Resend API Connection Error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'status' => 'failed',
+                'error' => 'Resend HTTPS API Connection Error: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Send a test email to verify SMTP credentials and destination inbox.
      */
     public function sendTestEmail(array $config, string $recipientEmail): array
     {
+        $host = strtolower(trim($config['smtp_host'] ?? ''));
+        $password = trim($config['smtp_password'] ?? '');
+        $fromAddress = $config['smtp_from_address'] ?? null;
+        $fromName = $config['smtp_from_name'] ?? null;
+
+        $now = Carbon::now()->format('d M Y, h:i:s A');
+
+        // 1. Check for direct Resend API
+        if (str_starts_with($password, 're_') || str_contains($host, 'resend')) {
+            $rows = [
+                'Gateway Driver' => 'Resend REST API (HTTPS Port 443)',
+                'Sender Identity' => ($fromName ?? 'Krishna Cottages') . " <" . ($fromAddress ?? 'onboarding@resend.dev') . ">",
+                'Recipient Address' => $recipientEmail,
+                'Timestamp' => $now,
+            ];
+            $html = $this->buildHtmlTemplate(
+                title: "Resend Email Gateway Connected!",
+                badge: "TEST PASSED",
+                badgeColor: "#059669",
+                lead: "This test email confirms that your Resend API integration is active.",
+                rows: $rows,
+                actionUrl: url('/admin'),
+                actionText: "Open Krishna Admin Portal"
+            );
+            return $this->sendViaResendApi($password, $recipientEmail, "✅ Resend API Test — Krishna Cottages", $html, $fromAddress, $fromName);
+        }
+
+        // 2. Check for direct Brevo HTTPS API
+        if ($host === 'api.brevo.com' || str_starts_with($password, 'xkeysib-') || (str_contains($host, 'brevo') && (empty($config['smtp_port']) || (int)$config['smtp_port'] === 443))) {
+            $rows = [
+                'Gateway Driver' => 'Brevo REST API (HTTPS Port 443 - Railway Firewall Bypassed)',
+                'Sender Identity' => ($fromName ?? 'Krishna Cottages') . " <" . ($fromAddress ?? 'noreply') . ">",
+                'Recipient Address' => $recipientEmail,
+                'Timestamp' => $now,
+            ];
+            $html = $this->buildHtmlTemplate(
+                title: "Brevo Email Gateway Connected!",
+                badge: "TEST PASSED",
+                badgeColor: "#059669",
+                lead: "This test email confirms that your Brevo HTTPS API connection is working seamlessly on Railway.",
+                rows: $rows,
+                actionUrl: url('/admin'),
+                actionText: "Open Krishna Admin Portal"
+            );
+            return $this->sendViaBrevoApi($password, $recipientEmail, "✅ Brevo HTTPS API Test — Krishna Cottages & Resorts", $html, $fromAddress, $fromName);
+        }
+
+        // 3. Fall back to standard SMTP transport with automatic Brevo HTTPS fallback on timeout
         $configuredFrom = $this->configureSmtp($config);
         if (!$configuredFrom) {
             return [
@@ -373,13 +531,12 @@ class EmailNotificationService
         }
 
         $subject = "✅ SMTP Email Test — Krishna Cottages & Resorts";
-        $now = Carbon::now()->format('d M Y, h:i:s A');
 
         $rows = [
             'Test Status' => 'SMTP Handshake Successful',
             'Configured Host' => $config['smtp_host'] . ':' . ($config['smtp_port'] ?? 587),
             'Encryption' => strtoupper($config['smtp_encryption'] ?? 'TLS'),
-            'Sender Identity' => ($config['smtp_from_name'] ?? 'Krishna Cottages') . " <" . ($config['smtp_from_address'] ?? 'noreply') . ">",
+            'Sender Identity' => ($fromName ?? 'Krishna Cottages') . " <" . ($fromAddress ?? 'noreply') . ">",
             'Recipient Address' => $recipientEmail,
             'Timestamp' => $now,
         ];
@@ -412,10 +569,20 @@ class EmailNotificationService
             ];
         } catch (\Throwable $e) {
             Log::warning("SMTP Test Email Error: " . $e->getMessage());
+
+            // If standard SMTP timed out and host or key is Brevo, automatically fallback to HTTPS API
+            if (str_contains($host, 'brevo') || str_starts_with($password, 'xsmtpsib-') || str_starts_with($password, 'xkeysib-')) {
+                Log::info("Railway blocked raw SMTP port; automatically attempting Brevo HTTPS API fallback...");
+                $apiResult = $this->sendViaBrevoApi($password, $recipientEmail, "✅ Brevo HTTPS API Test — Krishna Cottages & Resorts", $html, $fromAddress, $fromName);
+                if ($apiResult['success']) {
+                    return $apiResult;
+                }
+            }
+
             return [
                 'success' => false,
                 'status' => 'failed',
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage() . (str_contains($e->getMessage(), 'timed out') ? ' (Railway blocks raw SMTP ports 25, 465, 587, 2525. Enter api.brevo.com as Host or use a Brevo API Key on Port 443).' : ''),
             ];
         }
     }
@@ -442,39 +609,64 @@ class EmailNotificationService
         // 2. Resolve destination email
         $recipient = $overrideRecipient ?: Setting::get('smtp_recipient_email', env('ADMIN_NOTIFICATION_EMAIL', ''));
         if (empty($recipient)) {
-            // Fallback to super admin user email or fallback setting
             $adminUser = \App\Models\User::where('role', 'super_admin')->first();
             $recipient = $adminUser ? $adminUser->email : env('MAIL_FROM_ADDRESS', 'admin@krishnacottages.com');
         }
 
-        // 3. Configure SMTP dynamically
-        $configuredFrom = $this->configureSmtp();
+        $host = strtolower(trim(Setting::get('smtp_host', env('MAIL_HOST', ''))));
+        $password = trim(Setting::get('smtp_password', env('MAIL_PASSWORD', '')));
+        $fromAddress = Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', 'noreply@krishnacottages.com'));
+        $fromName = Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Krishna Cottages'));
 
         $status = 'pending';
         $failureReason = null;
 
-        if ($configuredFrom && !empty($recipient)) {
-            try {
-                $fromAddress = Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', 'noreply@krishnacottages.com'));
-                $fromName = Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Krishna Cottages'));
-
-                Mail::html($htmlBody, function ($message) use ($recipient, $subject, $fromAddress, $fromName) {
-                    $message->to($recipient)->subject($subject);
-                    if ($fromAddress) {
-                        $message->from($fromAddress, $fromName);
+        // 3. Dispatch via appropriate driver
+        if (!empty($recipient) && !empty($password)) {
+            // A. Resend REST API
+            if (str_starts_with($password, 're_') || str_contains($host, 'resend')) {
+                $res = $this->sendViaResendApi($password, $recipient, $subject, $htmlBody, $fromAddress, $fromName);
+                $status = $res['status'];
+                $failureReason = $res['error'];
+            }
+            // B. Brevo REST API (HTTPS port 443)
+            elseif ($host === 'api.brevo.com' || str_starts_with($password, 'xkeysib-') || (str_contains($host, 'brevo') && (int)Setting::get('smtp_port') === 443)) {
+                $res = $this->sendViaBrevoApi($password, $recipient, $subject, $htmlBody, $fromAddress, $fromName);
+                $status = $res['status'];
+                $failureReason = $res['error'];
+            }
+            // C. Standard SMTP (with Brevo fallback if port is blocked)
+            else {
+                $configuredFrom = $this->configureSmtp();
+                if ($configuredFrom) {
+                    try {
+                        Mail::html($htmlBody, function ($message) use ($recipient, $subject, $fromAddress, $fromName) {
+                            $message->to($recipient)->subject($subject);
+                            if ($fromAddress) {
+                                $message->from($fromAddress, $fromName);
+                            }
+                        });
+                        $status = 'delivered';
+                    } catch (\Throwable $e) {
+                        Log::warning("SMTP Dispatch failed: " . $e->getMessage());
+                        if (str_contains($host, 'brevo') || str_starts_with($password, 'xsmtpsib-')) {
+                            Log::info("Attempting Brevo HTTPS API fallback...");
+                            $res = $this->sendViaBrevoApi($password, $recipient, $subject, $htmlBody, $fromAddress, $fromName);
+                            $status = $res['status'];
+                            $failureReason = $res['error'];
+                        } else {
+                            $status = 'failed';
+                            $failureReason = $e->getMessage();
+                        }
                     }
-                });
-
-                $status = 'delivered';
-            } catch (\Throwable $e) {
-                Log::warning("Email Notification Dispatch Error: " . $e->getMessage());
-                $status = 'failed';
-                $failureReason = $e->getMessage();
+                } else {
+                    $status = 'pending';
+                    $failureReason = 'SMTP credentials not configured.';
+                }
             }
         } else {
             $status = 'pending';
-            $failureReason = 'SMTP credentials or recipient email address not configured in System Settings.';
-            Log::info("SMTP not configured. Notification recorded as pending: {$subject}");
+            $failureReason = 'Recipient or password not configured.';
         }
 
         // 4. Record in notification_logs table (channel = 'email')
