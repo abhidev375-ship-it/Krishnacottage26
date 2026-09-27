@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Enquiry;
+use App\Models\Facility;
 use App\Models\FacilityBooking;
 use App\Models\FoodOrder;
 use App\Models\NotificationLog;
@@ -128,14 +129,24 @@ class EmailNotificationService
 
         $subject = "🍽️ Kitchen Order #{$order->order_number} ({$location}) — ₹{$total}";
 
+        $scheduleText = $order->scheduled_at 
+            ? Carbon::parse($order->scheduled_at)->format('d M Y, h:i A')
+            : 'Immediate / As Soon As Possible';
+
         $rows = [
             'Order Number' => "#{$order->order_number}",
             'Service Type' => "{$type} [{$location}]",
             'Guest Name' => $order->customer_name,
+            'Contact Phone' => $order->customer_phone ?: 'In-House Guest',
+            'Scheduled For' => $scheduleText,
             'Total Items' => "{$itemCount} item(s)",
             'Order Value' => "₹{$total}",
             'Ordered Items' => $itemsSummary ?: 'Standard menu selection',
         ];
+
+        if (!empty($order->special_instructions)) {
+            $rows['Chef Instructions'] = $order->special_instructions;
+        }
 
         $html = $this->buildHtmlTemplate(
             title: "New Kitchen Dining Order",
@@ -176,7 +187,7 @@ class EmailNotificationService
             'Current Checkout' => $curCheckout,
             'Requested Checkout' => "{$reqCheckout} (+{$ext->extra_nights} nights)",
             'Standard Tariff' => "₹{$amount}",
-            'Guest Note' => $ext->notes ?: 'None provided',
+            'Guest Note' => ($ext->guest_notes ?? $ext->notes ?? 'None provided'),
         ];
 
         $html = $this->buildHtmlTemplate(
@@ -238,6 +249,50 @@ class EmailNotificationService
             refType: FacilityBooking::class,
             refId: $booking->id,
             branchId: $booking->branch_id
+        );
+    }
+
+    /**
+     * Dispatch email notification when a new resort facility/amenity is created.
+     */
+    public function sendFacilityAddedAlert(Facility $facility): ?NotificationLog
+    {
+        $branchName = $facility->branch ? $facility->branch->name : 'All Branches / Central';
+        $rate = $facility->is_bookable ? ('₹' . number_format($facility->rate, 2)) : 'Complimentary / Included';
+        $category = ucfirst(str_replace('_', ' ', $facility->category ?? 'Experience'));
+
+        $subject = "✨ New Resort Facility Added: {$facility->name} ({$branchName})";
+
+        $rows = [
+            'Facility / Activity' => $facility->name,
+            'Category' => $category,
+            'Property / Branch' => $branchName,
+            'Tariff / Rate' => $rate,
+            'Bookable by Guests' => $facility->is_bookable ? 'Yes (Online & In-House)' : 'No (Complimentary)',
+            'Operating Hours' => ($facility->opening_time && $facility->closing_time) ? "{$facility->opening_time} - {$facility->closing_time}" : 'All Day',
+        ];
+
+        if ($facility->short_description) {
+            $rows['Description'] = $facility->short_description;
+        }
+
+        $html = $this->buildHtmlTemplate(
+            title: "New Facility Published",
+            badge: "FACILITY ADDED",
+            badgeColor: "#0284c7",
+            lead: "A new resort facility or experience was added to the property catalogue.",
+            rows: $rows,
+            actionUrl: url('/admin/facilities'),
+            actionText: "Manage Facilities Desk"
+        );
+
+        return $this->dispatchEmail(
+            subject: $subject,
+            htmlBody: $html,
+            event: 'facility_added',
+            refType: Facility::class,
+            refId: $facility->id,
+            branchId: $facility->branch_id
         );
     }
 

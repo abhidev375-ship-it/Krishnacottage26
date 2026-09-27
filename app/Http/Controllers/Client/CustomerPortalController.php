@@ -22,6 +22,7 @@ use App\Models\RoomType;
 use App\Models\SpiceOrder;
 use App\Models\SpiceOrderItem;
 use App\Models\SpiceProduct;
+use App\Models\StayExtensionRequest;
 use App\Models\TaxiRequest;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -91,6 +92,11 @@ class CustomerPortalController extends Controller
 
         $otherStays = $allReservations->filter(function ($res) {
             return in_array($res->status, ['cancelled', 'no_show']);
+        });
+
+        // Determine if customer has any active or upcoming confirmed booking
+        $hasActiveBooking = $allReservations->contains(function ($res) use ($today) {
+            return in_array($res->status, ['confirmed', 'checked_in']) && Carbon::parse($res->check_out_date)->gte($today);
         });
 
         // 4. Resolve selected stay context (via query ?stay_id= or ?code= or smart default)
@@ -289,7 +295,8 @@ class CustomerPortalController extends Controller
             'spiceReturnPolicyDescription',
             'bookableFacilities',
             'myFacilityBookings',
-            'myTaxiRequests'
+            'myTaxiRequests',
+            'hasActiveBooking'
         ));
     }
 
@@ -432,6 +439,33 @@ class CustomerPortalController extends Controller
             'created_at' => Carbon::now(),
         ]);
 
+        // Create official StayExtensionRequest record
+        $ext = StayExtensionRequest::create([
+            'reservation_id' => $reservation->id,
+            'guest_id' => $reservation->guest_id,
+            'user_id' => $user->id,
+            'current_checkout_date' => $currentCheckout->toDateString(),
+            'requested_checkout_date' => $newCheckout->toDateString(),
+            'extra_nights' => $extraNights,
+            'standard_amount' => $extraTotal,
+            'offered_amount' => $extraTotal,
+            'status' => 'pending',
+            'payment_status' => 'pending',
+            'guest_notes' => $validated['notes'] ?? null,
+        ]);
+
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
+        try {
+            app(\App\Services\EmailNotificationService::class)->sendStayExtensionAlert($ext, $reservation);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Email Stay Extension Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendStayExtensionAlert($ext, $reservation);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Stay Extension Alert failed: " . $e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'message' => "Stay extension request submitted successfully! Our {$branchName} manager will confirm within a few moments.",
@@ -453,6 +487,8 @@ class CustomerPortalController extends Controller
             'customer_phone' => 'nullable|string|max:30',
             'table_number' => 'nullable|string|max:50',
             'target_room' => 'nullable|string|max:50',
+            'delivery_date' => 'nullable|date',
+            'delivery_time' => 'nullable|string|max:20',
             'special_instructions' => 'nullable|string|max:500',
             'payment_choice' => 'nullable|string|in:charge_to_room,upi_cod,upi,cod',
             'items' => 'required|array|min:1',
@@ -461,11 +497,54 @@ class CustomerPortalController extends Controller
         ]);
 
         $user = Auth::user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Please sign in to order food.'], 401);
+        }
+
         $reservation = !empty($validated['reservation_id'])
             ? Reservation::with(['branch', 'room', 'guest'])->find($validated['reservation_id'])
             : null;
 
+        // Enforce booked customer check: must have confirmed or checked_in stay not yet past checkout
+        if (!$reservation) {
+            $guest = $user->guest;
+            $reservation = Reservation::with(['branch', 'room', 'guest'])
+                ->where(function ($q) use ($user, $guest) {
+                    $q->where('created_by', $user->id);
+                    if ($guest) {
+                        $q->orWhere('guest_id', $guest->id);
+                    }
+                    $q->orWhereHas('guest', function ($gq) use ($user) {
+                        $gq->where('email', $user->email)
+                           ->when($user->phone, fn($pq) => $pq->orWhere('phone', $user->phone));
+                    });
+                })
+                ->whereIn('status', ['confirmed', 'checked_in'])
+                ->where('check_out_date', '>=', Carbon::today())
+                ->orderByRaw("CASE WHEN status = 'checked_in' THEN 1 ELSE 2 END")
+                ->first();
+        }
+
+        if (!$reservation && !$user->isSuperAdmin()) {
+            return response()->json([
+                'success' => false,
+                'is_unbooked' => true,
+                'message' => 'Food ordering is exclusively available for booked resort guests. Please reserve a stay or check in to order food.'
+            ], 403);
+        }
+
         $guest = ($reservation && $reservation->guest) ? $reservation->guest : $user->guest;
+
+        // Parse scheduled delivery timestamp
+        $scheduledAt = null;
+        if (!empty($validated['delivery_date'])) {
+            $timeStr = !empty($validated['delivery_time']) ? $validated['delivery_time'] : Carbon::now()->format('H:i');
+            try {
+                $scheduledAt = Carbon::parse($validated['delivery_date'] . ' ' . $timeStr);
+            } catch (\Throwable $e) {
+                $scheduledAt = null;
+            }
+        }
 
         $subtotal = 0;
         $orderItemsData = [];
@@ -493,7 +572,11 @@ class CustomerPortalController extends Controller
             ?? ($reservation && $reservation->room ? 'Villa ' . $reservation->room->room_number : 'In-House Villa');
 
         $paymentChoice = $validated['payment_choice'] ?? 'charge_to_room';
-        $specialNotes = ($paymentChoice === 'charge_to_room' ? '[Charge to Villa Folio] ' : ('[' . strtoupper($paymentChoice) . '] ')) . ($validated['special_instructions'] ?? '');
+        $specialNotes = ($paymentChoice === 'charge_to_room' ? '[Charge to Villa Folio] ' : ('[' . strtoupper($paymentChoice) . '] '));
+        if ($scheduledAt) {
+            $specialNotes .= "[Scheduled for: " . $scheduledAt->format('d M Y, h:i A') . "] ";
+        }
+        $specialNotes .= ($validated['special_instructions'] ?? '');
 
         $branchId = $reservation ? $reservation->branch_id : ($validated['branch_id'] ?? 1);
         $roomId = $reservation ? $reservation->room_id : null;
@@ -513,6 +596,7 @@ class CustomerPortalController extends Controller
             'tax_amount' => $taxAmount,
             'total_amount' => $totalAmount,
             'special_instructions' => $specialNotes,
+            'scheduled_at' => $scheduledAt,
             'ordered_at' => Carbon::now(),
         ]);
 
@@ -535,15 +619,28 @@ class CustomerPortalController extends Controller
                 'order_number' => $orderNumber,
                 'room' => $assignedRoom,
                 'total' => $totalAmount,
-                'payment_choice' => $paymentChoice
+                'payment_choice' => $paymentChoice,
+                'scheduled_at' => $scheduledAt ? $scheduledAt->toDateTimeString() : null,
             ],
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
         ]);
 
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
+        try {
+            app(\App\Services\EmailNotificationService::class)->sendFoodOrderAlert($foodOrder);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Email Food Order Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendFoodOrderAlert($foodOrder);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Food Order Alert failed: " . $e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
-            'message' => "Order #{$orderNumber} transmitted to {$bName} kitchen! Delivery to {$assignedRoom}.",
+            'message' => "Order #{$orderNumber} transmitted to {$bName} kitchen! Delivery to {$assignedRoom}." . ($scheduledAt ? " Scheduled for " . $scheduledAt->format('d M, h:i A') . "." : ""),
             'order_number' => $orderNumber,
             'total' => number_format($totalAmount, 2),
             'room' => $assignedRoom,
@@ -683,6 +780,18 @@ class CustomerPortalController extends Controller
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
         ]);
+
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
+        try {
+            app(\App\Services\EmailNotificationService::class)->sendSpiceOrderAlert($order);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Email Spice Order Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendSpiceOrderAlert($order);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Spice Order Alert failed: " . $e->getMessage());
+        }
 
         return response()->json([
             'success' => true,

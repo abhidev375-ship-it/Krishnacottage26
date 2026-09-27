@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Enquiry;
+use App\Models\Facility;
 use App\Models\FacilityBooking;
 use App\Models\FoodOrder;
 use App\Models\NotificationLog;
@@ -88,13 +89,23 @@ class TelegramNotificationService
         $itemCount = $order->items ? $order->items->sum('quantity') : 1;
         $total = number_format($order->total_amount, 2);
 
+        $scheduleText = $order->scheduled_at 
+            ? Carbon::parse($order->scheduled_at)->format('d M Y, h:i A')
+            : 'Immediate / As Soon As Possible';
+
         $html = "🍽️ <b>NEW KITCHEN ORDER — KRISHNA DINING</b>\n\n"
             . "• <b>Order Ref:</b> <code>#{$order->order_number}</code>\n"
             . "• <b>Type:</b> {$type} (<b>{$location}</b>)\n"
             . "• <b>Guest:</b> " . htmlspecialchars($order->customer_name, ENT_QUOTES) . "\n"
+            . "• <b>Scheduled For:</b> <b>{$scheduleText}</b>\n"
             . "• <b>Items Count:</b> {$itemCount} item(s)\n"
-            . "• <b>Total Amount:</b> ₹{$total}\n\n"
-            . "👉 <a href=\"" . url('/admin/food-orders') . "\">Open Kitchen Order Board to accept</a>";
+            . "• <b>Total Amount:</b> ₹{$total}\n";
+
+        if (!empty($order->special_instructions)) {
+            $html .= "• <b>Notes:</b> " . htmlspecialchars($order->special_instructions, ENT_QUOTES) . "\n";
+        }
+
+        $html .= "\n👉 <a href=\"" . url('/admin/food-orders') . "\">Open Kitchen Order Board to accept</a>";
 
         return $this->dispatchTelegram(
             text: $html,
@@ -158,6 +169,37 @@ class TelegramNotificationService
             refType: FacilityBooking::class,
             refId: $booking->id,
             branchId: $booking->branch_id
+        );
+    }
+
+    /**
+     * Dispatch Telegram alert when a new resort facility/amenity is added.
+     */
+    public function sendFacilityAddedAlert(Facility $facility): ?NotificationLog
+    {
+        $branchName = $facility->branch ? $facility->branch->name : 'All Branches / Central';
+        $rate = $facility->is_bookable ? ('₹' . number_format($facility->rate, 2)) : 'Complimentary';
+        $category = ucfirst(str_replace('_', ' ', $facility->category ?? 'Experience'));
+
+        $msg = "✨ <b>NEW RESORT FACILITY ADDED</b>\n\n"
+            . "• <b>Facility:</b> " . htmlspecialchars($facility->name, ENT_QUOTES) . "\n"
+            . "• <b>Category:</b> {$category}\n"
+            . "• <b>Branch:</b> " . htmlspecialchars($branchName, ENT_QUOTES) . "\n"
+            . "• <b>Tariff / Rate:</b> {$rate}\n"
+            . "• <b>Bookable:</b> " . ($facility->is_bookable ? 'Yes' : 'No') . "\n";
+
+        if ($facility->short_description) {
+            $msg .= "• <b>Details:</b> " . htmlspecialchars($facility->short_description, ENT_QUOTES) . "\n";
+        }
+
+        $msg .= "\n👉 <a href=\"" . url('/admin/facilities') . "\">Open Facilities Desk</a>";
+
+        return $this->dispatchTelegram(
+            text: $msg,
+            event: 'facility_added',
+            refType: Facility::class,
+            refId: $facility->id,
+            branchId: $facility->branch_id
         );
     }
 

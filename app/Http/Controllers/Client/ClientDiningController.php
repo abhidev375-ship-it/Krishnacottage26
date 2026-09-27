@@ -53,24 +53,35 @@ class ClientDiningController extends Controller
 
         $items = $query->orderBy('sort_order')->get();
 
-        // Check if current authenticated user has an active in-house stay
+        // Check if current authenticated user has an active booking or in-house stay
         $isInHouse = false;
         $inHouseStay = null;
+        $isBooked = false;
+        $bookedStay = null;
         if (Auth::check()) {
             $user = Auth::user();
-            $inHouseStay = \App\Models\Reservation::with(['branch', 'room'])
-                ->where(function ($q) use ($user) {
-                    $q->where('created_by', $user->id)
-                      ->orWhere('guest_id', $user->guest ? $user->guest->id : 0)
-                      ->orWhereHas('guest', function ($gq) use ($user) {
-                          $gq->where('email', $user->email)
-                             ->when($user->phone, fn($pq) => $pq->orWhere('phone', $user->phone));
-                      });
+            $guest = $user->guest ?? \App\Models\Guest::where('email', $user->email)->orWhere('phone', $user->phone)->first();
+            $bookedStay = \App\Models\Reservation::with(['branch', 'room'])
+                ->where(function ($q) use ($user, $guest) {
+                    $q->where('created_by', $user->id);
+                    if ($guest) {
+                        $q->orWhere('guest_id', $guest->id);
+                    }
+                    $q->orWhereHas('guest', function ($gq) use ($user) {
+                        $gq->where('email', $user->email)
+                           ->when($user->phone, fn($pq) => $pq->orWhere('phone', $user->phone));
+                    });
                 })
-                ->where('status', 'checked_in')
+                ->whereIn('status', ['confirmed', 'checked_in'])
                 ->where('check_out_date', '>=', Carbon::today())
+                ->orderByRaw("CASE WHEN status = 'checked_in' THEN 1 ELSE 2 END")
                 ->first();
-            $isInHouse = !is_null($inHouseStay);
+
+            if ($bookedStay) {
+                $isBooked = true;
+                $inHouseStay = $bookedStay;
+                $isInHouse = ($bookedStay->status === 'checked_in');
+            }
         }
 
         // If in-house rooms are selectable
@@ -85,7 +96,9 @@ class ClientDiningController extends Controller
             'dietary',
             'rooms',
             'isInHouse',
-            'inHouseStay'
+            'inHouseStay',
+            'isBooked',
+            'bookedStay'
         ));
     }
 
@@ -104,17 +117,61 @@ class ClientDiningController extends Controller
         $user = Auth::user();
         $guest = $user->guest ?? \App\Models\Guest::where('email', $user->email)->orWhere('phone', $user->phone)->first();
 
+        // Enforce booked customer requirement: must have confirmed or checked_in stay not yet past checkout
+        $activeReservation = \App\Models\Reservation::with(['branch', 'room'])
+            ->where(function ($q) use ($user, $guest) {
+                $q->where('created_by', $user->id);
+                if ($guest) {
+                    $q->orWhere('guest_id', $guest->id);
+                }
+                $q->orWhereHas('guest', function ($gq) use ($user) {
+                    $gq->where('email', $user->email)
+                       ->when($user->phone, fn($pq) => $pq->orWhere('phone', $user->phone));
+                });
+            })
+            ->whereIn('status', ['confirmed', 'checked_in'])
+            ->where('check_out_date', '>=', Carbon::today())
+            ->orderByRaw("CASE WHEN status = 'checked_in' THEN 1 ELSE 2 END")
+            ->first();
+
+        if (!$activeReservation && !$user->isSuperAdmin()) {
+            return response()->json([
+                'success' => false,
+                'is_unbooked' => true,
+                'message' => 'Food ordering is exclusively available for booked resort guests. Please reserve a stay or check in to order food.'
+            ], 403);
+        }
+
         $validated = $request->validate([
             'customer_name' => 'required|string|max:100',
             'customer_phone' => 'required|string|max:30',
             'branch_id' => 'nullable|exists:branches,id',
             'order_type' => 'required|in:room_service,dine_in,takeaway',
             'table_number' => 'nullable|string|max:50',
+            'delivery_date' => 'nullable|date',
+            'delivery_time' => 'nullable|string|max:20',
             'special_instructions' => 'nullable|string|max:500',
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|exists:menu_items,id',
             'items.*.quantity' => 'required|integer|min:1',
         ]);
+
+        // Compute scheduled delivery timestamp if date/time provided
+        $scheduledAt = null;
+        if (!empty($validated['delivery_date'])) {
+            $timeStr = !empty($validated['delivery_time']) ? $validated['delivery_time'] : Carbon::now()->format('H:i');
+            try {
+                $scheduledAt = Carbon::parse($validated['delivery_date'] . ' ' . $timeStr);
+            } catch (\Throwable $e) {
+                $scheduledAt = null;
+            }
+        }
+
+        $specialInstructions = $validated['special_instructions'] ?? '';
+        if ($scheduledAt) {
+            $scheduledHeader = "[Scheduled for: " . $scheduledAt->format('d M Y, h:i A') . "] ";
+            $specialInstructions = $scheduledHeader . $specialInstructions;
+        }
 
         $subtotal = 0;
         $orderItemsData = [];
@@ -137,21 +194,26 @@ class ClientDiningController extends Controller
         $totalAmount = $subtotal + $taxAmount;
 
         $orderNumber = 'KFD-' . date('ymd') . '-' . rand(100, 999);
+        $branchId = $validated['branch_id'] ?? ($activeReservation ? $activeReservation->branch_id : 1);
+        $roomId = $activeReservation ? $activeReservation->room_id : null;
+        $tableNumber = $validated['table_number'] ?? ($activeReservation && $activeReservation->room ? 'Villa ' . $activeReservation->room->room_number : null);
 
         $foodOrder = FoodOrder::create([
             'order_number' => $orderNumber,
-            'branch_id' => $validated['branch_id'] ?? 1,
+            'branch_id' => $branchId,
             'guest_id' => $guest ? $guest->id : null,
+            'room_id' => $roomId,
             'customer_name' => $validated['customer_name'],
             'customer_phone' => $validated['customer_phone'],
             'order_type' => $validated['order_type'],
-            'table_number' => $validated['table_number'] ?? null,
+            'table_number' => $tableNumber,
             'status' => 'new',
             'payment_status' => 'pending',
             'subtotal' => $subtotal,
             'tax_amount' => $taxAmount,
             'total_amount' => $totalAmount,
-            'special_instructions' => $validated['special_instructions'] ?? null,
+            'special_instructions' => $specialInstructions ?: null,
+            'scheduled_at' => $scheduledAt,
             'ordered_at' => Carbon::now(),
         ]);
 
@@ -160,7 +222,7 @@ class ClientDiningController extends Controller
         }
 
         AuditLog::create([
-            'user_id' => 1,
+            'user_id' => $user->id,
             'user_name' => $validated['customer_name'] . ' (Dining Guest)',
             'role' => 'customer',
             'branch_id' => $foodOrder->branch_id,
@@ -172,6 +234,7 @@ class ClientDiningController extends Controller
                 'order_number' => $orderNumber,
                 'total' => $totalAmount,
                 'type' => $validated['order_type'],
+                'scheduled_at' => $scheduledAt ? $scheduledAt->toDateTimeString() : null,
             ],
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),

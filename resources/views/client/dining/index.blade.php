@@ -12,8 +12,8 @@
             Slow-cooked recipes passed through generations, prepared in clay earthen pots with estate-harvested spices, cold-pressed coconut oil, and farm-fresh ingredients.
         </p>
 
-        @if(Auth::check() && $isInHouse)
-        <!-- CART SUMMARY CAPSULE TRIGGER (IN-HOUSE GUESTS ONLY) -->
+        @if(Auth::check() && $isBooked)
+        <!-- CART SUMMARY CAPSULE TRIGGER (BOOKED GUESTS ONLY) -->
         <button onclick="openCartDrawer()" class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brass hover:brightness-105 text-forest font-bold text-xs shadow-card transition touch-tap">
             <i data-lucide="shopping-bag" class="w-4 h-4"></i>
             <span>View Food Order Tray (<span id="cart-count-badge">0</span> items)</span>
@@ -134,22 +134,22 @@
                 </div>
             </div>
 
-            <!-- ACTION FOOTER: Gated strictly for in-house orders -->
+            <!-- ACTION FOOTER: Gated strictly for booked resort guests -->
             <div class="p-4 pt-0">
-                @if(Auth::check() && $isInHouse)
+                @if(Auth::check() && $isBooked)
                 <button onclick="addToDiningCart({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->price }})" 
                         class="w-full py-2 rounded-xl bg-paper hover:bg-forest hover:text-paper soft-border text-forest font-bold text-xs flex items-center justify-center gap-1.5 transition touch-tap">
                     <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald"></i>
-                    <span>Order to Villa {{ $inHouseStay->room ? $inHouseStay->room->room_number : '' }}</span>
+                    <span>Order {{ $bookedStay && $bookedStay->room ? 'to Villa ' . $bookedStay->room->room_number : 'Food' }}</span>
                 </button>
                 @elseif(Auth::check())
-                <div class="w-full py-2 rounded-xl bg-paper/50 text-forest/60 text-[10px] font-semibold text-center border border-forest/10">
-                    <span>In-Villa Ordering Unlocks at Check-in</span>
-                </div>
+                <a href="{{ route('rooms.index') }}" class="block w-full py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-[10px] font-bold text-center border border-amber-200 transition">
+                    <span>Exclusively for Booked Resort Guests &bull; Reserve a Stay</span>
+                </a>
                 @else
-                <div class="w-full py-2 rounded-xl bg-paper/50 text-forest/50 text-[10px] font-medium text-center border border-forest/10">
-                    <span>Curated for In-House Plantation Dining</span>
-                </div>
+                <a href="{{ route('login', ['redirect' => route('dining.index')]) }}" class="block w-full py-2 rounded-xl bg-paper/60 hover:bg-paper text-forest/70 text-[10px] font-semibold text-center border border-forest/10 transition">
+                    <span>Sign In to Order (Booked Guests Only)</span>
+                </a>
                 @endif
             </div>
         </div>
@@ -222,9 +222,20 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold tracking-wider text-forest/60 mb-1">Delivery / Dining Date *</label>
+                        <input type="date" id="order-delivery-date" class="w-full px-3.5 py-2 rounded-xl bg-white soft-border text-xs text-forest focus:ring-1 focus:ring-forest focus:outline-hidden">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold tracking-wider text-forest/60 mb-1">Delivery / Dining Time *</label>
+                        <input type="time" id="order-delivery-time" class="w-full px-3.5 py-2 rounded-xl bg-white soft-border text-xs text-forest focus:ring-1 focus:ring-forest focus:outline-hidden">
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-[10px] uppercase font-bold tracking-wider text-forest/60 mb-1">Villa Unit / Table Number</label>
-                    <input type="text" id="order-table-num" placeholder="e.g. Villa 104 or Table 6" class="w-full px-3.5 py-2 rounded-xl bg-white soft-border text-xs text-forest focus:ring-1 focus:ring-forest focus:outline-hidden">
+                    <input type="text" id="order-table-num" value="{{ isset($bookedStay) && $bookedStay && $bookedStay->room ? 'Villa ' . $bookedStay->room->room_number : '' }}" placeholder="e.g. Villa 104 or Table 6" class="w-full px-3.5 py-2 rounded-xl bg-white soft-border text-xs text-forest focus:ring-1 focus:ring-forest focus:outline-hidden">
                 </div>
 
                 <div>
@@ -350,9 +361,32 @@
         if (window.lucide) lucide.createIcons();
     }
 
+    function initDeliveryDateTimeDefaults() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const timeStr = `${hours}:${minutes}`;
+
+        const dDate = document.getElementById('order-delivery-date');
+        if (dDate && !dDate.value) {
+            dDate.value = todayStr;
+            dDate.min = todayStr;
+        }
+        const dTime = document.getElementById('order-delivery-time');
+        if (dTime && !dTime.value) {
+            dTime.value = timeStr;
+        }
+    }
+
     function openCartDrawer() {
         document.getElementById('cart-drawer').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        initDeliveryDateTimeDefaults();
         updateCartUI();
     }
 
@@ -372,6 +406,8 @@
         const phone = document.getElementById('order-guest-phone').value.trim();
         const orderType = document.getElementById('order-type').value;
         const tableNum = document.getElementById('order-table-num').value.trim();
+        const deliveryDate = document.getElementById('order-delivery-date')?.value || '';
+        const deliveryTime = document.getElementById('order-delivery-time')?.value || '';
         const instructions = document.getElementById('order-instructions').value.trim();
 
         if (!name || !phone) {
@@ -397,7 +433,9 @@
                     customer_phone: phone,
                     order_type: orderType,
                     table_number: tableNum,
-                    instructions: instructions,
+                    delivery_date: deliveryDate,
+                    delivery_time: deliveryTime,
+                    special_instructions: instructions,
                     items: diningCart.map(i => ({ id: i.id, quantity: i.qty }))
                 })
             });
@@ -406,6 +444,12 @@
             if (data.require_login) {
                 alert(data.message || 'Please sign in to place your dining order. Your tray has been preserved.');
                 window.location.href = data.login_url || '{{ route("login") }}';
+                return;
+            }
+
+            if (data.is_unbooked) {
+                alert(data.message || 'Food ordering is exclusively available for booked resort guests. Please reserve a stay or check in.');
+                window.location.href = '{{ route("rooms.index") }}';
                 return;
             }
 
@@ -426,7 +470,10 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', updateCartUI);
+    document.addEventListener('DOMContentLoaded', () => {
+        initDeliveryDateTimeDefaults();
+        updateCartUI();
+    });
 </script>
 @endpush
 @endsection

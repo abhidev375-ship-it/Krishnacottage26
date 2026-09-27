@@ -29,6 +29,7 @@ class FoodOrder extends Model
         'tax_amount',
         'total_amount',
         'special_instructions',
+        'scheduled_at',
         'ordered_at',
         'completed_at',
     ];
@@ -39,6 +40,7 @@ class FoodOrder extends Model
             'subtotal' => 'decimal:2',
             'tax_amount' => 'decimal:2',
             'total_amount' => 'decimal:2',
+            'scheduled_at' => 'datetime',
             'ordered_at' => 'datetime',
             'completed_at' => 'datetime',
         ];

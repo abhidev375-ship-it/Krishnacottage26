@@ -808,6 +808,18 @@ class AdminActionController extends Controller
         $facility = Facility::create($validated);
         $this->logAudit('create', 'Facility', $facility->id, $facility->branch_id, [], $facility->toArray());
 
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
+        try {
+            app(\App\Services\EmailNotificationService::class)->sendFacilityAddedAlert($facility);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Email Facility Added Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendFacilityAddedAlert($facility);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Facility Added Alert failed: " . $e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'message' => "Facility '{$facility->name}' created successfully.",
@@ -923,6 +935,18 @@ class AdminActionController extends Controller
         }
 
         $this->logAudit('create', 'FacilityBooking', $booking->id, $booking->branch_id, [], $booking->toArray());
+
+        // Dispatch automated operational alerts via SMTP Email & Telegram Bot
+        try {
+            app(\App\Services\EmailNotificationService::class)->sendFacilityBookingAlert($booking);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Email Facility Booking Alert failed: " . $e->getMessage());
+        }
+        try {
+            app(\App\Services\TelegramNotificationService::class)->sendFacilityBookingAlert($booking);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Telegram Facility Booking Alert failed: " . $e->getMessage());
+        }
 
         return response()->json([
             'success' => true,

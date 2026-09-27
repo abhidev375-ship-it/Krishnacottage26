@@ -865,12 +865,20 @@
                         <!-- Action Button: Place Order -->
                         <div class="pt-3 mt-2 border-t border-forest/10 flex items-center justify-between gap-2">
                             <span class="text-[10px] text-forest/50 font-medium">In-Villa Service</span>
+                            @if(isset($hasActiveBooking) && $hasActiveBooking)
                             <button type="button" 
                                     onclick="openOrderDrawer('dining', {{ $item->id }}, '{{ addslashes($item->name) }}', {{ (float) $item->price }}, '{{ addslashes($item->image_url ?: '') }}')" 
                                     class="px-4 py-2 rounded-xl bg-forest hover:bg-emerald text-paper font-bold text-xs flex items-center gap-1.5 shadow-xs transition touch-tap">
                                 <i data-lucide="plus" class="w-3.5 h-3.5 text-brass"></i>
                                 <span>Place Order</span>
                             </button>
+                            @else
+                            <a href="{{ route('rooms.index') }}" 
+                               class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-[11px] flex items-center gap-1 shadow-xs transition touch-tap"
+                               title="Food ordering is exclusively available for booked resort guests">
+                                <span>Book Stay to Order</span>
+                            </a>
+                            @endif
                         </div>
                     </div>
                     @empty
@@ -1998,6 +2006,17 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-3" id="drawer-delivery-schedule-row">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold tracking-wider text-forest/60 mb-1">Delivery / Dining Date *</label>
+                        <input type="date" id="order-delivery-date" class="w-full px-3.5 py-2.5 rounded-xl bg-white soft-border text-xs text-forest focus:ring-1 focus:ring-forest focus:outline-hidden">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold tracking-wider text-forest/60 mb-1">Delivery / Dining Time *</label>
+                        <input type="time" id="order-delivery-time" class="w-full px-3.5 py-2.5 rounded-xl bg-white soft-border text-xs text-forest focus:ring-1 focus:ring-forest focus:outline-hidden">
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-[10px] uppercase font-bold tracking-wider text-forest/60 mb-1">Villa Unit / Table Number</label>
                     <input type="text" id="order-table-num" 
@@ -2968,11 +2987,34 @@
         }
     }
 
+    function initDrawerDeliveryDateTimeDefaults() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const timeStr = `${hours}:${minutes}`;
+
+        const dDate = document.getElementById('order-delivery-date');
+        if (dDate && !dDate.value) {
+            dDate.value = todayStr;
+            dDate.min = todayStr;
+        }
+        const dTime = document.getElementById('order-delivery-time');
+        if (dTime && !dTime.value) {
+            dTime.value = timeStr;
+        }
+    }
+
     function openCartDrawer() {
         const drawer = document.getElementById('cart-drawer');
         if (drawer) {
             drawer.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            initDrawerDeliveryDateTimeDefaults();
             updateDrawerUI();
         }
     }
@@ -3088,6 +3130,8 @@
         const phone = document.getElementById('order-guest-phone').value.trim();
         const orderType = document.getElementById('order-type').value;
         const tableNum = document.getElementById('order-table-num').value.trim();
+        const deliveryDate = document.getElementById('order-delivery-date')?.value || '';
+        const deliveryTime = document.getElementById('order-delivery-time')?.value || '';
         const instructions = document.getElementById('order-instructions').value.trim();
 
         // Check selected payment choice
@@ -3126,6 +3170,8 @@
                         customer_phone: phone,
                         table_number: tableNum,
                         order_type: orderType,
+                        delivery_date: deliveryDate,
+                        delivery_time: deliveryTime,
                         special_instructions: instructions,
                         payment_choice: paymentChoice,
                         items: diningItems.map(i => ({ id: i.id, quantity: i.qty }))
@@ -3133,6 +3179,11 @@
                 });
 
                 const dataD = await resDining.json();
+                if (dataD.is_unbooked) {
+                    alert(dataD.message || 'Food ordering is exclusively available for booked resort guests.');
+                    window.location.href = '{{ route("rooms.index") }}';
+                    return;
+                }
                 if (resDining.ok && dataD.success) {
                     successMessages.push(dataD.message || 'Kitchen order confirmed!');
                 } else {
@@ -3540,6 +3591,7 @@
         }
         initMarqueeHoverListeners();
         startMarquee();
+        initDrawerDeliveryDateTimeDefaults();
         updateDrawerUI();
 
         @if($selectedStay && $isInHouse && (!isset($activeExt) || !$activeExt || !in_array($activeExt->status, ['pending', 'approved'])))
