@@ -378,7 +378,7 @@
             $smtpUsername = \App\Models\Setting::get('smtp_username', env('MAIL_USERNAME', ''));
             $smtpPassword = \App\Models\Setting::get('smtp_password', env('MAIL_PASSWORD', ''));
             $smtpFromAddress = \App\Models\Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', ''));
-            $smtpFromName = \App\Models\Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Krishna Cottages'));
+            $smtpFromName = \App\Models\Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Village Cottages'));
             $smtpRecipient = \App\Models\Setting::get('smtp_recipient_email', env('ADMIN_NOTIFICATION_EMAIL', ''));
             $isSmtpConfigured = !empty($smtpHost) && !empty($smtpUsername) && !empty($smtpRecipient);
 
@@ -509,7 +509,7 @@
                         <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
                             Sender Display Name
                         </label>
-                        <input type="text" name="smtp_from_name" id="smtp_from_name" value="{{ $smtpFromName }}" placeholder="Krishna Cottages" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary text-xs">
+                        <input type="text" name="smtp_from_name" id="smtp_from_name" value="{{ $smtpFromName }}" placeholder="Village Cottages" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary text-xs">
                         <p class="text-[10px] text-brand-muted mt-1">Sender name shown in recipient inbox.</p>
                     </div>
                 </div>

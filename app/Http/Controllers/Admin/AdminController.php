@@ -232,7 +232,7 @@ class AdminController extends Controller
         $homepageContent = $this->getHomepageContent();
 
         $cancellationRules = CancellationRule::with('branch')->orderBy('sort_order')->orderByDesc('hours_before_checkin')->get();
-        $cancellationPolicy = Setting::get('cancellation_policy_description', 'At Krishna Cottages, cancellations made 72+ hours prior receive 100% cashback. 48-72h prior receive 75%, and 24-48h prior receive 50%. Instant automated payback.');
+        $cancellationPolicy = Setting::get('cancellation_policy_description', 'At Village Cottages, cancellations made 72+ hours prior receive 100% cashback. 48-72h prior receive 75%, and 24-48h prior receive 50%. Instant automated payback.');
         $stayExtensionRequests = StayExtensionRequest::with(['reservation.room', 'reservation.roomType', 'reservation.branch', 'guest', 'user', 'reviewer'])
             ->latest()
             ->take(30)
@@ -651,26 +651,26 @@ class AdminController extends Controller
             'review_quote' => '“Everything felt easy — from the room to dinner to knowing what was nearby.”',
             'review_author' => 'Ananya & Ravi',
             'review_subtitle' => 'Garden Residence · completed stay',
-            'cta_eyebrow' => 'Your next Krishna moment',
+            'cta_eyebrow' => 'Your next Village moment',
             'cta_heading_1' => 'Stay for the place.',
             'cta_heading_2' => 'Remember the feeling.',
-            'cta_description' => 'Choose a branch, check your dates, discover what is around you and talk directly to Krishna whenever you need.',
-            'footer_brand_title' => 'Krishna Cottages',
+            'cta_description' => 'Choose a branch, check your dates, discover what is around you and talk directly to Village Cottages whenever you need.',
+            'footer_brand_title' => 'Village Cottages',
             'footer_brand_tagline' => 'Luxury Cottages of Kerala',
             'footer_brand_desc' => 'Immersive, slow-living cottages nestled in the spice hills, misty valleys, and tranquil backwaters of Kerala.',
             'footer_badge' => 'Eco-Conscious Botanical Cottages',
             'footer_dest_title' => 'Destinations',
             'footer_exp_title' => 'Experiences',
             'footer_exp_link_1' => 'Plantation Kitchen & Dining',
-            'footer_exp_link_2' => 'Krishna Spices Farm Shop',
+            'footer_exp_link_2' => 'Village Spices Farm Shop',
             'footer_exp_link_3' => 'Cottages Visual Gallery',
             'footer_exp_link_4' => 'Guided Nature Discoveries',
             'footer_concierge_title' => 'Direct Concierge',
             'footer_concierge_desc' => 'Front desk assistance 24/7 for bespoke retreat arrangements.',
             'footer_phone' => '+91 484 290 0000',
-            'footer_email' => 'concierge@krishnacottages.com',
+            'footer_email' => 'concierge@villagecottages.com',
             'footer_chat_btn' => 'Chat with Concierge',
-            'footer_copyright' => 'Krishna Cottages Hospitality Ltd. All rights reserved.',
+            'footer_copyright' => 'Village Cottages Hospitality Ltd. All rights reserved.',
             'footer_support_link' => 'Help & Support',
             'footer_policy_note' => '🌿 Strictly No Swimming Pool Policy'
         ];

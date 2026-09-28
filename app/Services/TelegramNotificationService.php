@@ -25,7 +25,7 @@ class TelegramNotificationService
     {
         $guestName = $reservation->guest ? $reservation->guest->full_name : 'Guest';
         $guestPhone = $reservation->guest ? $reservation->guest->phone : 'N/A';
-        $branchName = $reservation->branch ? $reservation->branch->name : 'Krishna Cottages';
+        $branchName = $reservation->branch ? $reservation->branch->name : 'Village Cottages';
         $roomTypeName = $reservation->roomType ? $reservation->roomType->name : 'Cottage Suite';
         $checkIn = Carbon::parse($reservation->check_in_date)->format('d M Y');
         $checkOut = Carbon::parse($reservation->check_out_date)->format('d M Y');
@@ -33,7 +33,7 @@ class TelegramNotificationService
         $total = number_format($reservation->total_amount, 2);
         $paymentStatus = strtoupper($reservation->payment_status ?? 'PENDING');
 
-        $html = "🏨 <b>NEW ROOM RESERVATION — KRISHNA COTTAGES</b>\n\n"
+        $html = "🏨 <b>NEW ROOM RESERVATION — VILLAGE COTTAGES</b>\n\n"
             . "• <b>Booking Ref:</b> <code>#{$reservation->booking_code}</code>\n"
             . "• <b>Guest:</b> " . htmlspecialchars($guestName, ENT_QUOTES) . " (" . htmlspecialchars($guestPhone, ENT_QUOTES) . ")\n"
             . "• <b>Branch:</b> " . htmlspecialchars($branchName, ENT_QUOTES) . "\n"
@@ -127,7 +127,7 @@ class TelegramNotificationService
         $reqCheckout = Carbon::parse($ext->requested_checkout_date)->format('d M Y');
         $amount = number_format($ext->standard_amount, 2);
 
-        $html = "🛎️ <b>STAY EXTENSION REQUEST — KRISHNA COTTAGES</b>\n\n"
+        $html = "🛎️ <b>STAY EXTENSION REQUEST — VILLAGE COTTAGES</b>\n\n"
             . "• <b>Guest:</b> " . htmlspecialchars($guestName, ENT_QUOTES) . " (<b>{$villa}</b>)\n"
             . "• <b>Booking Ref:</b> <code>#{$reservation->booking_code}</code>\n"
             . "• <b>Current Checkout:</b> {$curCheckout}\n"
@@ -287,7 +287,7 @@ class TelegramNotificationService
     public function sendTestMessage(string $botToken, string $chatId): array
     {
         $time = Carbon::now()->format('d M Y, h:i:s A');
-        $html = "👋 <b>Namaste from Krishna Cottages & Resorts!</b>\n\n"
+        $html = "👋 <b>Namaste from Village Cottages & Resorts!</b>\n\n"
             . "This test ping confirms that your <b>Telegram Notification Bot</b> is active and successfully linked to this chat.\n\n"
             . "• <b>Chat ID:</b> <code>{$chatId}</code>\n"
             . "• <b>Timestamp:</b> {$time}\n\n"

@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#F4F1E8">
-    <title>@yield('title', 'Krishna Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu, Munnar, Kerala')</title>
+    <title>@yield('title', 'Village Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu, Munnar, Kerala')</title>
 
     <!-- PRIMARY HIGH-RANKING SEO METADATA -->
-    <meta name="description" content="@yield('meta_description', 'Discover Krishna Cottages in Rajakkad, Idukki. Book luxury wooden cottages, nature homestays &amp; private hillside villas across Rajakkadu, Rajakumari, Adimali &amp; Munnar, Kerala with organic dining &amp; plantation views.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'krishna cottage idukki, krishna cottages rajakkad, krishna resort idukki, krishna homestay idukki, idukki cottages, idukki resorts, resorts in idukki, rajakkadu, resort in rajakkadu, home stay in idukki, home stay in rajakkadu, home stay in rajakumari, resort in rajakumari, resort in adimali, cottage in adimali, home stay in adimali, idukki, kerala, best resort in idukki, best cottage in idukki, best cottage in munnar, munnar resorts, munnar homestay, cottages in rajakkad idukki, kuthumkal waterfalls resort, mailadumpara cottages idukki, ponmudi lake resort rajakkad, adivaram idukki homestay, wooden cottages in idukki, plantation homestay in rajakkadu, budget homestay in rajakumari, family resort in adimali idukki, honeymoon cottage in munnar idukki, kerala eco cottage idukki, ayurvedic resort in idukki')">
+    <meta name="description" content="@yield('meta_description', 'Discover Village Cottages in Rajakkad, Idukki. Book luxury wooden cottages, nature homestays &amp; private hillside villas across Rajakkadu, Rajakumari, Adimali &amp; Munnar, Kerala with organic dining &amp; plantation views.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'village cottage idukki, village cottages rajakkad, village resort idukki, village homestay idukki, idukki cottages, idukki resorts, resorts in idukki, rajakkadu, resort in rajakkadu, home stay in idukki, home stay in rajakkadu, home stay in rajakumari, resort in rajakumari, resort in adimali, cottage in adimali, home stay in adimali, idukki, kerala, best resort in idukki, best cottage in idukki, best cottage in munnar, munnar resorts, munnar homestay, cottages in rajakkad idukki, kuthumkal waterfalls resort, mailadumpara cottages idukki, ponmudi lake resort rajakkad, adivaram idukki homestay, wooden cottages in idukki, plantation homestay in rajakkadu, budget homestay in rajakumari, family resort in adimali idukki, honeymoon cottage in munnar idukki, kerala eco cottage idukki, ayurvedic resort in idukki')">
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="{{ url()->current() }}" />
 
@@ -21,16 +21,16 @@
 
     <!-- OPEN GRAPH / FACEBOOK SOCIAL SHARING -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Krishna Cottages" />
+    <meta property="og:site_name" content="Village Cottages" />
     <meta property="og:url" content="{{ url()->current() }}" />
-    <meta property="og:title" content="@yield('og_title', 'Krishna Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar')" />
+    <meta property="og:title" content="@yield('og_title', 'Village Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar')" />
     <meta property="og:description" content="@yield('og_description', 'Authentic wooden cottages and peaceful hillside homestays in Rajakkad, Idukki, Kerala.')" />
     <meta property="og:image" content="@yield('og_image', 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=85')" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- TWITTER CARDS -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="@yield('twitter_title', 'Krishna Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar')" />
+    <meta name="twitter:title" content="@yield('twitter_title', 'Village Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar')" />
     <meta name="twitter:description" content="@yield('twitter_description', 'Experience peaceful wooden cottages and estate living in Rajakkadu, Rajakumari, Adimali & Munnar, Idukki, Kerala.')" />
 
     <!-- SPEED OPTIMIZATION & RESOURCE HINTS (Sub-3-Second Load Guarantee) -->
@@ -168,9 +168,9 @@
         <div class="drawer-panel ml-auto flex h-full w-full max-w-[440px] flex-col rounded-[28px] bg-paper p-4 text-forest shadow-[0_30px_100px_rgba(0,0,0,.22)] md:p-5">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
-                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-forest text-sm font-bold text-paper">K</span>
+                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-forest text-sm font-bold text-paper">V</span>
                     <div>
-                        <p class="text-sm font-semibold">Krishna Cottages</p>
+                        <p class="text-sm font-semibold">Village Cottages</p>
                         <p class="mt-0.5 text-[9px] uppercase tracking-[.18em] text-forest/40">Luxury Cottages of Kerala</p>
                     </div>
                 </div>

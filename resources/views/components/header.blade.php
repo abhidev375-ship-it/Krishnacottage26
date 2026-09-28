@@ -1,6 +1,6 @@
 @php
     $hContent = $homepageContent ?? app(\App\Http\Controllers\Admin\AdminController::class)->getHomepageContent();
-    $hBrandTitle = $hContent['header_brand_title'] ?? 'Krishna Cottage';
+    $hBrandTitle = $hContent['header_brand_title'] ?? 'Village Cottages';
     $hEyebrow = $hContent['header_eyebrow'] ?? 'A stay worth remembering';
 @endphp
 

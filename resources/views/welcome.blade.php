@@ -55,8 +55,8 @@
     $galleryAlbumsList = $galleryAlbumsList->filter(fn($a) => $a->images && $a->images->isNotEmpty())->take(6);
 @endphp
 
-@section('title', 'Krishna Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar, Kerala')
-@section('meta_description', 'Discover Krishna Cottages in Rajakkad, Idukki. Book handcrafted wooden cottages, authentic plantation dining, and nature homestays near Munnar with cardamom plantation views.')
+@section('title', 'Village Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar, Kerala')
+@section('meta_description', 'Discover Village Cottages in Rajakkad, Idukki. Book handcrafted wooden cottages, authentic plantation dining, and nature homestays near Munnar with cardamom plantation views.')
 
 @push('styles')
 <style>
@@ -168,7 +168,7 @@
                 <div class="hero-slide-item {{ $sIdx === 0 ? 'active' : 'inactive' }}" data-index="{{ $sIdx }}">
                     <!-- Background High-Res Image with Ken Burns zoom -->
                     <img src="{{ $slide['image'] }}" 
-                         alt="{{ $slide['title'] }} — Krishna Cottages Kerala" 
+                         alt="{{ $slide['title'] }} — Village Cottages Kerala" 
                          class="w-full h-full object-cover object-center brightness-[0.78]" 
                          {!! $sIdx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"' !!}
                          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1920&q=85';" />
@@ -181,7 +181,7 @@
                     <div class="absolute top-5 left-5 sm:top-8 sm:left-10 z-20 flex items-center gap-2">
                         <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-black/45 backdrop-blur-md text-white text-[11px] sm:text-xs font-semibold tracking-wider uppercase border border-white/20 shadow-xs">
                             <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brass"></i>
-                            <span>{{ $slide['tag'] ?? ($slide['subtitle'] ?? 'Krishna Cottages') }}</span>
+                            <span>{{ $slide['tag'] ?? ($slide['subtitle'] ?? 'Village Cottages') }}</span>
                         </span>
                         @if(!empty($slide['badge']))
                             <span class="hidden sm:inline-flex items-center gap-1 px-3 py-1 rounded-full bg-brass/25 backdrop-blur-md text-brass text-[11px] font-bold border border-brass/30">
@@ -371,7 +371,7 @@
                 <!-- Narrative Story -->
                 <div class="space-y-3.5 text-forest/80 text-sm sm:text-base leading-relaxed font-normal">
                     <p>
-                        {{ $hContent['welcome_description'] ?? 'Tucked into the misty emerald slopes of Rajakkad, Idukki, and neighboring Munnar, Krishna Cottages was conceived as a timeless sanctuary where hurry gives way to stillness. Surrounded by towering silver oaks, organic cardamom valleys, and rolling tea estates, our private wooden residences invite you to breathe deeply and reconnect with what matters.' }}
+                        {{ $hContent['welcome_description'] ?? 'Tucked into the misty emerald slopes of Rajakkad, Idukki, and neighboring Munnar, Village Cottages was conceived as a timeless sanctuary where hurry gives way to stillness. Surrounded by towering silver oaks, organic cardamom valleys, and rolling tea estates, our private wooden residences invite you to breathe deeply and reconnect with what matters.' }}
                     </p>
                     <p class="hidden sm:block text-forest/70 text-xs sm:text-sm">
                         From the gentle clatter of earthenware clay pots simmering with authentic Kerala heirloom spices to quiet sunset hours on cedar verandas, every detail is considered for restorative, peaceful slow living.
@@ -424,9 +424,9 @@
                     </div>
                     <div class="space-y-1 text-xs sm:text-sm text-forest/80 leading-relaxed">
                         <p class="serif italic">
-                            "We created Krishna Cottages as a haven where time gently pauses, hot spiced chai is poured by the rain, and mist greets you each sunrise."
+                            "We created Village Cottages as a haven where time gently pauses, hot spiced chai is poured by the rain, and mist greets you each sunrise."
                         </p>
-                        <span class="block text-[11px] font-bold text-forest/60 uppercase tracking-wider">— The Resident Hosts &middot; Krishna Cottages, Rajakkad &amp; Munnar</span>
+                        <span class="block text-[11px] font-bold text-forest/60 uppercase tracking-wider">— The Resident Hosts &middot; Village Cottages, Rajakkad &amp; Munnar</span>
                     </div>
                 </div>
 
@@ -451,7 +451,7 @@
                     <!-- Main Cottage Veranda Photo -->
                     <div class="relative overflow-hidden rounded-3xl shadow-2xl border-4 border-white bg-forest/10 aspect-[4/5] sm:h-[490px]">
                         <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=85" 
-                             alt="Krishna Cottages Hillside Wooden Veranda" 
+                             alt="Village Cottages Hillside Wooden Veranda" 
                              class="w-full h-full object-cover object-center hover:scale-105 transition duration-700" 
                              loading="lazy" 
                              onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=85';" />
@@ -465,7 +465,7 @@
                     <!-- Floating Overlapping Culinary / Farm Inset Photo (Bottom Left) -->
                     <div class="absolute -bottom-6 -left-4 sm:-left-8 w-44 sm:w-52 h-36 sm:h-44 rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-forest/10 group">
                         <img src="https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=85" 
-                             alt="Authentic Kerala Clay Pot Dining at Krishna Cottages" 
+                             alt="Authentic Kerala Clay Pot Dining at Village Cottages" 
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
                              loading="lazy" 
                              onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=600&q=85';" />
@@ -593,7 +593,7 @@
                         <div class="relative h-52 sm:h-60 w-full overflow-hidden bg-forest/5">
                             <a href="{{ route('rooms.show', $room->slug) }}" class="block w-full h-full">
                                 <img src="{{ $roomCover }}" 
-                                     alt="{{ $room->name }} — Krishna Cottages" 
+                                     alt="{{ $room->name }} — Village Cottages" 
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
                                      loading="lazy" 
                                      onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=85';" />
@@ -700,7 +700,7 @@
         <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12 space-y-2">
             <span class="eyebrow text-emerald font-bold">IMMERSIVE EXPERIENCES</span>
             <h2 class="serif text-3xl sm:text-4xl lg:text-5xl font-bold text-forest tracking-tight">
-                Life at Krishna Cottages
+                Life at Village Cottages
             </h2>
             <p class="text-xs sm:text-sm text-forest/70">
                 Immerse your senses in authentic Kerala dining, farm spices, and scenic hillside nature.
@@ -1364,7 +1364,7 @@
             'name' => $a->name ?: 'Cottage Album',
             'branch' => $a->branch ? $a->branch->name : 'All Retreats',
             'category' => ucfirst($a->category ?: 'Sanctuary'),
-            'description' => $a->description ?: 'Visual moments captured at Krishna Cottages.',
+            'description' => $a->description ?: 'Visual moments captured at Village Cottages.',
             'cover_url' => $a->cover_image_url ?: ($a->images->first()->image_url ?? 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'),
             'images' => $a->images->values()->map(function($img) {
                 return [

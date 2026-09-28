@@ -27,7 +27,7 @@ class EmailNotificationService
         $guestName = $reservation->guest ? $reservation->guest->full_name : 'Guest';
         $guestEmail = $reservation->guest ? $reservation->guest->email : 'N/A';
         $guestPhone = $reservation->guest ? $reservation->guest->phone : 'N/A';
-        $branchName = $reservation->branch ? $reservation->branch->name : 'Krishna Cottages';
+        $branchName = $reservation->branch ? $reservation->branch->name : 'Village Cottages';
         $roomTypeName = $reservation->roomType ? $reservation->roomType->name : 'Cottage Suite';
         $checkIn = Carbon::parse($reservation->check_in_date)->format('d M Y');
         $checkOut = Carbon::parse($reservation->check_out_date)->format('d M Y');
@@ -420,7 +420,7 @@ class EmailNotificationService
     public function sendViaBrevoApi(string $apiKey, string $recipient, string $subject, string $htmlBody, ?string $fromAddress = null, ?string $fromName = null): array
     {
         $senderEmail = $fromAddress ?: Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', 'krishnacottage2023@gmail.com'));
-        $senderName = $fromName ?: Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Krishna Cottages'));
+        $senderName = $fromName ?: Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Village Cottages'));
 
         $payload = [
             'sender' => [
@@ -479,7 +479,7 @@ class EmailNotificationService
     public function sendViaResendApi(string $apiKey, string $recipient, string $subject, string $htmlBody, ?string $fromAddress = null, ?string $fromName = null): array
     {
         $senderEmail = $fromAddress ?: 'onboarding@resend.dev';
-        $senderName = $fromName ?: 'Krishna Cottages';
+        $senderName = $fromName ?: 'Village Cottages';
 
         $payload = [
             'from' => "{$senderName} <{$senderEmail}>",
@@ -539,7 +539,7 @@ class EmailNotificationService
         if (str_starts_with($password, 're_') || str_contains($host, 'resend')) {
             $rows = [
                 'Gateway Driver' => 'Resend REST API (HTTPS Port 443)',
-                'Sender Identity' => ($fromName ?? 'Krishna Cottages') . " <" . ($fromAddress ?? 'onboarding@resend.dev') . ">",
+                'Sender Identity' => ($fromName ?? 'Village Cottages') . " <" . ($fromAddress ?? 'onboarding@resend.dev') . ">",
                 'Recipient Address' => $recipientEmail,
                 'Timestamp' => $now,
             ];
@@ -550,16 +550,16 @@ class EmailNotificationService
                 lead: "This test email confirms that your Resend API integration is active.",
                 rows: $rows,
                 actionUrl: url('/admin'),
-                actionText: "Open Krishna Admin Portal"
+                actionText: "Open Admin Portal"
             );
-            return $this->sendViaResendApi($password, $recipientEmail, "✅ Resend API Test — Krishna Cottages", $html, $fromAddress, $fromName);
+            return $this->sendViaResendApi($password, $recipientEmail, "✅ Resend API Test — Village Cottages", $html, $fromAddress, $fromName);
         }
 
         // 2. Check for direct Brevo HTTPS API
         if ($host === 'api.brevo.com' || str_starts_with($password, 'xkeysib-') || (str_contains($host, 'brevo') && (empty($config['smtp_port']) || (int)$config['smtp_port'] === 443))) {
             $rows = [
                 'Gateway Driver' => 'Brevo REST API (HTTPS Port 443 - Railway Firewall Bypassed)',
-                'Sender Identity' => ($fromName ?? 'Krishna Cottages') . " <" . ($fromAddress ?? 'noreply') . ">",
+                'Sender Identity' => ($fromName ?? 'Village Cottages') . " <" . ($fromAddress ?? 'noreply') . ">",
                 'Recipient Address' => $recipientEmail,
                 'Timestamp' => $now,
             ];
@@ -570,9 +570,9 @@ class EmailNotificationService
                 lead: "This test email confirms that your Brevo HTTPS API connection is working seamlessly on Railway.",
                 rows: $rows,
                 actionUrl: url('/admin'),
-                actionText: "Open Krishna Admin Portal"
+                actionText: "Open Admin Portal"
             );
-            return $this->sendViaBrevoApi($password, $recipientEmail, "✅ Brevo HTTPS API Test — Krishna Cottages & Resorts", $html, $fromAddress, $fromName);
+            return $this->sendViaBrevoApi($password, $recipientEmail, "✅ Brevo HTTPS API Test — Village Cottages & Resorts", $html, $fromAddress, $fromName);
         }
 
         // 3. Fall back to standard SMTP transport with automatic Brevo HTTPS fallback on timeout
@@ -585,13 +585,13 @@ class EmailNotificationService
             ];
         }
 
-        $subject = "✅ SMTP Email Test — Krishna Cottages & Resorts";
+        $subject = "✅ SMTP Email Test — Village Cottages & Resorts";
 
         $rows = [
             'Test Status' => 'SMTP Handshake Successful',
             'Configured Host' => $config['smtp_host'] . ':' . ($config['smtp_port'] ?? 587),
             'Encryption' => strtoupper($config['smtp_encryption'] ?? 'TLS'),
-            'Sender Identity' => ($fromName ?? 'Krishna Cottages') . " <" . ($fromAddress ?? 'noreply') . ">",
+            'Sender Identity' => ($fromName ?? 'Village Cottages') . " <" . ($fromAddress ?? 'noreply') . ">",
             'Recipient Address' => $recipientEmail,
             'Timestamp' => $now,
         ];
@@ -603,7 +603,7 @@ class EmailNotificationService
             lead: "This test email confirms that your SMTP mail server credentials are valid and notifications are active.",
             rows: $rows,
             actionUrl: url('/admin'),
-            actionText: "Open Krishna Admin Portal"
+            actionText: "Open Admin Portal"
         );
 
         try {
@@ -612,7 +612,7 @@ class EmailNotificationService
                     ->subject($subject);
 
                 if (!empty($config['smtp_from_address'])) {
-                    $message->from($config['smtp_from_address'], $config['smtp_from_name'] ?? 'Krishna Cottages');
+                    $message->from($config['smtp_from_address'], $config['smtp_from_name'] ?? 'Village Cottages');
                 }
             });
 
@@ -628,7 +628,7 @@ class EmailNotificationService
             // If standard SMTP timed out and host or key is Brevo, automatically fallback to HTTPS API
             if (str_contains($host, 'brevo') || str_starts_with($password, 'xsmtpsib-') || str_starts_with($password, 'xkeysib-')) {
                 Log::info("Railway blocked raw SMTP port; automatically attempting Brevo HTTPS API fallback...");
-                $apiResult = $this->sendViaBrevoApi($password, $recipientEmail, "✅ Brevo HTTPS API Test — Krishna Cottages & Resorts", $html, $fromAddress, $fromName);
+                $apiResult = $this->sendViaBrevoApi($password, $recipientEmail, "✅ Brevo HTTPS API Test — Village Cottages & Resorts", $html, $fromAddress, $fromName);
                 if ($apiResult['success']) {
                     return $apiResult;
                 }
@@ -671,7 +671,7 @@ class EmailNotificationService
         $host = strtolower(trim(Setting::get('smtp_host', env('MAIL_HOST', ''))));
         $password = trim(Setting::get('smtp_password', env('MAIL_PASSWORD', '')));
         $fromAddress = Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', 'noreply@krishnacottages.com'));
-        $fromName = Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Krishna Cottages'));
+        $fromName = Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Village Cottages'));
 
         $status = 'pending';
         $failureReason = null;
@@ -756,7 +756,7 @@ class EmailNotificationService
         $username = $overrideConfig['smtp_username'] ?? Setting::get('smtp_username', env('MAIL_USERNAME', ''));
         $password = $overrideConfig['smtp_password'] ?? Setting::get('smtp_password', env('MAIL_PASSWORD', ''));
         $fromAddress = $overrideConfig['smtp_from_address'] ?? Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', 'noreply@krishnacottages.com'));
-        $fromName = $overrideConfig['smtp_from_name'] ?? Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Krishna Cottages'));
+        $fromName = $overrideConfig['smtp_from_name'] ?? Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Village Cottages'));
 
         if (empty($host) || empty($username) || empty($password)) {
             return null;
@@ -783,7 +783,7 @@ class EmailNotificationService
     }
 
     /**
-     * Build responsive HTML email template with Krishna Cottages branding.
+     * Build responsive HTML email template with Village Cottages branding.
      */
     protected function buildHtmlTemplate(
         string $title,
@@ -824,7 +824,7 @@ class EmailNotificationService
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td>
-                  <span style="font-family: Georgia, serif; font-size: 20px; font-weight: bold; color: #FAF7F0; letter-spacing: 0.5px;">KRISHNA COTTAGES</span>
+                  <span style="font-family: Georgia, serif; font-size: 20px; font-weight: bold; color: #FAF7F0; letter-spacing: 0.5px;">VILLAGE COTTAGES</span>
                   <div style="font-size: 11px; color: #C9A86A; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px;">Resorts & Botanical Living</div>
                 </td>
                 <td align="right">
@@ -858,7 +858,7 @@ class EmailNotificationService
         <!-- Footer -->
         <tr>
           <td style="background-color: #f9fafb; padding: 18px 30px; text-align: center; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af;">
-            Krishna Cottages Automated Operational Gateway &bull; Sent at {$now}<br>
+            Village Cottages Automated Operational Gateway &bull; Sent at {$now}<br>
             Please do not reply directly to this notification email.
           </td>
         </tr>

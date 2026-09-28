@@ -88,7 +88,7 @@
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60">Resort Stay</span>
                                 </div>
                                 <p class="text-[11px] text-brand-muted mt-0.5">
-                                    {{ $rev->branch->name ?? 'Krishna Cottage' }}
+                                    {{ $rev->branch->name ?? 'Village Cottages' }}
                                     @if($rev->roomType) · {{ $rev->roomType->name }} @endif
                                     · {{ $rev->created_at ? $rev->created_at->format('d M Y, h:i A') : '' }}
                                 </p>

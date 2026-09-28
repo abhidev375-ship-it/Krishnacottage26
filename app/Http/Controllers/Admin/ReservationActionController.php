@@ -288,8 +288,8 @@ class ReservationActionController extends Controller
                     'branch_id' => $reservation->branch_id,
                     'reference_type' => 'Reservation',
                     'reference_id' => $reservation->id,
-                    'subject' => "Booking Cancelled & ₹{$cashback} Cashback Initiated - Krishna Cottages",
-                    'message_body' => "Dear {$reservation->guest->first_name}, your booking {$reservation->booking_code} has been cancelled. Based on our policy ({$calc['hours_remaining']}h prior to arrival), a cashback of ₹" . number_format($cashback, 2) . " ({$calc['percentage']}%) has been automated (Ref: #{$refundTxnId}). - Krishna Cottages",
+                    'subject' => "Booking Cancelled & ₹{$cashback} Cashback Initiated - Village Cottages",
+                    'message_body' => "Dear {$reservation->guest->first_name}, your booking {$reservation->booking_code} has been cancelled. Based on our policy ({$calc['hours_remaining']}h prior to arrival), a cashback of ₹" . number_format($cashback, 2) . " ({$calc['percentage']}%) has been automated (Ref: #{$refundTxnId}). - Village Cottages",
                     'status' => 'delivered',
                     'sent_at' => Carbon::now(),
                 ]);

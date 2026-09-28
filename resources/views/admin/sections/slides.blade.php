@@ -82,7 +82,7 @@
                             <div class="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 flex items-center gap-2">
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold uppercase tracking-wider border border-white/20">
                                     <i data-lucide="map-pin" class="w-3 h-3 text-brand-accent"></i>
-                                    <span>{{ $s['tag'] ?? ($s['subtitle'] ?? 'Krishna Cottages') }}</span>
+                                    <span>{{ $s['tag'] ?? ($s['subtitle'] ?? 'Village Cottages') }}</span>
                                 </span>
                                 @if(!empty($s['badge']))
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-brand-accent/25 backdrop-blur-md text-brand-accent text-[10px] font-bold border border-brand-accent/30">

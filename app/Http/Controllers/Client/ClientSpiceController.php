@@ -313,7 +313,7 @@ class ClientSpiceController extends Controller
             'customer_phone' => $validated['customer_phone'],
             'delivery_mode' => $deliveryMode,
             'room_number' => $validated['room_number'] ?? null,
-            'shipping_address_line1' => $isVilla ? ('Krishna Cottage / ' . ($validated['room_number'] ?? 'In-House Villa')) : $validated['shipping_address_line1'],
+            'shipping_address_line1' => $isVilla ? ('Village Cottages / ' . ($validated['room_number'] ?? 'In-House Villa')) : $validated['shipping_address_line1'],
             'shipping_address_line2' => $isVilla ? 'Resort Hand Delivery' : ($validated['shipping_address_line2'] ?? null),
             'shipping_city' => $isVilla ? 'Resort Estate' : $validated['shipping_city'],
             'shipping_state' => $isVilla ? 'Kerala' : $validated['shipping_state'],

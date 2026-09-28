@@ -535,7 +535,7 @@ class BookingAndPaymentTest extends TestCase
             'customer_name' => 'Aditi Sharma',
             'customer_email' => 'aditi.sharma@example.com',
             'customer_phone' => '+91 98765 43210',
-            'shipping_address_line1' => 'Villa 101, Krishna Cottages Wayanad',
+            'shipping_address_line1' => 'Villa 101, Village Cottages Wayanad',
             'shipping_city' => 'Wayanad',
             'shipping_state' => 'Kerala',
             'shipping_pincode' => '673121',

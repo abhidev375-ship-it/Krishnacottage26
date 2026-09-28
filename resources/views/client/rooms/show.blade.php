@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', $roomType->name . ' | Krishna Cottages')
+@section('title', $roomType->name . ' | Village Cottages')
 
 @section('content')
 <div class="mx-auto max-w-[1480px] px-4 sm:px-6 py-4 sm:py-6">

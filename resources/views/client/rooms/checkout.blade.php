@@ -377,7 +377,7 @@
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 soft-border shadow-card max-h-[85vh] overflow-y-auto space-y-4">
         <div class="flex items-center justify-between border-b border-forest/10 pb-4">
             <div>
-                <span class="eyebrow text-brass block">Krishna Cottages Protocols</span>
+                <span class="eyebrow text-brass block">Village Cottages Protocols</span>
                 <h3 class="serif text-xl sm:text-2xl font-bold text-forest mt-0.5" id="policy-modal-title">Cottage Ground Rules</h3>
             </div>
             <button type="button" onclick="closeGroundRulesModal()" class="w-8 h-8 rounded-full bg-forest/5 hover:bg-forest/10 flex items-center justify-center text-forest cursor-pointer">
@@ -395,7 +395,7 @@
                 <h4 class="font-bold text-forest flex items-center gap-1.5 text-xs">
                     <i data-lucide="ban" class="w-3.5 h-3.5 text-brass"></i> Strictly No Swimming Pool Policy
                 </h4>
-                <p>Krishna Cottages operates under eco-botanical heritage principles with no artificial swimming pools. We encourage cold mountain stream walks, herbal spice plantation trails, and natural veranda unwinding.</p>
+                <p>Village Cottages operates under eco-botanical heritage principles with no artificial swimming pools. We encourage cold mountain stream walks, herbal spice plantation trails, and natural veranda unwinding.</p>
             </div>
             <div class="space-y-1">
                 <h4 class="font-bold text-forest flex items-center gap-1.5 text-xs">
@@ -622,7 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     key: data.key_id,
                     amount: data.amount,
                     currency: data.currency || 'INR',
-                    name: data.name || 'Krishna Cottage',
+                    name: data.name || 'Village Cottages',
                     description: data.description || 'Room Reservation',
                     order_id: data.order_id,
                     prefill: prefillData,

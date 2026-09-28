@@ -349,7 +349,7 @@ class BookingController extends Controller
                 'amount' => $order['amount'],
                 'amount_rupees' => $amountToPay,
                 'currency' => $order['currency'],
-                'name' => 'Krishna Cottage',
+                'name' => 'Village Cottages',
                 'description' => "{$nights}-Night Stay · {$roomType->name}",
                 'prefill' => [
                     'name' => trim($validated['first_name'] . ' ' . $validated['last_name']),

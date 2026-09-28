@@ -8,7 +8,7 @@
     $faqs = $contactContent['faqs'] ?? [];
 @endphp
 
-@section('title', 'Concierge & Contact | Krishna Cottages')
+@section('title', 'Concierge & Contact | Village Cottages')
 
 @section('content')
 <!-- HERO SECTION -->
@@ -232,7 +232,7 @@
                     <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
                     Your details are securely held under strict privacy protocols.
                 </span>
-                <span class="hidden sm:inline text-forest/40">Krishna Cottages Hospitality</span>
+                <span class="hidden sm:inline text-forest/40">Village Cottages Hospitality</span>
             </div>
         </div>
 

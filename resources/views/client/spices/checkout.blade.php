@@ -99,7 +99,7 @@
                 <div id="villa-room-input-container" class="p-4 rounded-2xl bg-mint/50 border border-emerald/15 flex items-center justify-between">
                     <div>
                         <span class="text-[10px] uppercase font-bold text-emerald tracking-wider block">Assigned Delivery Unit</span>
-                        <span class="font-bold text-forest text-sm">Villa {{ $activeStay->room ? $activeStay->room->room_number : 'In-House Suite' }} &middot; {{ $activeStay->branch ? $activeStay->branch->name : 'Krishna Cottages' }}</span>
+                        <span class="font-bold text-forest text-sm">Villa {{ $activeStay->room ? $activeStay->room->room_number : 'In-House Suite' }} &middot; {{ $activeStay->branch ? $activeStay->branch->name : 'Village Cottages' }}</span>
                     </div>
                     <input type="hidden" name="room_number" value="{{ $activeStay->room ? $activeStay->room->room_number : 'In-House Suite' }}">
                     <span class="text-[10px] bg-white px-2 py-1 rounded-md text-forest font-mono">Room Folio Ready</span>

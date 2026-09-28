@@ -114,7 +114,7 @@
                                 <div class="absolute top-4 left-4 sm:top-6 sm:left-7 z-20 flex items-center gap-2">
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold tracking-wider uppercase border border-white/20 shadow-xs">
                                         <i data-lucide="map-pin" class="w-3 h-3 text-[#C7A76A]"></i>
-                                        <span>{{ $s['tag'] ?? ($s['subtitle'] ?? 'Krishna Cottages') }}</span>
+                                        <span>{{ $s['tag'] ?? ($s['subtitle'] ?? 'Village Cottages') }}</span>
                                     </span>
                                     @if(!empty($s['badge']))
                                         <span class="hidden xs:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#C7A76A]/25 backdrop-blur-md text-[#C7A76A] text-[10px] font-bold border border-[#C7A76A]/30">
@@ -326,7 +326,7 @@
             <section class="pt-8 border-t border-gray-200/80">
                 <div class="max-w-3xl mx-auto text-center space-y-3">
                     <span id="edit-welcome-eyebrow" class="wysiwyg-text text-xs font-bold uppercase tracking-wider text-[#0B5D4B]" contenteditable="true">
-                        {{ $homepageContent['welcome_eyebrow'] ?? 'WELCOME TO KRISHNA COTTAGES' }}
+                        {{ $homepageContent['welcome_eyebrow'] ?? 'WELCOME TO VILLAGE COTTAGES' }}
                     </span>
                     <h2 class="serif text-3xl sm:text-4xl font-bold text-[#063F34] tracking-tight">
                         <span id="edit-welcome-heading" class="wysiwyg-text" contenteditable="true">
@@ -336,7 +336,7 @@
                     <div class="w-16 h-0.5 bg-[#C7A76A] mx-auto my-3"></div>
                     <p class="text-sm text-[#063F34]/80 leading-relaxed font-normal">
                         <span id="edit-welcome-desc" class="wysiwyg-text" contenteditable="true">
-                            {{ $homepageContent['welcome_description'] ?? 'Tucked into the misty slopes of Rajakkad, Idukki, and nearby Munnar, Krishna Cottages provides handcrafted private wooden residences surrounded by aromatic tea plantations, cardamoms, and cool mountain air.' }}
+                            {{ $homepageContent['welcome_description'] ?? 'Tucked into the misty slopes of Rajakkad, Idukki, and nearby Munnar, Village Cottages provides handcrafted private wooden residences surrounded by aromatic tea plantations, cardamoms, and cool mountain air.' }}
                         </span>
                     </p>
                 </div>
@@ -476,7 +476,7 @@
                         </h2>
                         <p class="text-xs sm:text-sm text-[#063F34]/80 leading-relaxed">
                             <span id="edit-dining-desc" class="wysiwyg-text" contenteditable="true">
-                                {{ $homepageContent['dining_description'] ?? 'Every meal at Krishna Cottages is prepared with freshly plucked plantation herbs, slow-cooked in traditional clay pots over open firewood.' }}
+                                {{ $homepageContent['dining_description'] ?? 'Every meal at Village Cottages is prepared with freshly plucked plantation herbs, slow-cooked in traditional clay pots over open firewood.' }}
                             </span>
                         </p>
                         <div class="flex items-center gap-3 pt-2">
