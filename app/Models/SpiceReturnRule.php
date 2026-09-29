@@ -140,7 +140,7 @@ class SpiceReturnRule extends Model
                 'handling_fee' => 0.0,
                 'retained' => $totalPaid,
                 'rule_name' => 'Window Expired',
-                'rule_description' => "Return/cancellation window ({$hoursElapsed}h elapsed) has expired for this order under Krishna Estate policy.",
+                'rule_description' => "Return/cancellation window ({$hoursElapsed}h elapsed) has expired for this order under Village Cottages policy.",
                 'matched_rule' => null,
             ];
         }

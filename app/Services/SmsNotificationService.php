@@ -134,7 +134,7 @@ class SmsNotificationService
             try {
                 $response = Http::timeout(5)->post(config('services.sms.api_url'), [
                     'api_key' => $apiKey,
-                    'sender' => config('services.sms.sender_id', 'KRISHNA'),
+                    'sender' => config('services.sms.sender_id', 'VILLAGE'),
                     'to' => $cleanPhone,
                     'message' => $text,
                 ]);

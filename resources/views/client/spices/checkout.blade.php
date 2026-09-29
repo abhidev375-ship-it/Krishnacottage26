@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Checkout | Krishna Spices')
+@section('title', 'Checkout | Village Spices')
 
 @section('content')
 <div class="mx-auto max-w-[1280px] px-4 sm:px-6 py-5 sm:py-8">
@@ -399,7 +399,7 @@
     }
 
     function recalculateBill() {
-        const cart = JSON.parse(localStorage.getItem('krishna_spices_cart')) || [];
+        const cart = JSON.parse(localStorage.getItem('village_spices_cart') || localStorage.getItem('krishna_spices_cart')) || [];
         const container = document.getElementById('checkout-items-list');
         const jsonInput = document.getElementById('input-items-json');
         const submitBtn = document.getElementById('submit-spice-btn');
@@ -574,7 +574,7 @@
                     return;
                 }
 
-                const cart = JSON.parse(localStorage.getItem('krishna_spices_cart')) || [];
+                const cart = JSON.parse(localStorage.getItem('village_spices_cart') || localStorage.getItem('krishna_spices_cart')) || [];
                 if (cart.length === 0) {
                     e.preventDefault();
                     showError('Your shopping cart is empty. Please add spices before checking out.');
@@ -585,12 +585,14 @@
 
                 // Offline payment methods: COD or Charge to Room Folio
                 if (paymentMethod === 'cod' || paymentMethod === 'charge_to_room') {
+                    localStorage.removeItem('village_spices_cart');
                     localStorage.removeItem('krishna_spices_cart');
                     return;
                 }
 
                 // If payment tokens already set, allow standard submission
                 if (document.getElementById('razorpay_payment_id').value) {
+                    localStorage.removeItem('village_spices_cart');
                     localStorage.removeItem('krishna_spices_cart');
                     return;
                 }
@@ -640,7 +642,7 @@
                         key: data.key_id,
                         amount: data.amount,
                         currency: data.currency || 'INR',
-                        name: data.name || 'Krishna Spices',
+                        name: data.name || 'Village Spices',
                         description: data.description || 'Harvest Spice Order',
                         order_id: data.order_id,
                         prefill: prefillData,
@@ -649,6 +651,7 @@
                             document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
                             document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
                             document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                            localStorage.removeItem('village_spices_cart');
                             localStorage.removeItem('krishna_spices_cart');
                             btnText.textContent = 'Finalizing Order...';
                             form.submit();

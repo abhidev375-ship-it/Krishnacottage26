@@ -231,7 +231,7 @@
                             <i data-lucide="lock" class="w-6 h-6"></i>
                         </div>
                         <h4 class="font-bold text-brand-text text-sm">Conversation Locked by {{ $activeEnq->lockedBy ? $activeEnq->lockedBy->name : 'Staff' }}</h4>
-                        <p class="text-xs text-brand-muted max-w-sm">Under Krishna Resorts direct messaging protocols, only the committed staff member can read or respond to this conversation until they release the lock.</p>
+                        <p class="text-xs text-brand-muted max-w-sm">Under Village Cottages direct messaging protocols, only the committed staff member can read or respond to this conversation until they release the lock.</p>
                     </div>
                 @else
                     @foreach($activeEnq->messages as $msg)

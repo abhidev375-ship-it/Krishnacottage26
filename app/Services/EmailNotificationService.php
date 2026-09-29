@@ -361,7 +361,7 @@ class EmailNotificationService
             title: "New Spice Store Order Received",
             badge: "SPICE STORE",
             badgeColor: "#059669",
-            lead: "A customer placed an order on Krishna Spices Store.",
+            lead: "A customer placed an order on Village Spices Store.",
             rows: $rows,
             actionUrl: url('/admin/spice-orders'),
             actionText: "Open Spices Fulfillment Desk"
@@ -665,12 +665,12 @@ class EmailNotificationService
         $recipient = $overrideRecipient ?: Setting::get('smtp_recipient_email', env('ADMIN_NOTIFICATION_EMAIL', ''));
         if (empty($recipient)) {
             $adminUser = \App\Models\User::where('role', 'super_admin')->first();
-            $recipient = $adminUser ? $adminUser->email : env('MAIL_FROM_ADDRESS', 'admin@krishnacottages.com');
+            $recipient = $adminUser ? $adminUser->email : env('MAIL_FROM_ADDRESS', 'admin@villagecottages.com');
         }
 
         $host = strtolower(trim(Setting::get('smtp_host', env('MAIL_HOST', ''))));
         $password = trim(Setting::get('smtp_password', env('MAIL_PASSWORD', '')));
-        $fromAddress = Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', 'noreply@krishnacottages.com'));
+        $fromAddress = Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', 'noreply@villagecottages.com'));
         $fromName = Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Village Cottages'));
 
         $status = 'pending';
@@ -755,7 +755,7 @@ class EmailNotificationService
         $encryption = $overrideConfig['smtp_encryption'] ?? Setting::get('smtp_encryption', env('MAIL_ENCRYPTION', 'tls'));
         $username = $overrideConfig['smtp_username'] ?? Setting::get('smtp_username', env('MAIL_USERNAME', ''));
         $password = $overrideConfig['smtp_password'] ?? Setting::get('smtp_password', env('MAIL_PASSWORD', ''));
-        $fromAddress = $overrideConfig['smtp_from_address'] ?? Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', 'noreply@krishnacottages.com'));
+        $fromAddress = $overrideConfig['smtp_from_address'] ?? Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', 'noreply@villagecottages.com'));
         $fromName = $overrideConfig['smtp_from_name'] ?? Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Village Cottages'));
 
         if (empty($host) || empty($username) || empty($password)) {

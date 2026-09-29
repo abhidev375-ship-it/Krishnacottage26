@@ -508,7 +508,7 @@
                         </span>
                         <h2 class="serif text-2xl sm:text-3xl font-bold text-[#063F34] mt-1">
                             <span id="edit-spices-heading-1" class="wysiwyg-text" contenteditable="true">
-                                {{ $homepageContent['spices_heading_1'] ?? 'Krishna Pure Spices & Organics' }}
+                                {{ $homepageContent['spices_heading_1'] ?? 'Village Pure Spices & Organics' }}
                             </span>
                         </h2>
                     </div>
@@ -590,7 +590,7 @@
             </section>
 
             <!-- =========================================================================
-                 8. VISUAL GALLERY (MOMENTS AT KRISHNA)
+                 8. VISUAL GALLERY (MOMENTS AT VILLAGE COTTAGES)
                  ========================================================================= -->
             <section class="pt-8 border-t border-gray-200/80">
                 <div class="flex items-end justify-between mb-4">
@@ -653,7 +653,7 @@
                             </div>
                             <div class="flex items-center gap-2 text-white/80">
                                 <i data-lucide="mail" class="w-4 h-4"></i>
-                                <span id="edit-footer-email" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_email'] ?? 'concierge@krishnacottages.com' }}</span>
+                                <span id="edit-footer-email" class="wysiwyg-text" contenteditable="true">{{ $homepageContent['footer_email'] ?? 'concierge@villagecottages.com' }}</span>
                             </div>
                         </div>
                     </div>

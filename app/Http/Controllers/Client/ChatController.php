@@ -21,7 +21,7 @@ class ChatController extends Controller
      */
     public function init(Request $request): JsonResponse
     {
-        $sessionId = $request->cookie('krishna_chat_session') ?? $request->header('X-Chat-Session-Id') ?? Str::uuid()->toString();
+        $sessionId = $request->cookie('village_chat_session') ?? $request->cookie('krishna_chat_session') ?? $request->header('X-Chat-Session-Id') ?? Str::uuid()->toString();
         $user = Auth::user();
 
         // 1. Search for existing conversation
@@ -102,7 +102,7 @@ class ChatController extends Controller
                 'reservation_id' => $activeReservation ? $activeReservation->id : null,
                 'guest_id' => $activeReservation ? $activeReservation->guest_id : ($user && $user->guest ? $user->guest->id : null),
                 'customer_name' => $user ? $user->name : ($activeReservation && $activeReservation->guest ? $activeReservation->guest->full_name : 'Guest Visitor'),
-                'customer_email' => $user ? $user->email : ($activeReservation && $activeReservation->guest ? $activeReservation->guest->email : 'guest_' . substr($sessionId, 0, 8) . '@krishnaresorts.com'),
+                'customer_email' => $user ? $user->email : ($activeReservation && $activeReservation->guest ? $activeReservation->guest->email : 'guest_' . substr($sessionId, 0, 8) . '@villagecottages.com'),
                 'customer_phone' => $user ? $user->phone : ($activeReservation && $activeReservation->guest ? $activeReservation->guest->phone : null),
                 'topic' => $activeReservation ? 'booking_related' : 'general',
                 'subject' => $activeReservation ? ('Concierge: ' . ($activeReservation->branch ? $activeReservation->branch->name : 'Resort')) : 'Concierge Live Chat',
@@ -253,7 +253,7 @@ class ChatController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
             ] : null,
-        ])->cookie('krishna_chat_session', $sessionId, 60 * 24 * 30); // 30 days cookie
+        ])->cookie('village_chat_session', $sessionId, 60 * 24 * 30); // 30 days cookie
     }
 
     /**

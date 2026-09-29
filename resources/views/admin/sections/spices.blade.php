@@ -1,11 +1,11 @@
-<!-- KRISHNA SPICES E-COMMERCE & FULFILLMENT HUB (ADM-16, ADM-17, ADM-18) -->
+<!-- VILLAGE SPICES E-COMMERCE & FULFILLMENT HUB (ADM-16, ADM-17, ADM-18) -->
 <section id="spices" class="section space-y-5">
     <!-- Header with 3 Hub Navigation Tabs -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200/70 shadow-xs">
         <div>
             <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <h2 class="text-xl sm:text-2xl font-bold text-brand-text">Krishna Spices E-Commerce Hub</h2>
+                <h2 class="text-xl sm:text-2xl font-bold text-brand-text">Village Spices E-Commerce Hub</h2>
             </div>
             <p class="text-brand-muted text-xs mt-1">Single-estate harvest spices &bull; Pack-on-order fulfillment &bull; Courier &amp; Villa delivery &bull; Customizable Return &amp; Refund Policy.</p>
         </div>

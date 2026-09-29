@@ -742,13 +742,13 @@
                 <div>
                     <div class="relative h-60 w-full overflow-hidden bg-forest/5">
                         <img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=800&q=85" 
-                             alt="Krishna Spices Farm" 
+                             alt="Village Spices Farm" 
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
                              loading="lazy" />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                         <div class="absolute bottom-3 left-4 text-white">
                             <span class="eyebrow text-brass text-[9px]">ESTATE HARVEST</span>
-                            <h3 class="serif text-xl font-bold">Krishna Spices</h3>
+                            <h3 class="serif text-xl font-bold">Village Spices</h3>
                         </div>
                     </div>
                     <div class="p-6 space-y-2">

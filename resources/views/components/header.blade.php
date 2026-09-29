@@ -28,7 +28,7 @@
                 <a href="{{ route('home') }}" class="nav-item-line hover:text-emerald transition {{ request()->routeIs('home') ? 'active text-emerald font-bold' : '' }}">Home</a>
                 <a href="{{ route('rooms.index') }}" class="nav-item-line hover:text-emerald transition {{ request()->routeIs('rooms.*') || request()->routeIs('booking.*') ? 'active text-emerald font-bold' : '' }}">Stay</a>
                 <a href="{{ route('dining.index') }}" class="nav-item-line hover:text-emerald transition {{ request()->routeIs('dining.*') ? 'active text-emerald font-bold' : '' }}">Dining</a>
-                <a href="{{ route('spices.index') }}" class="nav-item-line hover:text-emerald transition {{ request()->routeIs('spices.*') ? 'active text-emerald font-bold' : '' }}">Krishna Spices</a>
+                <a href="{{ route('spices.index') }}" class="nav-item-line hover:text-emerald transition {{ request()->routeIs('spices.*') ? 'active text-emerald font-bold' : '' }}">Village Spices</a>
                 <a href="{{ route('facilities.index') }}" class="nav-item-line hover:text-emerald transition {{ request()->routeIs('facilities.*') ? 'active text-emerald font-bold' : '' }}">Facilities</a>
                 <a href="{{ route('gallery.index') }}" class="nav-item-line hover:text-emerald transition {{ request()->routeIs('gallery.*') ? 'active text-emerald font-bold' : '' }}">Gallery</a>
                 <a href="{{ route('nearby.index') }}" class="nav-item-line hover:text-emerald transition {{ request()->routeIs('nearby.*') ? 'active text-emerald font-bold' : '' }}">Discover</a>

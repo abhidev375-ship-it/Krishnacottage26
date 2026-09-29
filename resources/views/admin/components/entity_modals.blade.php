@@ -18,7 +18,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-700 mb-1">Branch Name *</label>
-                    <input type="text" name="name" required placeholder="e.g. Krishna · Munnar Mist" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
+                    <input type="text" name="name" required placeholder="e.g. Village Cottages · Munnar Mist" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
                 </div>
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-700 mb-1">Branch Code *</label>
@@ -28,7 +28,7 @@
 
             <div>
                 <label class="block text-[11px] font-semibold text-gray-700 mb-1">Display Name / Title</label>
-                <input type="text" name="display_name" placeholder="e.g. Krishna Valley & Garden Retreat" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
+                <input type="text" name="display_name" placeholder="e.g. Village Valley & Garden Retreat" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
             </div>
 
             <div>
@@ -86,7 +86,7 @@
                 </div>
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-700 mb-1">Email Address</label>
-                    <input type="email" name="email" placeholder="branch@krishnaresorts.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
+                    <input type="email" name="email" placeholder="branch@villagecottages.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
                 </div>
             </div>
 
@@ -2496,7 +2496,7 @@ async function handleCategoryFormSubmit(e) {
 
             <div>
                 <label class="block text-[11px] font-semibold text-gray-700 mb-1">Concierge Email</label>
-                <input type="email" name="resort_contact_email" value="{{ \App\Models\Setting::get('resort_contact_email', 'concierge@krishnaresorts.com') }}" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
+                <input type="email" name="resort_contact_email" value="{{ \App\Models\Setting::get('resort_contact_email', 'concierge@villagecottages.com') }}" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -2571,7 +2571,7 @@ async function handleCategoryFormSubmit(e) {
                 </div>
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-700 mb-1">Email Address *</label>
-                    <input type="email" name="email" required placeholder="maya@krishnaresorts.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
+                    <input type="email" name="email" required placeholder="maya@villagecottages.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
                 </div>
             </div>
 

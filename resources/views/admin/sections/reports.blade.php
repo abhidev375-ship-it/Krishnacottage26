@@ -45,7 +45,7 @@
         </div>
 
         <div class="bg-brand-surface p-4 rounded-xl border border-gray-200/70 shadow-xs">
-            <span class="text-xs text-brand-muted uppercase font-bold tracking-wider">Krishna Spices E-Commerce</span>
+            <span class="text-xs text-brand-muted uppercase font-bold tracking-wider">Village Spices E-Commerce</span>
             <div class="text-2xl font-extrabold text-brand-text mt-1">₹{{ number_format($spiceOrders->sum('total_amount')) }}</div>
             <div class="text-[11px] text-emerald-700 mt-1 font-semibold">{{ $spiceOrders->count() }} Shipments fulfilled</div>
         </div>

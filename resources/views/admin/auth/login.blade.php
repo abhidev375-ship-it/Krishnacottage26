@@ -63,10 +63,10 @@
             <input 
               type="email" 
               name="email" 
-              value="{{ old('email', 'admin@krishnaresorts.com') }}" 
+              value="{{ old('email', 'admin@villagecottages.com') }}" 
               required 
               autofocus 
-              placeholder="admin@krishnaresorts.com" 
+              placeholder="admin@villagecottages.com" 
               class="w-full bg-[#04251F]/70 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-xs font-semibold text-white placeholder:text-white/30 focus:outline-hidden focus:border-[#C7A76A] transition"
             />
           </div>

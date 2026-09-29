@@ -366,7 +366,7 @@
 
                 <div class="bg-mint p-3 rounded-2xl border border-emerald/15 flex items-center gap-2.5 text-xs text-forest">
                     <i data-lucide="shield-check" class="w-4 h-4 text-emerald shrink-0"></i>
-                    <span>Protected by Krishna Hospitality Guarantee &middot; 24/7 Concierge Support</span>
+                    <span>Protected by Village Cottages Hospitality Guarantee &middot; 24/7 Concierge Support</span>
                 </div>
             </div>
         </div>

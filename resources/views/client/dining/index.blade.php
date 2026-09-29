@@ -273,10 +273,10 @@
 
 @push('scripts')
 <script>
-    let diningCart = JSON.parse(localStorage.getItem('krishna_dining_cart')) || [];
+    let diningCart = JSON.parse(localStorage.getItem('village_dining_cart') || localStorage.getItem('krishna_dining_cart')) || [];
 
     function saveCart() {
-        localStorage.setItem('krishna_dining_cart', JSON.stringify(diningCart));
+        localStorage.setItem('village_dining_cart', JSON.stringify(diningCart));
         updateCartUI();
     }
 

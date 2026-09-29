@@ -568,8 +568,8 @@ class BookingController extends Controller
                         'branch_id' => $roomType->branch_id,
                         'reference_type' => 'Payment',
                         'reference_id' => $refundPayment->id,
-                        'subject' => 'Booking Conflict & 100% Automated Payback - Krishna Resorts',
-                        'message_body' => "Dear {$guest->first_name}, another guest secured the last available {$roomType->name} moments before your transaction settled. Your payment of ₹" . number_format($paidAmount, 2) . " has been 100% refunded (Refund Ref: #{$refundTxnId}). No cancellation fee applied. - Krishna Resorts",
+                        'subject' => 'Booking Conflict & 100% Automated Payback - Village Cottages',
+                        'message_body' => "Dear {$guest->first_name}, another guest secured the last available {$roomType->name} moments before your transaction settled. Your payment of ₹" . number_format($paidAmount, 2) . " has been 100% refunded (Refund Ref: #{$refundTxnId}). No cancellation fee applied. - Village Cottages",
                         'status' => 'delivered',
                         'sent_at' => Carbon::now(),
                     ]);
@@ -647,7 +647,7 @@ class BookingController extends Controller
                 'from_status' => 'inquiry',
                 'to_status' => 'confirmed',
                 'user_id' => $user->id,
-                'note' => 'Guest booked online via Krishna Resorts Web Platform (' . strtoupper($validated['payment_method']) . ')',
+                'note' => 'Guest booked online via Village Cottages Web Platform (' . strtoupper($validated['payment_method']) . ')',
                 'created_at' => Carbon::now(),
             ]);
 
@@ -703,8 +703,8 @@ class BookingController extends Controller
                 'branch_id' => $roomType->branch_id,
                 'reference_type' => Reservation::class,
                 'reference_id' => $reservation->id,
-                'subject' => "Booking Confirmed #{$bookingCode} - Krishna Resorts",
-                'message_body' => "Dear {$guest->first_name}, your stay at " . ($roomType->branch ? $roomType->branch->name : 'Krishna Resorts') . " is confirmed! Ref: #{$bookingCode}. Dates: {$checkInStr} to {$checkOutStr}. Resort Location: {$branchAddress}. - Krishna Resorts",
+                'subject' => "Booking Confirmed #{$bookingCode} - Village Cottages",
+                'message_body' => "Dear {$guest->first_name}, your stay at " . ($roomType->branch ? $roomType->branch->name : 'Village Cottages') . " is confirmed! Ref: #{$bookingCode}. Dates: {$checkInStr} to {$checkOutStr}. Resort Location: {$branchAddress}. - Village Cottages",
                 'status' => 'delivered',
                 'sent_at' => Carbon::now(),
             ]);
@@ -982,7 +982,7 @@ class BookingController extends Controller
                     'slug' => $rt->slug,
                     'short_description' => $rt->short_description ?: 'Luxury cottage experience surrounded by tranquil greenery.',
                     'branch_id' => $rt->branch_id,
-                    'branch_name' => $rt->branch?->name ?? 'Krishna Resorts',
+                    'branch_name' => $rt->branch?->name ?? 'Village Cottages',
                     'branch_city' => $rt->branch?->city ?? 'Kerala',
                     'category_name' => $rt->category?->name ?? 'Villa Suite',
                     'bed_type' => $rt->bed_type ?: 'King Size Bed',

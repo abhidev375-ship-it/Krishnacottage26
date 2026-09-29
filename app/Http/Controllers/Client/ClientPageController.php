@@ -95,7 +95,7 @@ class ClientPageController extends Controller
         $contactContent = Setting::get('contact_content', []);
 
         $centralPhone = Setting::get('resort_phone', $contactContent['central_phone'] ?? '+91 94471 22334');
-        $centralEmail = Setting::get('resort_email', $contactContent['central_email'] ?? 'concierge@krishnaresorts.com');
+        $centralEmail = Setting::get('resort_email', $contactContent['central_email'] ?? 'concierge@villagecottages.com');
         $centralAddress = Setting::get('resort_address', $contactContent['central_address'] ?? 'Tea Garden Estate, Rajakkad, Idukki District, Kerala - 685566');
         $frontdeskHours = Setting::get('frontdesk_hours', $contactContent['frontdesk_hours'] ?? 'Open 24 Hours · 7 Days a Week');
 

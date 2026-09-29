@@ -205,7 +205,7 @@
                                             @endif
                                             <span class="text-[10px] bg-emerald-600 text-paper px-2 py-0.5 rounded-full font-bold uppercase">Active Key</span>
                                         </div>
-                                        <p class="text-[10px] text-forest/60 mt-0.5">High-speed Wi-Fi: <strong class="text-forest">KrishnaGuest_{{ $selectedStay->branch->code ?? 'RESORT' }}</strong> (Password: <span class="font-mono">kerala{{ date('Y') }}</span>)</p>
+                                        <p class="text-[10px] text-forest/60 mt-0.5">High-speed Wi-Fi: <strong class="text-forest">VillageGuest_{{ $selectedStay->branch->code ?? 'RESORT' }}</strong> (Password: <span class="font-mono">kerala{{ date('Y') }}</span>)</p>
                                     @elseif($isUpcoming)
                                         <div class="font-semibold text-forest text-xs">
                                             Room assigned upon physical check-in at front desk
@@ -2949,10 +2949,10 @@
     // -------------------------------------------------------------
     // 4. ORDER & PAYMENT SLIDE-OVER DRAWER (MATCHING DINING PAGE)
     // -------------------------------------------------------------
-    let drawerCart = JSON.parse(localStorage.getItem('krishna_dashboard_tray')) || [];
+    let drawerCart = JSON.parse(localStorage.getItem('village_dashboard_tray') || localStorage.getItem('krishna_dashboard_tray')) || [];
 
     function saveDrawerCart() {
-        localStorage.setItem('krishna_dashboard_tray', JSON.stringify(drawerCart));
+        localStorage.setItem('village_dashboard_tray', JSON.stringify(drawerCart));
         updateDrawerUI();
     }
 
@@ -2977,7 +2977,7 @@
             } else {
                 iconEl.setAttribute('data-lucide', 'utensils');
                 titleEl.textContent = 'In-Villa Dining Tray';
-                subEl.textContent = 'Fresh from Krishna Kitchen';
+                subEl.textContent = 'Fresh from Village Kitchen';
             }
         }
 

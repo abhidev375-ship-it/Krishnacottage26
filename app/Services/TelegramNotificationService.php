@@ -93,7 +93,7 @@ class TelegramNotificationService
             ? Carbon::parse($order->scheduled_at)->format('d M Y, h:i A')
             : 'Immediate / As Soon As Possible';
 
-        $html = "🍽️ <b>NEW KITCHEN ORDER — KRISHNA DINING</b>\n\n"
+        $html = "🍽️ <b>NEW KITCHEN ORDER — VILLAGE DINING</b>\n\n"
             . "• <b>Order Ref:</b> <code>#{$order->order_number}</code>\n"
             . "• <b>Type:</b> {$type} (<b>{$location}</b>)\n"
             . "• <b>Guest:</b> " . htmlspecialchars($order->customer_name, ENT_QUOTES) . "\n"
@@ -155,7 +155,7 @@ class TelegramNotificationService
         $branchName = $booking->branch ? $booking->branch->name : 'Resort Concierge';
         $villa = ($booking->reservation && $booking->reservation->room) ? " (Villa {$booking->reservation->room->room_number})" : '';
 
-        $html = "🌿 <b>EXPERIENCE & SPA BOOKING — KRISHNA CONCIERGE</b>\n\n"
+        $html = "🌿 <b>EXPERIENCE & SPA BOOKING — VILLAGE CONCIERGE</b>\n\n"
             . "• <b>Experience:</b> " . htmlspecialchars($facilityName, ENT_QUOTES) . "\n"
             . "• <b>Guest:</b> " . htmlspecialchars($guestName, ENT_QUOTES) . "{$villa}\n"
             . "• <b>Scheduled Date:</b> {$date}\n"
@@ -213,7 +213,7 @@ class TelegramNotificationService
         $pickup = Carbon::parse($taxi->pickup_date)->format('d M Y') . " at " . $taxi->pickup_time;
         $stops = $taxi->selected_locations ? $taxi->selected_locations->pluck('name')->implode(', ') : 'Custom Excursion';
 
-        $html = "🚕 <b>CAB & EXCURSION REQUEST — KRISHNA CONCIERGE</b>\n\n"
+        $html = "🚕 <b>CAB & EXCURSION REQUEST — VILLAGE CONCIERGE</b>\n\n"
             . "• <b>Ref:</b> <code>#{$taxi->booking_reference}</code>\n"
             . "• <b>Guest:</b> " . htmlspecialchars($guestName, ENT_QUOTES) . " (<b>{$villa}</b>)\n"
             . "• <b>Pickup:</b> {$pickup}\n"
@@ -240,7 +240,7 @@ class TelegramNotificationService
         $total = number_format($order->total_amount, 2);
         $itemCount = $order->items ? $order->items->sum('quantity') : 1;
 
-        $html = "📦 <b>NEW SPICE ORDER — KRISHNA SPICES STORE</b>\n\n"
+        $html = "📦 <b>NEW SPICE ORDER — VILLAGE SPICES STORE</b>\n\n"
             . "• <b>Order Ref:</b> <code>#{$order->order_number}</code>\n"
             . "• <b>Customer:</b> " . htmlspecialchars($order->customer_name, ENT_QUOTES) . "\n"
             . "• <b>Delivery Mode:</b> {$mode} (" . htmlspecialchars($location, ENT_QUOTES) . ")\n"
@@ -265,7 +265,7 @@ class TelegramNotificationService
         $cashback = number_format($order->refund_amount ?? 0, 2);
         $reason = mb_strimwidth($order->cancellation_reason ?? 'Customer requested cancellation/return', 0, 100, '...');
 
-        $html = "🔄 <b>SPICE RETURN REQUEST — KRISHNA SPICES</b>\n\n"
+        $html = "🔄 <b>SPICE RETURN REQUEST — VILLAGE SPICES</b>\n\n"
             . "• <b>Order Ref:</b> <code>#{$order->order_number}</code>\n"
             . "• <b>Customer:</b> " . htmlspecialchars($order->customer_name, ENT_QUOTES) . "\n"
             . "• <b>Eligible Cashback:</b> ₹{$cashback}\n"

@@ -138,7 +138,7 @@
                     @endif
                 </a>
                 <a href="#spices" data-section="spices" onclick="navigateTo('spices')" class="nav-item flex items-center justify-between px-3 py-2 rounded-r-md text-white/70 cursor-pointer">
-                    <div class="flex items-center gap-3"><i data-lucide="leaf" class="w-4 h-4"></i> Krishna Spices Store</div>
+                    <div class="flex items-center gap-3"><i data-lucide="leaf" class="w-4 h-4"></i> Village Spices Store</div>
                     @if($lowStockProducts > 0)
                         <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white font-bold">{{ $lowStockProducts }} Low</span>
                     @endif
@@ -1169,7 +1169,7 @@
             }
         }
 
-        // ================= KRISHNA SPICES TABS & RETURN POLICY =================
+        // ================= VILLAGE SPICES TABS & RETURN POLICY =================
         function switchSpiceTab(tab) {
             const tabs = ['orders', 'products', 'policy', 'inventory'];
             tabs.forEach(t => {

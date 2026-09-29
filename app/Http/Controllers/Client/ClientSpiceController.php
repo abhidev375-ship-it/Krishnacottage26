@@ -54,7 +54,7 @@ class ClientSpiceController extends Controller
         $returnRules = SpiceReturnRule::active()->orderBy('sort_order')->get();
         $policyDescription = Setting::get(
             'spice_return_policy_description',
-            'All Krishna Spices are harvested and vacuum-ground on-demand after receiving your order to guarantee plantation freshness. You can cancel your order with a 100% full refund at any time before dispatch. Unopened, factory-sealed spice packs can be returned within 7 days of delivery under our 90% freshness guarantee.'
+            'All Village Spices are harvested and vacuum-ground on-demand after receiving your order to guarantee plantation freshness. You can cancel your order with a 100% full refund at any time before dispatch. Unopened, factory-sealed spice packs can be returned within 7 days of delivery under our 90% freshness guarantee.'
         );
 
         $globalReturnsEnabled = (bool) Setting::get('spice_returns_enabled', true);
@@ -166,7 +166,7 @@ class ClientSpiceController extends Controller
                 'amount' => $order['amount'],
                 'amount_rupees' => $total,
                 'currency' => $order['currency'],
-                'name' => 'Krishna Spices',
+                'name' => 'Village Spices',
                 'description' => 'Single-Estate Spices Direct from Plantation',
                 'prefill' => [
                     'name' => $validated['customer_name'],

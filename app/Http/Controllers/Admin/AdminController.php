@@ -173,7 +173,7 @@ class AdminController extends Controller
         $spiceReturnOrders = SpiceOrder::with(['items', 'returnRule'])->where('refund_status', '!=', 'none')->orderByDesc('updated_at')->get();
         $spiceReturnPolicyDescription = Setting::get(
             'spice_return_policy_description',
-            'All Krishna Spices are harvested and vacuum-ground on-demand after receiving your order to guarantee plantation freshness. You can cancel your order with a 100% full refund at any time before dispatch. Unopened, factory-sealed spice packs can be returned within 7 days of delivery under our 90% freshness guarantee.'
+            'All Village Spices are harvested and vacuum-ground on-demand after receiving your order to guarantee plantation freshness. You can cancel your order with a 100% full refund at any time before dispatch. Unopened, factory-sealed spice packs can be returned within 7 days of delivery under our 90% freshness guarantee.'
         );
         $globalSpiceReturnsEnabled = (bool) Setting::get('spice_returns_enabled', true);
         $inventoryLogs = SpiceInventoryLog::with(['product', 'user'])->latest('created_at')->take(15)->get();
@@ -564,13 +564,13 @@ class AdminController extends Controller
             'hero_eyebrow' => $branchCount . ' Kerala Retreat Destinations · One Experience',
             'hero_heading_1' => 'Come away to',
             'hero_heading_2' => 'somewhere better.',
-            'hero_description' => 'Stay slow. Eat well. Explore more. Krishna brings private wooden cottages, authentic plantation dining, and estate-harvested spices into one considered Kerala journey.',
+            'hero_description' => 'Stay slow. Eat well. Explore more. Village Cottages brings private wooden cottages, authentic plantation dining, and estate-harvested spices into one considered Kerala journey.',
             'hero_image_main' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=85',
             'hero_image_secondary' => 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=700&q=85',
             'hero_card_title' => 'Authentic Kerala Living',
             'hero_card_description' => 'Private wooden cottages immersed in nature & spice trails.',
             'hero_slides' => $heroSlides,
-            'branch_section_eyebrow' => 'Choose your Krishna',
+            'branch_section_eyebrow' => 'Choose your retreat',
             'branch_section_heading' => $branchCount . ' ways to stay.',
             'branches' => $branchCards,
             'stay_eyebrow' => 'Your stay',
@@ -580,7 +580,7 @@ class AdminController extends Controller
             'stay_image' => 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=85',
             'stay_image_title' => 'Rooms for slower stays.',
             'stay_image_subtitle' => 'Room details, amenities and availability.',
-            'experience_eyebrow' => 'The Krishna experience',
+            'experience_eyebrow' => 'The Village experience',
             'experience_heading_1' => 'More than a room.',
             'experience_heading_2' => 'A complete stay.',
             'experience_image_main' => 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1000&q=85',
@@ -598,14 +598,14 @@ class AdminController extends Controller
             'experience_card_4_title' => 'Family moments',
             'experience_card_4_desc' => 'Easy days, shared time and comfortable spaces.',
             'experience_card_5_title' => 'Events & celebrations',
-            'experience_card_5_desc' => 'Gatherings, celebrations and special occasions at Krishna.',
+            'experience_card_5_desc' => 'Gatherings, celebrations and special occasions at Village Cottages.',
             'experience_card_6_title' => 'Dining experiences',
             'experience_card_6_desc' => 'Restaurant, menu browsing and direct food ordering.',
             'experience_card_7_title' => 'Concierge & enquiry',
             'experience_card_7_desc' => 'Ask questions directly while planning or during your stay.',
             'experience_card_8_title' => 'Around your branch',
             'experience_card_8_desc' => 'Discover places nearby, with branch-specific suggestions.',
-            'gallery_eyebrow' => 'See Krishna',
+            'gallery_eyebrow' => 'See Village Cottages',
             'gallery_heading' => 'A stay you can picture.',
             'gallery_images' => [
                 [
@@ -627,9 +627,9 @@ class AdminController extends Controller
             'dining_image' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=800&q=85',
             'dining_title' => 'Local table',
             'dining_description' => 'Seasonal dishes, branch menus and direct food ordering.',
-            'spices_eyebrow' => 'Krishna Spices',
+            'spices_eyebrow' => 'Village Spices',
             'spices_heading_1' => 'Take a little',
-            'spices_heading_2' => 'Krishna home.',
+            'spices_heading_2' => 'Village home.',
             'spices_pinned_product_1_id' => 1,
             'spices_pinned_product_2_id' => 2,
             'locations_eyebrow' => 'Kerala Sanctuaries',
@@ -682,7 +682,7 @@ class AdminController extends Controller
     public function exportCsv(Request $request)
     {
         $type = $request->get('type', 'reservations');
-        $filename = "krishna_cottages_{$type}_" . date('Ymd_His') . ".csv";
+        $filename = "village_cottages_{$type}_" . date('Ymd_His') . ".csv";
 
         $headers = [
             "Content-type"        => "text/csv",

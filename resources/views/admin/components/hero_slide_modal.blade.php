@@ -154,7 +154,7 @@
                     <!-- Slide Title -->
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-brand-text mb-1">Slide Title / Branch Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="slide-title" required placeholder="e.g. Krishna Valley & Garden Retreat" class="w-full px-3.5 py-2.5 text-xs rounded-xl border border-gray-200 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-primary/20 transition font-medium">
+                        <input type="text" id="slide-title" required placeholder="e.g. Village Valley & Garden Retreat" class="w-full px-3.5 py-2.5 text-xs rounded-xl border border-gray-200 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-primary/20 transition font-medium">
                     </div>
 
                     <!-- Location Tag & Subtitle -->

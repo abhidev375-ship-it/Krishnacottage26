@@ -197,7 +197,7 @@
             <div id="g360-tab-spices" class="g360-tab-content hidden space-y-4">
                 <div class="flex items-center justify-between pb-2 border-b border-gray-200">
                     <div>
-                        <h4 class="text-xs font-bold text-brand-text">Krishna Spices Orders</h4>
+                        <h4 class="text-xs font-bold text-brand-text">Village Spices Orders</h4>
                         <p class="text-[10px] text-brand-muted">Purchases of packets and custom loose kg weights</p>
                     </div>
                     <span id="g360-spices-orders-count" class="px-2.5 py-1 bg-emerald-100 text-emerald-900 font-bold text-xs rounded-lg">0 Orders</span>

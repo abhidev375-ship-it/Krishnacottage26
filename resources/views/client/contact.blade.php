@@ -176,7 +176,7 @@
                                 <option value="general" {{ old('topic') === 'general' ? 'selected' : '' }}>General Concierge & Assistance</option>
                                 <option value="booking_related" {{ old('topic') === 'booking_related' ? 'selected' : '' }}>Villa Booking & Retreat Reservations</option>
                                 <option value="dining" {{ old('topic') === 'dining' ? 'selected' : '' }}>Plantation Dining & Special Meals</option>
-                                <option value="spices" {{ old('topic') === 'spices' ? 'selected' : '' }}>Krishna Spices Farm Shop</option>
+                                <option value="spices" {{ old('topic') === 'spices' ? 'selected' : '' }}>Village Spices Farm Shop</option>
                                 <option value="events" {{ old('topic') === 'events' ? 'selected' : '' }}>Weddings, Retreats & Private Celebrations</option>
                             </select>
                         </div>
@@ -478,8 +478,8 @@
                         // Store guest details in localStorage for the Concierge Chat widget
                         const enteredName = formData.get('name');
                         const enteredPhone = formData.get('phone');
-                        if (enteredName) localStorage.setItem('krishna_guest_name', enteredName);
-                        if (enteredPhone) localStorage.setItem('krishna_guest_phone', enteredPhone);
+                        if (enteredName) localStorage.setItem('village_guest_name', enteredName);
+                        if (enteredPhone) localStorage.setItem('village_guest_phone', enteredPhone);
 
                         // Reset form fields
                         contactForm.reset();

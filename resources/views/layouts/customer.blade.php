@@ -198,7 +198,7 @@
                         <i data-lucide="arrow-right" class="w-4 h-4 {{ request()->routeIs('dining.*') ? 'text-emerald' : 'text-forest/30' }}"></i>
                     </a>
                     <a class="drawer-link rounded-2xl px-3 py-3 text-xl serif hover:bg-white flex items-center justify-between transition {{ request()->routeIs('spices.*') ? 'bg-mint text-emerald font-bold border-l-4 border-emerald' : 'text-forest' }}" href="{{ route('spices.index') }}">
-                        <span class="flex items-center"><span class="mr-3 text-[11px] font-sans {{ request()->routeIs('spices.*') ? 'text-emerald font-bold' : 'text-forest/40' }}">04</span>Krishna Spices</span>
+                        <span class="flex items-center"><span class="mr-3 text-[11px] font-sans {{ request()->routeIs('spices.*') ? 'text-emerald font-bold' : 'text-forest/40' }}">04</span>Village Spices</span>
                         <i data-lucide="arrow-right" class="w-4 h-4 {{ request()->routeIs('spices.*') ? 'text-emerald' : 'text-forest/30' }}"></i>
                     </a>
                     <a class="drawer-link rounded-2xl px-3 py-3 text-xl serif hover:bg-white flex items-center justify-between transition {{ request()->routeIs('facilities.*') ? 'bg-mint text-emerald font-bold border-l-4 border-emerald' : 'text-forest' }}" href="{{ route('facilities.index') }}">
@@ -466,8 +466,8 @@
         let selectedTargetRoom = null;
         let branchDiningItems = [];
         let guestContact = {
-            name: localStorage.getItem('krishna_guest_name') || '',
-            phone: localStorage.getItem('krishna_guest_phone') || ''
+            name: localStorage.getItem('village_guest_name') || localStorage.getItem('krishna_guest_name') || '',
+            phone: localStorage.getItem('village_guest_phone') || localStorage.getItem('krishna_guest_phone') || ''
         };
 
         const conciergeModal = document.getElementById('conciergeModal');
@@ -830,7 +830,7 @@
             msgDiv.innerHTML = `
                 ${!isCustomer ? `
                 <div class="flex items-center gap-1.5 mb-1 px-1">
-                    <span class="text-[10px] font-bold text-forest">Krishna Concierge</span>
+                    <span class="text-[10px] font-bold text-forest">Village Concierge</span>
                     <span class="text-[9px] text-forest/40">&middot; ${timeStr}</span>
                 </div>` : ''}
                 <div class="max-w-[85%] sm:max-w-[78%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed ${isCustomer ? 'bg-forest text-paper rounded-br-xs shadow-card' : 'bg-white text-forest soft-border rounded-bl-xs shadow-xs'}">
@@ -939,11 +939,11 @@
             const phone = document.getElementById('guestInputPhone').value.trim();
             if (name) {
                 guestContact.name = name;
-                localStorage.setItem('krishna_guest_name', name);
+                localStorage.setItem('village_guest_name', name);
             }
             if (phone) {
                 guestContact.phone = phone;
-                localStorage.setItem('krishna_guest_phone', phone);
+                localStorage.setItem('village_guest_phone', phone);
             }
             const label = document.getElementById('guestDisplayLabel');
             if (label) label.textContent = (guestContact.name || 'Guest') + (guestContact.phone ? ' (' + guestContact.phone + ')' : '');
