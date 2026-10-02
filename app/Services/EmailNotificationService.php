@@ -34,6 +34,12 @@ class EmailNotificationService
         $nights = Carbon::parse($reservation->check_in_date)->diffInDays(Carbon::parse($reservation->check_out_date)) ?: 1;
         $total = number_format($reservation->total_amount, 2);
         $paymentStatus = strtoupper($reservation->payment_status ?? 'PENDING');
+        $tariffText = "₹{$total} ({$paymentStatus})";
+        if ($reservation->payment_status === 'partial') {
+            $paid = number_format($reservation->paid_amount, 2);
+            $balance = number_format($reservation->total_amount - $reservation->paid_amount, 2);
+            $tariffText .= " — 20% Deposit ₹{$paid} Paid, Balance ₹{$balance} Due at Check-in";
+        }
 
         $subject = "🏨 New Room Reservation #{$reservation->booking_code} — {$guestName}";
 
@@ -44,7 +50,7 @@ class EmailNotificationService
             'Branch / Property' => $branchName,
             'Room Category' => $roomTypeName,
             'Stay Schedule' => "{$checkIn} → {$checkOut} ({$nights} night" . ($nights > 1 ? 's' : '') . ")",
-            'Tariff Total' => "₹{$total} ({$paymentStatus})",
+            'Tariff Total' => $tariffText,
         ];
 
         $html = $this->buildHtmlTemplate(

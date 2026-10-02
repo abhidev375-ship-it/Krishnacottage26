@@ -647,7 +647,7 @@ class BookingController extends Controller
                 'from_status' => 'inquiry',
                 'to_status' => 'confirmed',
                 'user_id' => $user->id,
-                'note' => 'Guest booked online via Country Side Cottages Web Platform (' . strtoupper($validated['payment_method']) . ')',
+                'note' => 'Guest booked online via Country Side Cottages Web Platform (' . strtoupper($validated['payment_method']) . ($validated['payment_choice'] === 'deposit_20' ? ' - 20% Deposit Paid' : ' - Full Payment') . ')',
                 'created_at' => Carbon::now(),
             ]);
 
@@ -668,7 +668,7 @@ class BookingController extends Controller
                         'razorpay_payment_id' => $request->input('razorpay_payment_id'),
                         'razorpay_signature' => $request->input('razorpay_signature'),
                     ] : null,
-                    'notes' => 'Customer booking settlement for ' . $bookingCode . ' via ' . strtoupper($validated['payment_method']),
+                    'notes' => 'Customer booking settlement for ' . $bookingCode . ' via ' . strtoupper($validated['payment_method']) . ($validated['payment_choice'] === 'deposit_20' ? " (20% Deposit ₹" . number_format($paidAmount, 2) . ", Balance ₹" . number_format($total - $paidAmount, 2) . " due at check-in)" : " (Full payment ₹" . number_format($total, 2) . ")"),
                     'created_by' => $user->id,
                 ]);
             }
@@ -688,7 +688,9 @@ class BookingController extends Controller
                     'guest' => $guest->full_name,
                     'room_number' => $freeRoom->room_number,
                     'total' => $total,
+                    'paid_amount' => $paidAmount,
                     'payment_status' => $paymentStatus,
+                    'payment_choice' => $validated['payment_choice'],
                 ],
                 'ip_address' => $request->ip(),
                 'created_at' => Carbon::now(),
@@ -696,6 +698,10 @@ class BookingController extends Controller
 
             // Send booking confirmation SMS containing exact physical branch location
             $branchAddress = $roomType->branch ? $roomType->branch->full_address : 'Kerala, India';
+            $paymentNote = ($validated['payment_choice'] === 'deposit_20') 
+                ? "20% Deposit of ₹" . number_format($paidAmount, 2) . " paid. Balance ₹" . number_format($total - $paidAmount, 2) . " due at check-in." 
+                : "Paid in full (₹" . number_format($total, 2) . ").";
+
             NotificationLog::create([
                 'event' => 'reservation_confirmed',
                 'channel' => 'sms',
@@ -704,7 +710,7 @@ class BookingController extends Controller
                 'reference_type' => Reservation::class,
                 'reference_id' => $reservation->id,
                 'subject' => "Booking Confirmed #{$bookingCode} - Country Side Cottages",
-                'message_body' => "Dear {$guest->first_name}, your stay at " . ($roomType->branch ? $roomType->branch->name : 'Country Side Cottages') . " is confirmed! Ref: #{$bookingCode}. Dates: {$checkInStr} to {$checkOutStr}. Resort Location: {$branchAddress}. - Country Side Cottages",
+                'message_body' => "Dear {$guest->first_name}, your stay at " . ($roomType->branch ? $roomType->branch->name : 'Country Side Cottages') . " is confirmed! Ref: #{$bookingCode}. Dates: {$checkInStr} to {$checkOutStr}. {$paymentNote} Resort Location: {$branchAddress}. - Country Side Cottages",
                 'status' => 'delivered',
                 'sent_at' => Carbon::now(),
             ]);

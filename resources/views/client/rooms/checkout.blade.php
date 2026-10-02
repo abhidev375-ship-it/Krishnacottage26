@@ -73,9 +73,9 @@
                     <h2 class="serif text-xl font-bold text-forest">Choose how to pay</h2>
 
                     <div class="space-y-3">
-                        <label class="flex items-start justify-between p-4 rounded-2xl border border-forest bg-mint/50 cursor-pointer transition">
+                        <label id="choice-card-full" class="flex items-start justify-between p-4 rounded-2xl border-2 border-forest bg-mint/50 cursor-pointer transition shadow-xs" onclick="updatePaymentChoice('full')">
                             <div class="flex items-start gap-3">
-                                <input type="radio" name="payment_choice" value="full" checked class="mt-1 text-forest focus:ring-forest">
+                                <input type="radio" name="payment_choice" value="full" {{ old('payment_choice', 'full') === 'full' ? 'checked' : '' }} class="mt-1 text-forest focus:ring-forest" onchange="updatePaymentChoice('full')">
                                 <div>
                                     <div class="text-xs font-bold text-forest">Pay in full</div>
                                     <div class="text-[11px] text-forest/60 mt-0.5">Pay the total ₹{{ number_format($total) }} now and enjoy a seamless check-in.</div>
@@ -84,11 +84,14 @@
                             <span class="text-xs font-bold text-forest">₹{{ number_format($total) }}</span>
                         </label>
 
-                        <label class="flex items-start justify-between p-4 rounded-2xl soft-border hover:border-forest/40 bg-white cursor-pointer transition">
+                        <label id="choice-card-deposit_20" class="flex items-start justify-between p-4 rounded-2xl soft-border hover:border-forest/40 bg-white cursor-pointer transition" onclick="updatePaymentChoice('deposit_20')">
                             <div class="flex items-start gap-3">
-                                <input type="radio" name="payment_choice" value="deposit_20" class="mt-1 text-forest focus:ring-forest">
+                                <input type="radio" name="payment_choice" value="deposit_20" {{ old('payment_choice') === 'deposit_20' ? 'checked' : '' }} class="mt-1 text-forest focus:ring-forest" onchange="updatePaymentChoice('deposit_20')">
                                 <div>
-                                    <div class="text-xs font-bold text-forest">Pay 20% deposit now</div>
+                                    <div class="text-xs font-bold text-forest flex items-center gap-1.5">
+                                        <span>Pay 20% deposit now</span>
+                                        <span class="text-[9px] bg-emerald/10 text-emerald font-bold px-2 py-0.5 rounded-md border border-emerald/20">Reserve Now</span>
+                                    </div>
                                     <div class="text-[11px] text-forest/60 mt-0.5">Pay ₹{{ number_format($deposit) }} today, and the rest (₹{{ number_format($total - $deposit) }}) upon arrival at the cottages.</div>
                                 </div>
                             </div>
@@ -230,8 +233,8 @@
                                 </div>
                                 <input type="hidden" name="selected_upi_app" id="selected_upi_app" value="gpay">
 
-                                <!-- DYNAMIC UPI INSTRUCTIONS & TEST MODE GUIDE -->
-                                <div id="upi-instruction-card" class="mt-3 p-3.5 rounded-xl bg-forest/5 border border-forest/15 space-y-2.5">
+                                <!-- PRODUCTION-GRADE UPI INSTRUCTIONS -->
+                                <div id="upi-instruction-card" class="mt-3 p-3.5 rounded-xl bg-forest/5 border border-forest/15">
                                     <div class="flex items-start gap-2.5">
                                         <div class="w-6 h-6 rounded-full bg-forest text-paper flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 shadow-xs">
                                             <i data-lucide="info" class="w-3.5 h-3.5"></i>
@@ -242,26 +245,7 @@
                                                 <span class="text-[9px] bg-emerald/10 text-emerald font-bold px-1.5 py-0.5 rounded">Instant</span>
                                             </div>
                                             <div id="upi-guide-desc" class="text-[11px] text-forest/75 leading-relaxed">
-                                                <strong>📱 Mobile Phones:</strong> Directly launches Google Pay app via UPI Intent.
-                                                <br>
-                                                <strong>💻 Live Production (<code class="text-forest font-semibold">rzp_live_...</code>):</strong> Displays Dynamic QR code to scan with phone.
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- IMPORTANT TEST MODE NOTICE -->
-                                    <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200/90 text-amber-900 text-[11px] space-y-1.5">
-                                        <div class="flex items-center gap-1.5 font-bold text-amber-950">
-                                            <i data-lucide="flask-conical" class="w-4 h-4 text-amber-700 shrink-0"></i>
-                                            <span>Why no QR code appears in Test Mode:</span>
-                                        </div>
-                                        <p class="text-[11px] leading-relaxed text-amber-900/90">
-                                            Razorpay intentionally disables QR codes in <strong>Test Mode</strong> (<code class="bg-white/80 px-1 py-0.5 rounded border border-amber-300 font-mono text-[10px]">rzp_test_...</code>) because banks cannot generate simulated QR codes.
-                                        </p>
-                                        <div class="bg-white/90 p-2.5 rounded-md border border-amber-200 text-[11px] text-forest space-y-1">
-                                            <span class="font-bold text-emerald block">🧪 How to test right now:</span>
-                                            <div class="text-[10px] text-forest/80">
-                                                When the Razorpay popup opens, we have automatically pre-filled <strong class="text-forest font-mono">success@razorpay</strong> for you. Simply click the green <strong>"Pay"</strong> or <strong>"Success"</strong> button to simulate a successful payment!
+                                                Directly open Google Pay on mobile or scan dynamic QR code with any UPI app on desktop.
                                             </div>
                                         </div>
                                     </div>
@@ -287,15 +271,6 @@
                                 <span class="text-xs font-bold text-forest">Net Banking</span>
                             </div>
                             <span class="text-[10px] text-forest/50">All Major Banks</span>
-                        </label>
-
-                        <!-- PAY AT COTTAGES -->
-                        <label class="flex items-center justify-between p-3.5 rounded-2xl soft-border hover:border-forest/40 transition cursor-pointer" id="box-pay_at_resort-option" onclick="togglePaymentRadio('pay_at_resort')">
-                            <div class="flex items-center gap-3">
-                                <input type="radio" name="payment_method" value="pay_at_resort" class="text-forest focus:ring-forest" onchange="togglePaymentRadio('pay_at_resort')">
-                                <span class="text-xs font-bold text-forest">Pay at Cottages upon Check-in</span>
-                            </div>
-                            <span class="text-[10px] bg-paper text-forest font-bold px-2 py-0.5 rounded-lg soft-border">Front Desk</span>
                         </label>
                     </div>
                 </div>
@@ -360,6 +335,31 @@
 
                     <div class="pt-3 border-t border-forest/10 flex justify-between font-bold text-sm text-forest">
                         <span>Total (INR)</span>
+                        <span>₹{{ number_format($total) }}</span>
+                    </div>
+
+                    <!-- DYNAMIC REAL-TIME DEPOSIT / PAYMENT BREAKDOWN -->
+                    <div id="summary-deposit-section" class="pt-3 border-t border-forest/10 space-y-2 {{ old('payment_choice') === 'deposit_20' ? '' : 'hidden' }}">
+                        <div class="flex justify-between items-center text-xs font-bold text-emerald bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
+                            <span class="flex items-center gap-1.5">
+                                <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald shrink-0"></i>
+                                <span>Due Now (20% Deposit)</span>
+                            </span>
+                            <span>₹{{ number_format($deposit) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px] font-semibold text-amber-900 bg-amber-50 px-3 py-2 rounded-xl border border-amber-200">
+                            <span class="flex items-center gap-1.5">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-700 shrink-0"></i>
+                                <span>Remaining Balance Due at Check-in</span>
+                            </span>
+                            <span>₹{{ number_format($total - $deposit) }}</span>
+                        </div>
+                    </div>
+                    <div id="summary-full-section" class="pt-3 border-t border-forest/10 flex justify-between items-center text-xs font-bold text-forest bg-forest/5 px-3 py-2 rounded-xl {{ old('payment_choice') === 'deposit_20' ? 'hidden' : '' }}">
+                        <span class="flex items-center gap-1.5">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-forest shrink-0"></i>
+                            <span>Due Now (Full Payment)</span>
+                        </span>
                         <span>₹{{ number_format($total) }}</span>
                     </div>
                 </div>
@@ -474,6 +474,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const totalAmount = {{ (float) $total }};
+    const depositAmount = {{ (float) $deposit }};
+    const totalFormatted = '₹{{ number_format($total) }}';
+    const depositFormatted = '₹{{ number_format($deposit) }}';
+
+    function getSelectedChoice() {
+        const checked = document.querySelector('input[name="payment_choice"]:checked');
+        return checked ? checked.value : 'full';
+    }
+
+    function getSelectedMethod() {
+        const checked = document.querySelector('input[name="payment_method"]:checked');
+        return checked ? checked.value : 'upi';
+    }
+
+    function updateSubmitButton() {
+        if (!submitBtn) return;
+        if (submitBtn.disabled && btnSpinner && !btnSpinner.classList.contains('hidden')) return;
+
+        const choice = getSelectedChoice();
+        const method = getSelectedMethod();
+        const isDeposit = (choice === 'deposit_20');
+        const activeAmount = isDeposit ? depositFormatted : totalFormatted;
+        const labelPrefix = isDeposit ? '20% Deposit (' + activeAmount + ')' : 'in Full (' + activeAmount + ')';
+
+        if (method === 'upi') {
+            btnText.textContent = `Confirm & Pay ${labelPrefix} via UPI`;
+        } else if (method === 'card') {
+            btnText.textContent = `Confirm & Pay ${labelPrefix} with Card`;
+        } else if (method === 'netbanking') {
+            btnText.textContent = `Confirm & Pay ${labelPrefix} via Net Banking`;
+        } else {
+            btnText.textContent = `Confirm & Pay ${labelPrefix}`;
+        }
+    }
+
     function setLoading(isLoading) {
         if (!submitBtn) return;
         submitBtn.disabled = isLoading;
@@ -482,42 +518,70 @@ document.addEventListener('DOMContentLoaded', () => {
             btnSpinner.classList.remove('hidden');
             submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
         } else {
-            btnText.textContent = 'Confirm & Reserve Room';
             btnSpinner.classList.add('hidden');
             submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+            updateSubmitButton();
         }
     }
+
+    window.updatePaymentChoice = function(choice) {
+        const radio = document.querySelector(`input[name="payment_choice"][value="${choice}"]`);
+        if (radio) radio.checked = true;
+
+        const cardFull = document.getElementById('choice-card-full');
+        const cardDeposit = document.getElementById('choice-card-deposit_20');
+        const summaryDeposit = document.getElementById('summary-deposit-section');
+        const summaryFull = document.getElementById('summary-full-section');
+
+        if (choice === 'deposit_20') {
+            if (cardDeposit) {
+                cardDeposit.className = 'flex items-start justify-between p-4 rounded-2xl border-2 border-forest bg-mint/50 cursor-pointer transition shadow-xs';
+            }
+            if (cardFull) {
+                cardFull.className = 'flex items-start justify-between p-4 rounded-2xl soft-border hover:border-forest/40 bg-white cursor-pointer transition';
+            }
+            if (summaryDeposit) summaryDeposit.classList.remove('hidden');
+            if (summaryFull) summaryFull.classList.add('hidden');
+        } else {
+            if (cardFull) {
+                cardFull.className = 'flex items-start justify-between p-4 rounded-2xl border-2 border-forest bg-mint/50 cursor-pointer transition shadow-xs';
+            }
+            if (cardDeposit) {
+                cardDeposit.className = 'flex items-start justify-between p-4 rounded-2xl soft-border hover:border-forest/40 bg-white cursor-pointer transition';
+            }
+            if (summaryDeposit) summaryDeposit.classList.add('hidden');
+            if (summaryFull) summaryFull.classList.remove('hidden');
+        }
+
+        updateSubmitButton();
+    };
 
     window.togglePaymentRadio = function(method) {
         const radio = document.querySelector(`input[name="payment_method"][value="${method}"]`);
         if (radio) radio.checked = true;
 
         const upiBox = document.getElementById('box-upi-option');
+        const cardBox = document.getElementById('box-card-option');
+        const netbankingBox = document.getElementById('box-netbanking-option');
         const upiPanel = document.getElementById('upi-apps-panel');
 
+        // Reset styling
+        if (upiBox) upiBox.className = 'rounded-2xl soft-border overflow-hidden transition';
+        if (cardBox) cardBox.className = 'flex items-center justify-between p-3.5 rounded-2xl soft-border hover:border-forest/40 transition cursor-pointer';
+        if (netbankingBox) netbankingBox.className = 'flex items-center justify-between p-3.5 rounded-2xl soft-border hover:border-forest/40 transition cursor-pointer';
+
         if (method === 'upi') {
-            if (upiBox) {
-                upiBox.className = 'rounded-2xl border-2 border-forest bg-mint/20 overflow-hidden transition';
-            }
+            if (upiBox) upiBox.className = 'rounded-2xl border-2 border-forest bg-mint/20 overflow-hidden transition';
             if (upiPanel) upiPanel.classList.remove('hidden');
-            if (btnText) btnText.textContent = 'Confirm & Pay via UPI (₹{{ number_format($total) }})';
-        } else {
-            if (upiBox) {
-                upiBox.className = 'rounded-2xl soft-border overflow-hidden transition';
-            }
+        } else if (method === 'card') {
+            if (cardBox) cardBox.className = 'flex items-center justify-between p-3.5 rounded-2xl border-2 border-forest bg-mint/20 transition cursor-pointer shadow-xs';
             if (upiPanel) upiPanel.classList.add('hidden');
-            if (btnText) {
-                if (method === 'pay_at_resort') {
-                    btnText.textContent = 'Confirm & Reserve (Pay at Cottages)';
-                } else if (method === 'card') {
-                    btnText.textContent = 'Confirm & Pay with Card (₹{{ number_format($total) }})';
-                } else if (method === 'netbanking') {
-                    btnText.textContent = 'Confirm & Pay via Net Banking (₹{{ number_format($total) }})';
-                } else {
-                    btnText.textContent = 'Confirm & Reserve Room';
-                }
-            }
+        } else if (method === 'netbanking') {
+            if (netbankingBox) netbankingBox.className = 'flex items-center justify-between p-3.5 rounded-2xl border-2 border-forest bg-mint/20 transition cursor-pointer shadow-xs';
+            if (upiPanel) upiPanel.classList.add('hidden');
         }
+
+        updateSubmitButton();
     };
 
     window.selectUpiApp = function(app) {
@@ -536,21 +600,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (guideTitle && guideDesc) {
             if (app === 'gpay') {
                 guideTitle.innerHTML = '<span>Google Pay (GPay) Selected</span><span class="text-[9px] bg-emerald/10 text-emerald font-bold px-1.5 py-0.5 rounded">Instant</span>';
-                guideDesc.innerHTML = '<strong>📱 Mobile Phones:</strong> Directly launches Google Pay app via UPI Intent.<br><strong>💻 Live Production (<code class="text-forest font-semibold">rzp_live_...</code>):</strong> Displays Dynamic QR code to scan with phone.';
+                guideDesc.innerHTML = 'Directly open Google Pay on mobile or scan the dynamic QR code with any UPI app on desktop.';
             } else if (app === 'phonepe') {
                 guideTitle.innerHTML = '<span>PhonePe UPI Selected</span><span class="text-[9px] bg-[#5F259F]/10 text-[#5F259F] font-bold px-1.5 py-0.5 rounded">Instant</span>';
-                guideDesc.innerHTML = '<strong>📱 Mobile Phones:</strong> Directly launches PhonePe app via UPI Intent.<br><strong>💻 Live Production (<code class="text-forest font-semibold">rzp_live_...</code>):</strong> Displays Dynamic QR code to scan with phone.';
+                guideDesc.innerHTML = 'Directly open PhonePe on mobile or scan the dynamic QR code with any UPI app on desktop.';
             } else if (app === 'paytm') {
                 guideTitle.innerHTML = '<span>Paytm UPI Selected</span><span class="text-[9px] bg-[#002970]/10 text-[#002970] font-bold px-1.5 py-0.5 rounded">Instant</span>';
-                guideDesc.innerHTML = '<strong>📱 Mobile Phones:</strong> Directly launches Paytm app via UPI Intent.<br><strong>💻 Live Production (<code class="text-forest font-semibold">rzp_live_...</code>):</strong> Displays Dynamic QR code to scan with phone.';
+                guideDesc.innerHTML = 'Directly open Paytm on mobile or scan the dynamic QR code with any UPI app on desktop.';
             } else {
                 guideTitle.innerHTML = '<span>Scan QR / Any UPI App</span><span class="text-[9px] bg-forest/10 text-forest font-bold px-1.5 py-0.5 rounded">All Apps</span>';
-                guideDesc.innerHTML = '<strong>Scan & Pay (Live Mode):</strong> Works with Google Pay, PhonePe, Paytm, BHIM, CRED, Amazon Pay.';
+                guideDesc.innerHTML = 'Scan the on-screen QR code using any UPI app (Google Pay, PhonePe, Paytm, BHIM, CRED).';
             }
         }
         if (window.lucide) lucide.createIcons();
         window.togglePaymentRadio('upi');
     };
+
+    // Initialize initial state
+    updatePaymentChoice('{{ old("payment_choice", "full") }}');
+    togglePaymentRadio('{{ old("payment_method", "upi") }}');
 
     if (form) {
         form.addEventListener('submit', async (e) => {
@@ -562,11 +630,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const paymentMethodInput = form.querySelector('input[name="payment_method"]:checked');
             const paymentMethod = paymentMethodInput ? paymentMethodInput.value : 'upi';
-
-            // Pay at Resort bypasses Razorpay
-            if (paymentMethod === 'pay_at_resort') {
-                return;
-            }
 
             // If transaction token already present, proceed to standard submit
             if (document.getElementById('razorpay_payment_id').value) {
@@ -605,7 +668,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
 
                 if (!res.ok || !data.success) {
-                    showError(data.message || 'Unable to initialize online payment. Please try again or select Pay at Cottages.');
+                    showError(data.message || 'Unable to initialize online payment. Please try again or select another payment method.');
                     setLoading(false);
                     return;
                 }
@@ -613,9 +676,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const prefillData = Object.assign({}, data.prefill || {});
                 if (paymentMethod === 'upi') {
                     prefillData.method = 'upi';
-                    if (data.key_id && data.key_id.startsWith('rzp_test_')) {
-                        prefillData.vpa = 'success@razorpay';
-                    }
                 }
 
                 const options = {

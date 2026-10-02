@@ -227,7 +227,7 @@
                             <input type="hidden" name="selected_upi_app" id="selected_spice_upi_app" value="gpay">
 
                             <!-- DYNAMIC UPI INSTRUCTIONS & TEST MODE GUIDE -->
-                            <div id="spice-upi-instruction-card" class="mt-3 p-3.5 rounded-xl bg-forest/5 border border-forest/15 space-y-2.5">
+                            <div id="spice-upi-instruction-card" class="mt-3 p-3.5 rounded-xl bg-forest/5 border border-forest/15">
                                 <div class="flex items-start gap-2.5">
                                     <div class="w-6 h-6 rounded-full bg-forest text-paper flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 shadow-xs">
                                         <i data-lucide="info" class="w-3.5 h-3.5"></i>
@@ -238,26 +238,7 @@
                                             <span class="text-[9px] bg-emerald/10 text-emerald font-bold px-1.5 py-0.5 rounded">Instant</span>
                                         </div>
                                         <div id="spice-upi-guide-desc" class="text-[11px] text-forest/75 leading-relaxed">
-                                            <strong>📱 Mobile Phones:</strong> Directly launches Google Pay app via UPI Intent.
-                                            <br>
-                                            <strong>💻 Live Production (<code class="text-forest font-semibold">rzp_live_...</code>):</strong> Displays Dynamic QR code to scan with phone.
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- IMPORTANT TEST MODE NOTICE -->
-                                <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200/90 text-amber-900 text-[11px] space-y-1.5">
-                                    <div class="flex items-center gap-1.5 font-bold text-amber-950">
-                                        <i data-lucide="flask-conical" class="w-4 h-4 text-amber-700 shrink-0"></i>
-                                        <span>Why no QR code appears in Test Mode:</span>
-                                    </div>
-                                    <p class="text-[11px] leading-relaxed text-amber-900/90">
-                                        Razorpay intentionally disables QR codes in <strong>Test Mode</strong> (<code class="bg-white/80 px-1 py-0.5 rounded border border-amber-300 font-mono text-[10px]">rzp_test_...</code>) because banks cannot generate simulated QR codes.
-                                    </p>
-                                    <div class="bg-white/90 p-2.5 rounded-md border border-amber-200 text-[11px] text-forest space-y-1">
-                                        <span class="font-bold text-emerald block">🧪 How to test right now:</span>
-                                        <div class="text-[10px] text-forest/80">
-                                            When the Razorpay popup opens, we have automatically pre-filled <strong class="text-forest font-mono">success@razorpay</strong> for you. Simply click the green <strong>"Pay"</strong> or <strong>"Success"</strong> button to simulate a successful payment!
+                                            Directly open Google Pay on mobile or scan the dynamic QR code with any UPI app on desktop.
                                         </div>
                                     </div>
                                 </div>
@@ -551,16 +532,16 @@
             if (guideTitle && guideDesc) {
                 if (app === 'gpay') {
                     guideTitle.innerHTML = '<span>Google Pay (GPay) Selected</span><span class="text-[9px] bg-emerald/10 text-emerald font-bold px-1.5 py-0.5 rounded">Instant</span>';
-                    guideDesc.innerHTML = '<strong>📱 Mobile Phones:</strong> Directly launches Google Pay app via UPI Intent.<br><strong>💻 Live Production (<code class="text-forest font-semibold">rzp_live_...</code>):</strong> Displays Dynamic QR code to scan with phone.';
+                    guideDesc.innerHTML = 'Directly open Google Pay on mobile or scan the dynamic QR code with any UPI app on desktop.';
                 } else if (app === 'phonepe') {
                     guideTitle.innerHTML = '<span>PhonePe UPI Selected</span><span class="text-[9px] bg-[#5F259F]/10 text-[#5F259F] font-bold px-1.5 py-0.5 rounded">Instant</span>';
-                    guideDesc.innerHTML = '<strong>📱 Mobile Phones:</strong> Directly launches PhonePe app via UPI Intent.<br><strong>💻 Live Production (<code class="text-forest font-semibold">rzp_live_...</code>):</strong> Displays Dynamic QR code to scan with phone.';
+                    guideDesc.innerHTML = 'Directly open PhonePe on mobile or scan the dynamic QR code with any UPI app on desktop.';
                 } else if (app === 'paytm') {
                     guideTitle.innerHTML = '<span>Paytm UPI Selected</span><span class="text-[9px] bg-[#002970]/10 text-[#002970] font-bold px-1.5 py-0.5 rounded">Instant</span>';
-                    guideDesc.innerHTML = '<strong>📱 Mobile Phones:</strong> Directly launches Paytm app via UPI Intent.<br><strong>💻 Live Production (<code class="text-forest font-semibold">rzp_live_...</code>):</strong> Displays Dynamic QR code to scan with phone.';
+                    guideDesc.innerHTML = 'Directly open Paytm on mobile or scan the dynamic QR code with any UPI app on desktop.';
                 } else {
                     guideTitle.innerHTML = '<span>Scan QR / Any UPI App</span><span class="text-[9px] bg-forest/10 text-forest font-bold px-1.5 py-0.5 rounded">All Apps</span>';
-                    guideDesc.innerHTML = '<strong>Scan & Pay (Live Mode):</strong> Works with Google Pay, PhonePe, Paytm, BHIM, CRED, Amazon Pay.';
+                    guideDesc.innerHTML = 'Scan the on-screen QR code using any UPI app (Google Pay, PhonePe, Paytm, BHIM, CRED).';
                 }
             }
             if (window.lucide) lucide.createIcons();
@@ -635,9 +616,6 @@
                     const prefillData = Object.assign({}, data.prefill || {});
                     if (paymentMethod === 'upi') {
                         prefillData.method = 'upi';
-                        if (data.key_id && data.key_id.startsWith('rzp_test_')) {
-                            prefillData.vpa = 'success@razorpay';
-                        }
                     }
 
                     const options = {

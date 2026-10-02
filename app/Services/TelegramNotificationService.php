@@ -32,6 +32,12 @@ class TelegramNotificationService
         $nights = Carbon::parse($reservation->check_in_date)->diffInDays(Carbon::parse($reservation->check_out_date)) ?: 1;
         $total = number_format($reservation->total_amount, 2);
         $paymentStatus = strtoupper($reservation->payment_status ?? 'PENDING');
+        $tariffDisplay = "₹{$total} [<b>{$paymentStatus}</b>]";
+        if ($reservation->payment_status === 'partial') {
+            $paid = number_format($reservation->paid_amount, 2);
+            $balance = number_format($reservation->total_amount - $reservation->paid_amount, 2);
+            $tariffDisplay .= " (20% Deposit ₹{$paid} Paid · Balance ₹{$balance} Due at Check-in)";
+        }
 
         $html = "🏨 <b>NEW ROOM RESERVATION — COUNTRY SIDE COTTAGES</b>\n\n"
             . "• <b>Booking Ref:</b> <code>#{$reservation->booking_code}</code>\n"
@@ -39,7 +45,7 @@ class TelegramNotificationService
             . "• <b>Branch:</b> " . htmlspecialchars($branchName, ENT_QUOTES) . "\n"
             . "• <b>Accommodation:</b> " . htmlspecialchars($roomTypeName, ENT_QUOTES) . "\n"
             . "• <b>Dates:</b> {$checkIn} → {$checkOut} ({$nights} night" . ($nights > 1 ? 's' : '') . ")\n"
-            . "• <b>Tariff:</b> ₹{$total} [<b>{$paymentStatus}</b>]\n\n"
+            . "• <b>Tariff:</b> {$tariffDisplay}\n\n"
             . "👉 <a href=\"" . url('/admin/reservations') . "\">Open Admin Portal to review & allocate key</a>";
 
         return $this->dispatchTelegram(

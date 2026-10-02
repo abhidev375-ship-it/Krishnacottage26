@@ -360,6 +360,61 @@ class BookingAndPaymentTest extends TestCase
     }
 
     /**
+     * Test 6b: Booking with 20% Deposit Option correctly calculates partial amount and records ledger.
+     */
+    public function test_booking_store_with_20_percent_deposit(): void
+    {
+        $checkIn = Carbon::tomorrow()->format('Y-m-d');
+        $checkOut = Carbon::tomorrow()->addDays(2)->format('Y-m-d');
+
+        $orderId = 'order_depositOrder99887';
+        $paymentId = 'pay_depositPayment11223';
+        $secret = Setting::get('razorpay_key_secret');
+
+        $validSignature = hash_hmac('sha256', $orderId . '|' . $paymentId, $secret);
+
+        $response = $this->actingAs($this->customer)->post(route('booking.store'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in_date' => $checkIn,
+            'check_out_date' => $checkOut,
+            'adults' => 2,
+            'children' => 0,
+            'first_name' => 'Aditi',
+            'last_name' => 'Sharma',
+            'email' => 'aditi.sharma@example.com',
+            'phone' => '+91 98765 43210',
+            'payment_method' => 'card',
+            'payment_choice' => 'deposit_20',
+            'razorpay_order_id' => $orderId,
+            'razorpay_payment_id' => $paymentId,
+            'razorpay_signature' => $validSignature,
+        ]);
+
+        $response->assertStatus(302);
+
+        // Subtotal = 9000, Tax = 1080, Total = 10080
+        // 20% Deposit = 2016.00
+        $this->assertDatabaseHas('reservations', [
+            'room_type_id' => $this->roomType->id,
+            'status' => 'confirmed',
+            'payment_status' => 'partial',
+            'total_amount' => 10080.00,
+            'paid_amount' => 2016.00,
+            'payment_method' => 'card',
+        ]);
+
+        // Payment record should be for the 20% deposit amount
+        $this->assertDatabaseHas('payments', [
+            'payable_type' => Reservation::class,
+            'transaction_id' => $paymentId,
+            'amount' => 2016.00,
+            'payment_method' => 'card',
+            'gateway' => 'razorpay',
+            'status' => 'successful',
+        ]);
+    }
+
+    /**
      * Test 7: Booking fails and rejects transaction if Razorpay signature is invalid/tampered.
      */
     public function test_booking_fails_on_tampered_razorpay_signature(): void
