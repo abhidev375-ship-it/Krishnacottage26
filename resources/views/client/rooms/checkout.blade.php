@@ -41,6 +41,12 @@
                 <input type="hidden" name="check_out_date" value="{{ $checkOut }}">
                 <input type="hidden" name="adults" value="{{ $adults }}">
                 <input type="hidden" name="children" value="{{ $children }}">
+                <input type="hidden" name="rooms_count" value="{{ $roomsCount ?? 1 }}">
+                @if(!empty($childAges))
+                    @foreach($childAges as $age)
+                        <input type="hidden" name="child_ages[]" value="{{ $age }}">
+                    @endforeach
+                @endif
                 
                 <!-- Razorpay Transaction Tokens -->
                 <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
@@ -61,8 +67,13 @@
                     </div>
                     <div class="flex items-center justify-between border-t border-forest/5 pt-3">
                         <div>
-                            <div class="text-xs font-bold text-forest">Guests</div>
-                            <div class="text-xs text-forest/60 mt-0.5">{{ $adults }} adult{{ $adults > 1 ? 's' : '' }}{{ $children > 0 ? ', ' . $children . ' children' : '' }}</div>
+                            <div class="text-xs font-bold text-forest">Rooms &amp; Guests</div>
+                            <div class="text-xs text-forest/60 mt-0.5">
+                                {{ $roomsCount ?? 1 }} room{{ ($roomsCount ?? 1) > 1 ? 's' : '' }} &middot; {{ $adults }} adult{{ $adults > 1 ? 's' : '' }}{{ $children > 0 ? ', ' . $children . ' children' : '' }}
+                                @if(!empty($party['reclassified_adults']) && $party['reclassified_adults'] > 0)
+                                    <span class="text-[10px] text-amber-700 block font-medium">({{ $party['reclassified_adults'] }} child &gt; 12 accommodated as adult)</span>
+                                @endif
+                            </div>
                         </div>
                         <a href="{{ route('rooms.show', $roomType->slug) }}" class="text-xs font-semibold text-emerald hover:underline">Edit</a>
                     </div>
@@ -321,7 +332,12 @@
                 <div class="space-y-2.5 text-xs text-forest/70">
                     <h4 class="eyebrow text-forest/50 mb-2">Price Details</h4>
                     <div class="flex justify-between">
-                        <span>₹{{ number_format($rate) }} &times; {{ $nights }} night{{ $nights > 1 ? 's' : '' }}</span>
+                        <span>
+                            ₹{{ number_format($rate) }} avg / night &times; {{ $nights }} night{{ $nights > 1 ? 's' : '' }}{{ ($roomsCount ?? 1) > 1 ? ' &times; ' . $roomsCount . ' rooms' : '' }}
+                            @if(!empty($pricing['weekend_nights']) && $pricing['weekend_nights'] > 0)
+                                <span class="text-[10px] text-amber-700 block">({{ $pricing['weekend_nights'] }} weekend night{{ $pricing['weekend_nights'] > 1 ? 's' : '' }} @ ₹{{ number_format($pricing['weekend_price']) }})</span>
+                            @endif
+                        </span>
                         <span class="font-semibold text-forest">₹{{ number_format($subtotal) }}</span>
                     </div>
                     <div class="flex justify-between">
@@ -648,11 +664,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     check_out_date: formData.get('check_out_date'),
                     adults: formData.get('adults'),
                     children: formData.get('children'),
+                    rooms_count: formData.get('rooms_count') || 1,
+                    child_ages: formData.getAll('child_ages[]'),
                     payment_choice: formData.get('payment_choice'),
                     first_name: formData.get('first_name'),
                     last_name: formData.get('last_name'),
                     email: formData.get('email'),
                     phone: formData.get('phone'),
+                    city: formData.get('city'),
+                    country: formData.get('country'),
+                    special_requests: formData.get('special_requests'),
                 };
 
                 const res = await fetch('{{ route("booking.razorpay.create-order") }}', {

@@ -78,24 +78,40 @@
                 </div>
             </div>
 
-            <!-- 3. GUESTS COUNTER (POPOVER STEPPER) -->
-            <div class="relative px-5 py-2.5 w-full md:w-56 hover:bg-forest/[0.03] transition cursor-pointer group" id="stay-guest-picker-container">
+            <!-- 3. GUESTS & ROOMS COUNTER (POPOVER STEPPER) -->
+            <div class="relative px-5 py-2.5 w-full md:w-64 hover:bg-forest/[0.03] transition cursor-pointer group" id="stay-guest-picker-container">
+                <input type="hidden" name="rooms" id="stay-rooms-input" value="{{ $roomsCount ?? 1 }}">
                 <input type="hidden" name="adults" id="stay-adults-input" value="{{ $adults }}">
                 <input type="hidden" name="children" id="stay-children-input" value="{{ $children }}">
                 <div onclick="toggleStayGuestPopover()" class="w-full">
                     <label class="block text-[9px] uppercase tracking-[0.16em] font-bold text-forest/50 group-hover:text-emerald transition cursor-pointer flex items-center gap-1.5">
                         <i data-lucide="users" class="w-3 h-3 text-emerald shrink-0"></i>
-                        <span>Guests</span>
+                        <span>Rooms &amp; Guests</span>
                     </label>
                     <div class="flex items-center justify-between text-sm font-semibold text-forest mt-0.5 select-none">
-                        <span id="stay-guest-label" class="truncate">{{ $adults }} Adult{{ $adults > 1 ? 's' : '' }}{{ $children > 0 ? ', ' . $children . ' Kid' . ($children > 1 ? 's' : '') : ', 0 Kids' }}</span>
+                        <span id="stay-guest-label" class="truncate">{{ $roomsCount ?? 1 }} Room{{ ($roomsCount ?? 1) > 1 ? 's' : '' }} &middot; {{ $adults }} Adult{{ $adults > 1 ? 's' : '' }}{{ $children > 0 ? ', ' . $children . ' Kid' . ($children > 1 ? 's' : '') : '' }}</span>
                         <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-forest/40 group-hover:text-forest transition-transform duration-200 shrink-0 ml-1" id="stay-guest-chevron"></i>
                     </div>
                 </div>
 
                 <!-- Floating Popover Card -->
-                <div id="stay-guest-popover" class="hidden absolute top-full right-0 mt-3 w-72 rounded-2xl bg-[#FAF8F5] border border-forest/15 p-4 shadow-2xl z-[100] animate-in fade-in zoom-in-95 duration-150">
-                    <div class="space-y-3.5" onclick="event.stopPropagation()">
+                <div id="stay-guest-popover" class="hidden absolute top-full right-0 mt-3 w-80 rounded-2xl bg-[#FAF8F5] border border-forest/15 p-4 shadow-2xl z-[100] animate-in fade-in zoom-in-95 duration-150">
+                    <div class="space-y-3" onclick="event.stopPropagation()">
+                        <!-- Rooms Row -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-forest">Rooms</p>
+                                <p class="text-[10px] text-forest/50">Number of suites</p>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <button type="button" onclick="adjustStayGuestCount('rooms', -1)" id="stay-rooms-minus" class="grid h-7 w-7 place-items-center rounded-full border border-forest/20 text-forest hover:bg-forest/5 disabled:opacity-30 disabled:cursor-not-allowed transition text-xs font-bold cursor-pointer" {{ ($roomsCount ?? 1) <= 1 ? 'disabled' : '' }}>-</button>
+                                <span id="stay-rooms-val" class="w-4 text-center text-xs font-bold text-forest">{{ $roomsCount ?? 1 }}</span>
+                                <button type="button" onclick="adjustStayGuestCount('rooms', 1)" id="stay-rooms-plus" class="grid h-7 w-7 place-items-center rounded-full border border-forest/20 text-forest hover:bg-forest/5 transition text-xs font-bold cursor-pointer">+</button>
+                            </div>
+                        </div>
+
+                        <div class="h-px bg-forest/10"></div>
+
                         <!-- Adults Row -->
                         <div class="flex items-center justify-between">
                             <div>
@@ -127,12 +143,12 @@
                         <!-- Policy Notice -->
                         <div class="p-2 rounded-xl bg-white soft-border text-[10px] text-forest/65 flex items-start gap-1.5 leading-snug">
                             <i data-lucide="info" class="w-3.5 h-3.5 text-emerald shrink-0 mt-0.5"></i>
-                            <span>Infants &amp; toddlers under 5 stay complimentary using existing bedding.</span>
+                            <span>Infants under 5 stay free. Children &gt; 12 are treated as adults for bedding.</span>
                         </div>
 
                         <!-- Apply Button -->
                         <button type="button" onclick="closeStayGuestPopover()" class="w-full py-1.5 rounded-xl bg-forest text-paper text-xs font-bold hover:bg-emerald transition cursor-pointer">
-                            Apply Guests
+                            Apply
                         </button>
                     </div>
                 </div>
@@ -212,7 +228,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
         @foreach($roomTypes as $room)
         @php
-            $estTotal = round($room->base_price * $nights * 1.12);
+            $estTotal = isset($room->stay_pricing) ? $room->stay_pricing['total'] : round($room->base_price * $nights * 1.12);
         @endphp
         <div class="group bg-white rounded-[24px] soft-border overflow-hidden shadow-card lift transition-all duration-300 flex flex-col justify-between">
             <!-- PHOTO SECTION (AIRBNB STYLE) -->
@@ -294,15 +310,18 @@
                 <div class="pt-4 mt-4 border-t border-forest/10 flex items-end justify-between">
                     <div>
                         <div class="flex items-baseline gap-1">
-                            <span class="text-lg font-bold text-forest">₹{{ number_format($room->base_price) }}</span>
+                            <span class="text-lg font-bold text-forest">₹{{ number_format(isset($room->stay_pricing) ? $room->stay_pricing['average_nightly_rate'] : $room->base_price) }}</span>
                             <span class="text-xs text-forest/50 font-normal">/ night</span>
                         </div>
                         <div class="text-[11px] text-forest/55 underline decoration-dotted mt-0.5">
                             ₹{{ number_format($estTotal) }} total incl. 12% GST
+                            @if(isset($room->stay_pricing) && $room->stay_pricing['weekend_nights'] > 0)
+                                <span class="text-amber-700 font-semibold block text-[10px]">Weekend peak rate applies</span>
+                            @endif
                         </div>
                     </div>
 
-                    <a href="{{ route('rooms.show', ['slug' => $room->slug, 'check_in' => $checkIn, 'check_out' => $checkOut, 'adults' => $adults, 'children' => $children]) }}" 
+                    <a href="{{ route('rooms.show', array_filter(['slug' => $room->slug, 'check_in' => $checkIn, 'check_out' => $checkOut, 'adults' => $adults, 'children' => $children, 'rooms' => $roomsCount ?? 1, 'child_ages' => !empty($childAges) ? implode(',', $childAges) : null])) }}" 
                        class="px-4 py-2 rounded-xl bg-forest hover:bg-emerald text-paper font-bold text-xs flex items-center gap-1.5 shadow-card transition">
                         <span>Reserve</span>
                         <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-brass"></i>

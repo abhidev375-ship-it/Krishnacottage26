@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Reservation;
 use App\Models\SpiceOrder;
+use App\Models\User;
+use App\Services\BookingAvailabilityService;
 use App\Services\RazorpayService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -68,6 +70,35 @@ class RazorpayWebhookController extends Controller
         if ($existingPayment) {
             Log::info("Razorpay Webhook: Payment {$paymentId} is already recorded.");
             return;
+        }
+
+        // Check if there is an active temporary hold matching this Razorpay order
+        if ($orderId) {
+            $heldReservation = app(BookingAvailabilityService::class)->findHoldByRazorpayOrderId($orderId);
+            if ($heldReservation && $heldReservation->status === 'hold') {
+                $notes = json_decode($heldReservation->internal_notes, true) ?: [];
+                $paymentChoice = $notes['payment_choice'] ?? 'full';
+                $paidAmount = ($paymentChoice === 'deposit_20') 
+                    ? round($heldReservation->total_amount * 0.20, 2) 
+                    : (float) $heldReservation->total_amount;
+                
+                $method = $paymentEntity['method'] ?? 'online';
+                $creator = $heldReservation->creator ?? User::find($heldReservation->created_by) ?? User::first();
+
+                app(BookingAvailabilityService::class)->confirmHeldReservation(
+                    $heldReservation,
+                    $paymentId,
+                    $orderId,
+                    null,
+                    $method,
+                    $paymentChoice,
+                    $paidAmount,
+                    $creator
+                );
+
+                Log::info("Razorpay Webhook: Successfully auto-confirmed held reservation {$heldReservation->booking_code} for payment {$paymentId}");
+                return;
+            }
         }
 
         // Check if there is an existing payment record with this order_id in gateway_response

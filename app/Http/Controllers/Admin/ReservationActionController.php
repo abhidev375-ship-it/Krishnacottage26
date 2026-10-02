@@ -251,10 +251,8 @@ class ReservationActionController extends Controller
             'payment_status' => $newPaymentStatus,
         ]);
 
-        // Release physical room immediately
-        if ($reservation->room) {
-            $reservation->room->update(['operational_status' => 'available']);
-        }
+        // Safely update physical room operational status without overwriting another active stay today
+        app(\App\Services\BookingAvailabilityService::class)->safeReleaseRoomOperationalStatus($reservation);
 
         // Automated payback ledger record if cashback > 0
         $refundTxnId = null;
@@ -347,18 +345,27 @@ class ReservationActionController extends Controller
             return response()->json(['success' => false, 'message' => 'Room branch mismatch.'], 422);
         }
 
-        // Concurrency check for the room's dates
+        // Concurrency check for the room's dates (confirmed, checked-in, active holds, and room blocks)
+        $now = Carbon::now();
         $overlap = Reservation::where('room_id', $room->id)
             ->where('id', '!=', $reservation->id)
-            ->whereIn('status', ['confirmed', 'checked_in'])
+            ->where(function ($q) use ($now) {
+                $q->whereIn('status', ['confirmed', 'checked_in'])
+                  ->orWhere(fn($sq) => $sq->where('status', 'hold')->where('hold_expires_at', '>', $now));
+            })
             ->where('check_in_date', '<', $reservation->check_out_date)
             ->where('check_out_date', '>', $reservation->check_in_date)
-            ->exists();
+            ->exists()
+            ||
+            $room->blocks()
+                ->where('start_date', '<', $reservation->check_out_date)
+                ->where('end_date', '>', $reservation->check_in_date)
+                ->exists();
 
         if ($overlap) {
             return response()->json([
                 'success' => false,
-                'message' => "Room {$room->room_number} is already booked by another guest for these dates.",
+                'message' => "Room {$room->room_number} is already booked or blocked for these dates.",
             ], 422);
         }
 
@@ -451,12 +458,21 @@ class ReservationActionController extends Controller
                     ->lockForUpdate()
                     ->get();
 
+                $now = Carbon::now();
                 foreach ($candidateRooms as $cand) {
                     $overlap = Reservation::where('room_id', $cand->id)
-                        ->whereIn('status', ['confirmed', 'checked_in'])
+                        ->where(function ($q) use ($now) {
+                            $q->whereIn('status', ['confirmed', 'checked_in'])
+                              ->orWhere(fn($sq) => $sq->where('status', 'hold')->where('hold_expires_at', '>', $now));
+                        })
                         ->where('check_in_date', '<', $checkOut->toDateString())
                         ->where('check_out_date', '>', $checkIn->toDateString())
-                        ->exists();
+                        ->exists()
+                        ||
+                        $cand->blocks()
+                            ->where('start_date', '<', $checkOut->toDateString())
+                            ->where('end_date', '>', $checkIn->toDateString())
+                            ->exists();
 
                     if (!$overlap) {
                         $selectedRoom = $cand;
@@ -469,15 +485,24 @@ class ReservationActionController extends Controller
                 throw new \Exception('No physical rooms of this category are available for the selected dates.');
             }
 
-            // Verify the selected room is strictly free for requested dates
+            // Verify the selected room is strictly free for requested dates (including active holds and blocks)
+            $now = Carbon::now();
             $isOverlapped = Reservation::where('room_id', $selectedRoom->id)
-                ->whereIn('status', ['confirmed', 'checked_in'])
+                ->where(function ($q) use ($now) {
+                    $q->whereIn('status', ['confirmed', 'checked_in'])
+                      ->orWhere(fn($sq) => $sq->where('status', 'hold')->where('hold_expires_at', '>', $now));
+                })
                 ->where('check_in_date', '<', $checkOut->toDateString())
                 ->where('check_out_date', '>', $checkIn->toDateString())
-                ->exists();
+                ->exists()
+                ||
+                $selectedRoom->blocks()
+                    ->where('start_date', '<', $checkOut->toDateString())
+                    ->where('end_date', '>', $checkIn->toDateString())
+                    ->exists();
 
             if ($isOverlapped) {
-                throw new \Exception("Physical Room {$selectedRoom->room_number} is already booked for these dates.");
+                throw new \Exception("Physical Room {$selectedRoom->room_number} is already booked or blocked for these dates.");
             }
 
             $bookingCode = 'KR-' . date('Y') . '-' . strtoupper(Str::random(5));

@@ -335,16 +335,30 @@
                         You won't be charged yet &middot; Instant confirmation
                     </p>
 
+                    <input type="hidden" name="rooms" value="{{ $roomsCount ?? 1 }}">
+                    @if(!empty($childAges))
+                        @foreach($childAges as $age)
+                            <input type="hidden" name="child_ages[]" value="{{ $age }}">
+                        @endforeach
+                    @endif
+
                     <!-- ITEMIZED PRICING BREAKDOWN (AIRBNB TRANSPARENT STYLE) -->
                     @php
-                        $sub = $roomType->base_price * $nights;
-                        $tax = round($sub * 0.12, 2);
-                        $tot = $sub + $tax;
-                        $advance = round($tot * 0.20, 2);
+                        $sub = $stayPricing['subtotal'] ?? ($roomType->base_price * $nights);
+                        $tax = $stayPricing['tax'] ?? round($sub * 0.12, 2);
+                        $tot = $stayPricing['total'] ?? ($sub + $tax);
+                        $advance = $stayPricing['deposit'] ?? round($tot * 0.20, 2);
+                        $avgRate = $stayPricing['average_nightly_rate'] ?? $roomType->base_price;
+                        $wkndNights = $stayPricing['weekend_nights'] ?? 0;
                     @endphp
                     <div class="pt-4 border-t border-forest/10 space-y-2 text-xs text-forest/70">
                         <div class="flex justify-between">
-                            <span class="underline">₹{{ number_format($roomType->base_price) }} &times; {{ $nights }} night{{ $nights > 1 ? 's' : '' }}</span>
+                            <span>
+                                ₹{{ number_format($avgRate) }} avg / night &times; {{ $nights }} night{{ $nights > 1 ? 's' : '' }}{{ ($roomsCount ?? 1) > 1 ? ' &times; ' . $roomsCount . ' rooms' : '' }}
+                                @if($wkndNights > 0 && !empty($stayPricing['weekend_price']))
+                                    <span class="text-[10px] text-amber-700 block">({{ $wkndNights }} weekend night{{ $wkndNights > 1 ? 's' : '' }} @ ₹{{ number_format($stayPricing['weekend_price']) }})</span>
+                                @endif
+                            </span>
                             <span class="font-semibold text-forest">₹{{ number_format($sub) }}</span>
                         </div>
                         <div class="flex justify-between">

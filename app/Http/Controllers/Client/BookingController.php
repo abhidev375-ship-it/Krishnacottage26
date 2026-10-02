@@ -15,7 +15,10 @@ use App\Models\Review;
 use App\Models\Room;
 use App\Models\RoomCategory;
 use App\Models\RoomType;
+use App\Services\BookingAvailabilityService;
+use App\Services\EmailNotificationService;
 use App\Services\RazorpayService;
+use App\Services\TelegramNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -41,7 +44,22 @@ class BookingController extends Controller
         $checkOut = $request->query('check_out', Carbon::tomorrow()->addDays(2)->format('Y-m-d'));
         $adults = max(1, (int) $request->query('adults', 2));
         $children = max(0, (int) $request->query('children', 0));
-        $totalGuests = $adults + $children;
+        $roomsCount = max(1, (int) $request->query('rooms', 1));
+
+        $childAgesInput = $request->query('child_ages');
+        $childAges = [];
+        if (is_array($childAgesInput)) {
+            $childAges = array_map('intval', $childAgesInput);
+        } elseif (is_string($childAgesInput) && strlen(trim($childAgesInput)) > 0) {
+            $childAges = array_map('intval', explode(',', $childAgesInput));
+        }
+
+        $bookingService = app(BookingAvailabilityService::class);
+        $party = $bookingService->evaluatePartyComposition($adults, $children, $childAges);
+        $effectiveAdults = $party['effective_adults'];
+        $effectiveChildren = $party['effective_children'];
+        $totalGuests = $party['total_guests'];
+
         $minPrice = $request->query('min_price');
         $maxPrice = $request->query('max_price');
         $amenityFilter = $request->query('amenity');
@@ -61,21 +79,21 @@ class BookingController extends Controller
         }
 
         if ($totalGuests > 1) {
-            $query->where('max_guests', '>=', $totalGuests);
+            $query->whereRaw('(? <= (max_guests * ?))', [$totalGuests, $roomsCount]);
         }
 
-        if ($adults > 0) {
-            $query->where(function ($q) use ($adults) {
+        if ($effectiveAdults > 0) {
+            $query->where(function ($q) use ($effectiveAdults, $roomsCount) {
                 $q->whereNull('max_adults')
                   ->orWhere('max_adults', 0)
-                  ->orWhere('max_adults', '>=', $adults);
+                  ->orWhereRaw('(? <= (max_adults * ?))', [$effectiveAdults, $roomsCount]);
             });
         }
 
-        if ($children > 0) {
-            $query->where(function ($q) use ($adults, $children) {
+        if ($effectiveChildren > 0) {
+            $query->where(function ($q) use ($effectiveAdults, $effectiveChildren, $roomsCount) {
                 $q->whereNull('max_children')
-                  ->orWhereRaw('? <= (COALESCE(max_children, 0) + (GREATEST(0, COALESCE(max_adults, 2) - ?)))', [$children, $adults]);
+                  ->orWhereRaw('? <= ((COALESCE(max_children, 0) * ?) + (GREATEST(0, (COALESCE(max_adults, 2) * ?) - ?)))', [$effectiveChildren, $roomsCount, $roomsCount, $effectiveAdults]);
             });
         }
 
@@ -102,6 +120,13 @@ class BookingController extends Controller
         $endDate = Carbon::parse($checkOut);
         $nights = max(1, $startDate->diffInDays($endDate));
 
+        // Attach weekend-aware stay pricing and physical availability to each room type
+        foreach ($roomTypes as $rt) {
+            $rt->stay_pricing = $bookingService->calculateStayPricing($rt, $startDate, $endDate, $roomsCount);
+            $availableRooms = $bookingService->getAvailablePhysicalRooms($rt->id, $checkIn, $checkOut);
+            $rt->available_rooms_count = $availableRooms->count();
+        }
+
         return view('client.rooms.index', compact(
             'roomTypes',
             'branches',
@@ -114,6 +139,9 @@ class BookingController extends Controller
             'checkOut',
             'adults',
             'children',
+            'roomsCount',
+            'childAges',
+            'party',
             'totalGuests',
             'nights',
             'minPrice',
@@ -136,10 +164,24 @@ class BookingController extends Controller
         $checkOut = $request->query('check_out', Carbon::tomorrow()->addDays(2)->format('Y-m-d'));
         $adults = max(1, (int) $request->query('adults', 2));
         $children = max(0, (int) $request->query('children', 0));
+        $roomsCount = max(1, (int) $request->query('rooms', 1));
+
+        $childAgesInput = $request->query('child_ages');
+        $childAges = [];
+        if (is_array($childAgesInput)) {
+            $childAges = array_map('intval', $childAgesInput);
+        } elseif (is_string($childAgesInput) && strlen(trim($childAgesInput)) > 0) {
+            $childAges = array_map('intval', explode(',', $childAgesInput));
+        }
+
+        $bookingService = app(BookingAvailabilityService::class);
+        $party = $bookingService->evaluatePartyComposition($adults, $children, $childAges);
         
         $startDate = Carbon::parse($checkIn);
         $endDate = Carbon::parse($checkOut);
         $nights = max(1, $startDate->diffInDays($endDate));
+
+        $stayPricing = $bookingService->calculateStayPricing($roomType, $startDate, $endDate, $roomsCount);
 
         // Approved reviews for this room or branch
         $reviews = Review::with('guest')
@@ -197,7 +239,11 @@ class BookingController extends Controller
             'checkOut',
             'adults',
             'children',
+            'roomsCount',
+            'childAges',
+            'party',
             'nights',
+            'stayPricing',
             'reviews',
             'averageRating',
             'reviewsCount',
@@ -227,16 +273,39 @@ class BookingController extends Controller
         $checkOut = $request->query('check_out', Carbon::tomorrow()->addDays(2)->format('Y-m-d'));
         $adults = max(1, (int) $request->query('adults', 2));
         $children = max(0, (int) $request->query('children', 0));
+        $roomsCount = max(1, (int) $request->query('rooms', 1));
+
+        $childAgesInput = $request->query('child_ages');
+        $childAges = [];
+        if (is_array($childAgesInput)) {
+            $childAges = array_map('intval', $childAgesInput);
+        } elseif (is_string($childAgesInput) && strlen(trim($childAgesInput)) > 0) {
+            $childAges = array_map('intval', explode(',', $childAgesInput));
+        }
+
+        $bookingService = app(BookingAvailabilityService::class);
+        $party = $bookingService->evaluatePartyComposition($adults, $children, $childAges);
+        $effectiveAdults = $party['effective_adults'];
+        $effectiveChildren = $party['effective_children'];
+
+        $capacityCheck = $bookingService->validateRoomTypeCapacity($roomType, $effectiveAdults, $effectiveChildren, $roomsCount);
+        if (!$capacityCheck['valid']) {
+            return redirect()->route('rooms.show', $roomType->slug)
+                ->with('error', $capacityCheck['message']);
+        }
 
         $startDate = Carbon::parse($checkIn);
         $endDate = Carbon::parse($checkOut);
-        $nights = max(1, $startDate->diffInDays($endDate));
+        $paymentChoice = $request->query('payment_choice', 'full');
 
-        $rate = (float) $roomType->base_price;
-        $subtotal = $rate * $nights;
-        $tax = round($subtotal * 0.12, 2); // 12% GST
-        $total = $subtotal + $tax;
-        $deposit = round($total * 0.20, 2); // 20% advance option
+        $pricing = $bookingService->calculateStayPricing($roomType, $startDate, $endDate, $roomsCount, $paymentChoice);
+
+        $nights = $pricing['nights'];
+        $rate = $pricing['average_nightly_rate'];
+        $subtotal = $pricing['subtotal'];
+        $tax = $pricing['tax'];
+        $total = $pricing['total'];
+        $deposit = $pricing['deposit'];
 
         return view('client.rooms.checkout', compact(
             'roomType',
@@ -245,8 +314,12 @@ class BookingController extends Controller
             'checkOut',
             'adults',
             'children',
+            'roomsCount',
+            'childAges',
+            'party',
             'nights',
             'rate',
+            'pricing',
             'subtotal',
             'tax',
             'total',
@@ -269,70 +342,92 @@ class BookingController extends Controller
             'check_out_date' => 'required|date|after:check_in_date',
             'adults' => 'required|integer|min:1',
             'children' => 'nullable|integer|min:0',
+            'rooms_count' => 'nullable|integer|min:1|max:10',
+            'child_ages' => 'nullable',
             'payment_choice' => 'required|string|in:full,deposit_20',
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'email' => 'required|email|max:150',
             'phone' => 'required|string|max:30',
+            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'special_requests' => 'nullable|string|max:1000',
         ]);
 
         $roomType = RoomType::with('branch')->findOrFail($validated['room_type_id']);
+        $bookingService = app(BookingAvailabilityService::class);
 
         $adults = max(1, (int) $validated['adults']);
         $children = max(0, (int) ($validated['children'] ?? 0));
-        $totalGuests = $adults + $children;
+        $roomsCount = max(1, (int) ($validated['rooms_count'] ?? 1));
 
-        // Capacity checks
-        if ($roomType->max_adults && $adults > $roomType->max_adults) {
-            return response()->json(['success' => false, 'message' => "Max {$roomType->max_adults} adults allowed in {$roomType->name}."], 422);
+        $childAges = [];
+        if (!empty($validated['child_ages'])) {
+            $childAges = is_array($validated['child_ages']) 
+                ? array_map('intval', $validated['child_ages']) 
+                : array_map('intval', explode(',', (string) $validated['child_ages']));
         }
-        if ($roomType->max_guests && $totalGuests > $roomType->max_guests) {
-            return response()->json(['success' => false, 'message' => "Max {$roomType->max_guests} guests allowed in {$roomType->name}."], 422);
+
+        // 1. Evaluate party composition (reclassifying > child_max_age as adults)
+        $party = $bookingService->evaluatePartyComposition($adults, $children, $childAges);
+        $effectiveAdults = $party['effective_adults'];
+        $effectiveChildren = $party['effective_children'];
+
+        // 2. Validate capacity rules with child bed substitution
+        $capacityCheck = $bookingService->validateRoomTypeCapacity($roomType, $effectiveAdults, $effectiveChildren, $roomsCount);
+        if (!$capacityCheck['valid']) {
+            return response()->json(['success' => false, 'message' => $capacityCheck['message']], 422);
         }
 
-        $startDate = Carbon::parse($validated['check_in_date']);
-        $endDate = Carbon::parse($validated['check_out_date']);
-        $nights = max(1, $startDate->diffInDays($endDate));
+        $startDate = Carbon::parse($validated['check_in_date'])->startOfDay();
+        $endDate = Carbon::parse($validated['check_out_date'])->startOfDay();
 
-        $rate = (float) $roomType->base_price;
-        $subtotal = $rate * $nights;
-        $tax = round($subtotal * 0.12, 2);
-        $total = $subtotal + $tax;
+        // 3. True stay pricing (weekend-aware, 12% GST, 20% deposit)
+        $pricing = $bookingService->calculateStayPricing($roomType, $startDate, $endDate, $roomsCount, $validated['payment_choice']);
+        $amountToPay = $pricing['amount_to_pay_now'];
 
-        $amountToPay = ($validated['payment_choice'] === 'deposit_20') ? round($total * 0.20, 2) : $total;
-
-        // Quick inventory check
         $checkInStr = $startDate->toDateString();
         $checkOutStr = $endDate->toDateString();
-        $availableRooms = Room::where('room_type_id', $roomType->id)
-            ->whereNotIn('operational_status', ['maintenance', 'blocked', 'out_of_order'])
-            ->get();
 
-        $freeRoom = null;
-        foreach ($availableRooms as $room) {
-            $hasOverlap = Reservation::where('room_id', $room->id)
-                ->whereIn('status', ['confirmed', 'checked_in'])
-                ->where('check_in_date', '<', $checkOutStr)
-                ->where('check_out_date', '>', $checkInStr)
-                ->exists();
+        // 4. Create 10-minute temporary inventory hold with row-locking
+        $user = Auth::user();
+        $guestData = [
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'city' => $validated['city'] ?? 'Kerala',
+            'country' => $validated['country'] ?? 'India',
+            'special_requests' => $validated['special_requests'] ?? null,
+        ];
 
-            if (!$hasOverlap) {
-                $freeRoom = $room;
-                break;
-            }
-        }
+        $holdResult = $bookingService->createTemporaryHold(
+            $user,
+            $roomType,
+            $checkInStr,
+            $checkOutStr,
+            $effectiveAdults,
+            $effectiveChildren,
+            $roomsCount,
+            $pricing['total'],
+            $pricing['average_nightly_rate'],
+            $pricing['subtotal'],
+            $pricing['tax'],
+            $guestData,
+            $validated['payment_choice']
+        );
 
-        if (!$freeRoom) {
+        if (!$holdResult['success']) {
             return response()->json([
                 'success' => false,
-                'message' => "Selected suite ({$roomType->name}) is fully booked for these dates. Please choose another date or suite.",
+                'message' => $holdResult['message'],
             ], 422);
         }
 
-        $receiptId = 'KR-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+        $holdReservation = $holdResult['reservation'];
 
         try {
-            $order = $razorpayService->createOrder($amountToPay, $receiptId, [
+            $order = $razorpayService->createOrder($amountToPay, $holdReservation->booking_code, [
                 'room_type_id' => (string) $roomType->id,
                 'room_type_name' => $roomType->name,
                 'check_in' => $checkInStr,
@@ -340,6 +435,17 @@ class BookingController extends Controller
                 'payment_choice' => $validated['payment_choice'],
                 'customer_email' => $validated['email'],
                 'customer_phone' => $validated['phone'],
+                'hold_id' => (string) $holdReservation->id,
+            ]);
+
+            // Save razorpay_order_id in hold internal_notes
+            $holdReservation->update([
+                'internal_notes' => json_encode([
+                    'payment_choice' => $validated['payment_choice'],
+                    'razorpay_order_id' => $order['id'],
+                    'held_at' => Carbon::now()->toIso8601String(),
+                    'rooms_count' => $roomsCount,
+                ]),
             ]);
 
             return response()->json([
@@ -350,7 +456,9 @@ class BookingController extends Controller
                 'amount_rupees' => $amountToPay,
                 'currency' => $order['currency'],
                 'name' => 'Country Side Cottages',
-                'description' => "{$nights}-Night Stay · {$roomType->name}",
+                'description' => "{$pricing['nights']}-Night Stay · {$roomType->name}" . ($validated['payment_choice'] === 'deposit_20' ? ' (20% Deposit)' : ''),
+                'hold_code' => $holdReservation->booking_code,
+                'expires_at' => $holdResult['expires_at']->toIso8601String(),
                 'prefill' => [
                     'name' => trim($validated['first_name'] . ' ' . $validated['last_name']),
                     'email' => $validated['email'],
@@ -361,6 +469,8 @@ class BookingController extends Controller
                 ],
             ]);
         } catch (\Throwable $e) {
+            // If Razorpay order fails, release the hold immediately
+            $holdReservation->delete();
             return response()->json([
                 'success' => false,
                 'message' => 'Unable to initialize Razorpay checkout: ' . $e->getMessage(),
@@ -386,6 +496,8 @@ class BookingController extends Controller
             'check_out_date' => 'required|date|after:check_in_date',
             'adults' => 'required|integer|min:1',
             'children' => 'nullable|integer|min:0',
+            'rooms_count' => 'nullable|integer|min:1|max:10',
+            'child_ages' => 'nullable',
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'email' => 'required|email|max:150',
@@ -405,6 +517,7 @@ class BookingController extends Controller
         }
 
         $validated = $request->validate($rules);
+        $bookingService = app(BookingAvailabilityService::class);
 
         // Verify cryptographic signature if online payment
         if ($validated['payment_method'] !== 'pay_at_resort') {
@@ -420,41 +533,91 @@ class BookingController extends Controller
             }
         }
 
+        // Check if this booking corresponds to an active temporary hold
+        $heldReservation = null;
+        if (!empty($validated['razorpay_order_id'])) {
+            $heldReservation = $bookingService->findHoldByRazorpayOrderId($validated['razorpay_order_id']);
+        }
+
+        if (!$heldReservation && Auth::check() && $validated['payment_method'] !== 'pay_at_resort') {
+            $heldReservation = Reservation::where('created_by', $user->id)
+                ->where('room_type_id', $validated['room_type_id'])
+                ->where('status', 'hold')
+                ->where('hold_expires_at', '>', Carbon::now())
+                ->latest()
+                ->first();
+        }
+
+        if ($heldReservation) {
+            $paidAmount = ($validated['payment_choice'] === 'deposit_20') 
+                ? round($heldReservation->total_amount * 0.20, 2) 
+                : (float) $heldReservation->total_amount;
+
+            $confirmed = $bookingService->confirmHeldReservation(
+                $heldReservation,
+                $validated['razorpay_payment_id'] ?? ('PAY-' . strtoupper(Str::random(10))),
+                $validated['razorpay_order_id'] ?? ('ORD-' . strtoupper(Str::random(10))),
+                $validated['razorpay_signature'] ?? null,
+                $validated['payment_method'],
+                $validated['payment_choice'],
+                $paidAmount,
+                $user
+            );
+
+            session(['last_booking_code' => $confirmed->booking_code, 'guest_email' => $confirmed->guest?->email]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'booking_code' => $confirmed->booking_code,
+                    'redirect' => route('booking.confirmation', ['code' => $confirmed->booking_code]),
+                ]);
+            }
+
+            return redirect()->route('booking.confirmation', ['code' => $confirmed->booking_code]);
+        }
+
+        // FALLBACK: Direct reservation allocation (when no prior hold existed)
         $roomType = RoomType::findOrFail($validated['room_type_id']);
+        $roomsCount = max(1, (int) ($validated['rooms_count'] ?? 1));
 
         $adults = max(1, (int) $validated['adults']);
         $children = max(0, (int) ($validated['children'] ?? 0));
-        $totalGuests = $adults + $children;
-
-        // Server-Side Capacity Validation
-        if ($roomType->max_adults && $adults > $roomType->max_adults) {
-            return back()->withInput()->with('error', "The selected suite ({$roomType->name}) accommodates a maximum of {$roomType->max_adults} adults. Please adjust your party size or select multiple suites.");
+        
+        $childAges = [];
+        if (!empty($validated['child_ages'])) {
+            $childAges = is_array($validated['child_ages']) 
+                ? array_map('intval', $validated['child_ages']) 
+                : array_map('intval', explode(',', (string) $validated['child_ages']));
         }
 
-        if ($roomType->max_guests && $totalGuests > $roomType->max_guests) {
-            return back()->withInput()->with('error', "The selected suite ({$roomType->name}) accommodates a maximum of {$roomType->max_guests} total guests. Please select a larger suite or multiple rooms.");
+        $party = $bookingService->evaluatePartyComposition($adults, $children, $childAges);
+        $effectiveAdults = $party['effective_adults'];
+        $effectiveChildren = $party['effective_children'];
+        $totalGuests = $party['total_guests'];
+
+        // Capacity validation
+        $capacityCheck = $bookingService->validateRoomTypeCapacity($roomType, $effectiveAdults, $effectiveChildren, $roomsCount);
+        if (!$capacityCheck['valid']) {
+            return back()->withInput()->with('error', $capacityCheck['message']);
         }
 
-        $maxAllowedChildren = ($roomType->max_children ?? 0) + max(0, ($roomType->max_adults ?? 2) - $adults);
-        if ($children > 0 && $children > $maxAllowedChildren && $roomType->max_children) {
-            return back()->withInput()->with('error', "The selected suite cannot accommodate {$children} children with the requested {$adults} adults.");
-        }
+        $startDate = Carbon::parse($validated['check_in_date'])->startOfDay();
+        $endDate = Carbon::parse($validated['check_out_date'])->startOfDay();
+        $pricing = $bookingService->calculateStayPricing($roomType, $startDate, $endDate, $roomsCount, $validated['payment_choice']);
 
-        $startDate = Carbon::parse($validated['check_in_date']);
-        $endDate = Carbon::parse($validated['check_out_date']);
-        $nights = max(1, $startDate->diffInDays($endDate));
-
-        $rate = (float) $roomType->base_price;
-        $subtotal = $rate * $nights;
-        $tax = round($subtotal * 0.12, 2);
-        $total = $subtotal + $tax;
+        $nights = $pricing['nights'];
+        $rate = $pricing['average_nightly_rate'];
+        $subtotal = $pricing['subtotal'];
+        $tax = $pricing['tax'];
+        $total = $pricing['total'];
 
         $paidAmount = 0;
         $paymentStatus = 'pending';
 
         if ($validated['payment_method'] !== 'pay_at_resort') {
             if ($validated['payment_choice'] === 'deposit_20') {
-                $paidAmount = round($total * 0.20, 2);
+                $paidAmount = $pricing['deposit'];
                 $paymentStatus = 'partial';
             } else {
                 $paidAmount = $total;
@@ -463,7 +626,7 @@ class BookingController extends Controller
         }
 
         // Execute booking allocation within an atomic database transaction
-        $result = DB::transaction(function () use ($validated, $user, $roomType, $startDate, $endDate, $nights, $rate, $subtotal, $tax, $total, $paidAmount, $paymentStatus, $totalGuests, $request) {
+        $result = DB::transaction(function () use ($validated, $user, $roomType, $startDate, $endDate, $nights, $rate, $subtotal, $tax, $total, $paidAmount, $paymentStatus, $totalGuests, $roomsCount, $request) {
             // Find or create Guest linked to authenticated user
             $guest = Guest::firstOrCreate(
                 ['email' => $validated['email']],
@@ -491,7 +654,7 @@ class BookingController extends Controller
                 ->lockForUpdate()
                 ->get();
 
-            // Filter rooms that have zero overlapping reservations for the requested date range [startDate, endDate)
+            // Filter rooms that have zero overlapping reservations and room_blocks for requested dates
             $checkInStr = $startDate->toDateString();
             $checkOutStr = $endDate->toDateString();
 
@@ -504,10 +667,18 @@ class BookingController extends Controller
                 }
 
                 $hasOverlap = Reservation::where('room_id', $room->id)
-                    ->whereIn('status', ['confirmed', 'checked_in'])
+                    ->where(function ($q) {
+                        $q->whereIn('status', ['confirmed', 'checked_in'])
+                          ->orWhere(fn($sq) => $sq->where('status', 'hold')->where('hold_expires_at', '>', Carbon::now()));
+                    })
                     ->where('check_in_date', '<', $checkOutStr)
                     ->where('check_out_date', '>', $checkInStr)
-                    ->exists();
+                    ->exists()
+                    ||
+                    $room->blocks()
+                        ->where('start_date', '<', $checkOutStr)
+                        ->where('end_date', '>', $checkInStr)
+                        ->exists();
 
                 if (!$hasOverlap) {
                     $freeRoom = $room;
@@ -843,16 +1014,22 @@ class BookingController extends Controller
     public function checkAvailability(Request $request)
     {
         $validated = $request->validate([
+            'room_type_id' => 'nullable',
             'branch_id' => 'nullable',
             'check_in' => 'nullable|date',
             'check_out' => 'nullable|date',
             'adults' => 'nullable|integer|min:1|max:20',
             'children' => 'nullable|integer|min:0|max:20',
+            'rooms' => 'nullable|integer|min:1|max:10',
+            'child_ages' => 'nullable',
         ]);
 
+        $bookingService = app(BookingAvailabilityService::class);
         $branchId = !empty($validated['branch_id']) ? (int) $validated['branch_id'] : null;
+        $roomTypeId = !empty($validated['room_type_id']) ? (int) $validated['room_type_id'] : null;
         $checkInStr = $validated['check_in'] ?? Carbon::tomorrow()->format('Y-m-d');
         $checkOutStr = $validated['check_out'] ?? Carbon::tomorrow()->addDays(2)->format('Y-m-d');
+        $roomsCount = max(1, (int) ($validated['rooms'] ?? 1));
 
         try {
             $checkIn = Carbon::parse($checkInStr)->startOfDay();
@@ -879,100 +1056,64 @@ class BookingController extends Controller
         $nights = max(1, $checkIn->diffInDays($checkOut));
         $adults = max(1, (int) ($validated['adults'] ?? 2));
         $children = max(0, (int) ($validated['children'] ?? 0));
-        $totalGuests = $adults + $children;
+
+        $childAges = [];
+        if (!empty($validated['child_ages'])) {
+            $childAges = is_array($validated['child_ages']) 
+                ? array_map('intval', $validated['child_ages']) 
+                : array_map('intval', explode(',', (string) $validated['child_ages']));
+        }
+
+        $party = $bookingService->evaluatePartyComposition($adults, $children, $childAges);
+        $effectiveAdults = $party['effective_adults'];
+        $effectiveChildren = $party['effective_children'];
+        $totalGuests = $party['total_guests'];
 
         // Query active bookable room types
-        $query = RoomType::with(['branch', 'category', 'amenitiesList', 'rooms.blocks'])
+        $query = RoomType::with(['branch', 'category', 'amenitiesList'])
             ->where('is_active', true)
             ->where('is_bookable', true);
+
+        if ($roomTypeId) {
+            $query->where('id', $roomTypeId);
+        }
 
         if ($branchId) {
             $query->where('branch_id', $branchId);
         }
 
-        // Capacity filter on RoomType level:
-        // 1. max_guests must accommodate total guests
-        $query->where('max_guests', '>=', $totalGuests);
+        // Capacity filter on RoomType level
+        $query->whereRaw('(? <= (max_guests * ?))', [$totalGuests, $roomsCount]);
 
-        // 2. max_adults must accommodate adults (if max_adults > 0)
-        $query->where(function ($q) use ($adults) {
-            $q->whereNull('max_adults')
-              ->orWhere('max_adults', 0)
-              ->orWhere('max_adults', '>=', $adults);
-        });
+        if ($effectiveAdults > 0) {
+            $query->where(function ($q) use ($effectiveAdults, $roomsCount) {
+                $q->whereNull('max_adults')
+                  ->orWhere('max_adults', 0)
+                  ->orWhereRaw('(? <= (max_adults * ?))', [$effectiveAdults, $roomsCount]);
+            });
+        }
 
-        // 3. Child allocation with adult-bed substitution rule:
-        // Children count cannot exceed configured max_children + any unused adult slots
-        if ($children > 0) {
-            $query->where(function ($q) use ($adults, $children) {
+        if ($effectiveChildren > 0) {
+            $query->where(function ($q) use ($effectiveAdults, $effectiveChildren, $roomsCount) {
                 $q->whereNull('max_children')
-                  ->orWhereRaw('? <= (COALESCE(max_children, 0) + (GREATEST(0, COALESCE(max_adults, 2) - ?)))', [$children, $adults]);
+                  ->orWhereRaw('? <= ((COALESCE(max_children, 0) * ?) + (GREATEST(0, (COALESCE(max_adults, 2) * ?) - ?)))', [$effectiveChildren, $roomsCount, $roomsCount, $effectiveAdults]);
             });
         }
 
         $roomTypes = $query->orderBy('sort_order')->get();
-
         $availableSuites = [];
 
         foreach ($roomTypes as $rt) {
-            // Get physical rooms for this room type
-            // Exclude out_of_order, maintenance, blocked
-            $eligibleRooms = $rt->rooms->filter(function ($room) use ($totalGuests, $checkIn, $checkOut) {
-                // Check operational status
-                if (in_array($room->operational_status, ['maintenance', 'blocked', 'out_of_order'])) {
-                    return false;
-                }
+            $availableRooms = $bookingService->getAvailablePhysicalRooms($rt->id, $checkInStr, $checkOutStr);
+            $availableRoomsCount = $availableRooms->count();
 
-                // Check physical room capacity override (if specified)
-                $roomCap = (int) ($room->max_guests ?? 0);
-                if ($roomCap > 0 && $roomCap < $totalGuests) {
-                    return false;
-                }
-
-                // Check RoomBlock conflicts
-                $hasBlockConflict = $room->blocks->contains(function ($block) use ($checkIn, $checkOut) {
-                    $bStart = Carbon::parse($block->start_date)->startOfDay();
-                    $bEnd = Carbon::parse($block->end_date)->startOfDay();
-                    return $bStart->lt($checkOut) && $bEnd->gt($checkIn);
-                });
-
-                if ($hasBlockConflict) {
-                    return false;
-                }
-
-                return true;
-            });
-
-            if ($eligibleRooms->isEmpty()) {
-                continue;
-            }
-
-            // Find overlapping active reservations for this room type
-            // Overlapping condition: check_in_date < $checkOut AND check_out_date > $checkIn
-            // with status IN ('confirmed', 'checked_in')
-            $overlappingReservations = Reservation::where('room_type_id', $rt->id)
-                ->whereIn('status', ['confirmed', 'checked_in'])
-                ->where('check_in_date', '<', $checkOut->format('Y-m-d'))
-                ->where('check_out_date', '>', $checkIn->format('Y-m-d'))
-                ->get();
-
-            // Rooms already reserved with room_id assigned
-            $reservedRoomIds = $overlappingReservations->pluck('room_id')->filter()->all();
-
-            // Remaining eligible rooms that are not specifically assigned
-            $freeRooms = $eligibleRooms->reject(function ($room) use ($reservedRoomIds) {
-                return in_array($room->id, $reservedRoomIds);
-            });
-
-            // Account for unassigned reservations (where room_id is null)
-            $unassignedCount = $overlappingReservations->whereNull('room_id')->count();
-            $availableRoomsCount = max(0, $freeRooms->count() - $unassignedCount);
-
-            if ($availableRoomsCount > 0) {
-                $rate = (float) $rt->base_price;
-                $subtotal = round($rate * $nights, 2);
-                $tax = round($subtotal * 0.12, 2); // 12% GST
-                $grandTotal = $subtotal + $tax;
+            if ($availableRoomsCount >= $roomsCount) {
+                $pricing = $bookingService->calculateStayPricing($rt, $checkIn, $checkOut, $roomsCount);
+                $rate = $pricing['average_nightly_rate'];
+                $subtotal = $pricing['subtotal'];
+                $tax = $pricing['tax'];
+                $grandTotal = $pricing['total'];
+                $deposit = $pricing['deposit'];
 
                 // Extract amenities names
                 $amenityNames = [];
@@ -1005,6 +1146,8 @@ class BookingController extends Controller
                     'formatted_tax' => '₹' . number_format($tax),
                     'grand_total' => $grandTotal,
                     'formatted_grand_total' => '₹' . number_format($grandTotal),
+                    'deposit_amount' => $deposit,
+                    'formatted_deposit' => '₹' . number_format($deposit),
                     'available_rooms_count' => $availableRoomsCount,
                     'amenities' => $amenityNames,
                     'checkout_url' => route('booking.checkout', $rt->id) . '?' . http_build_query([
@@ -1012,6 +1155,7 @@ class BookingController extends Controller
                         'check_out' => $checkOutStr,
                         'adults' => $adults,
                         'children' => $children,
+                        'rooms' => $roomsCount,
                     ]),
                 ];
             }
@@ -1025,6 +1169,7 @@ class BookingController extends Controller
             'check_out' => $checkOutStr,
             'adults' => $adults,
             'children' => $children,
+            'rooms' => $roomsCount,
             'total_guests' => $totalGuests,
             'results' => $availableSuites,
         ]);

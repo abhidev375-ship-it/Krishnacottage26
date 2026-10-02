@@ -36,6 +36,9 @@ class BookingAndPaymentTest extends TestCase
     {
         parent::setUp();
 
+        // Pin current time to a deterministic Monday to keep default weekday test assertions stable
+        Carbon::setTestNow(Carbon::parse('2026-10-05 10:00:00'));
+
         // Configure mock or test credentials for Razorpay
         Setting::set('razorpay_key_id', 'rzp_test_validKeyId123', 'payment');
         Setting::set('razorpay_key_secret', 'testSecretKey456', 'payment');
@@ -107,6 +110,12 @@ class BookingAndPaymentTest extends TestCase
             'state' => 'Karnataka',
             'country' => 'India',
         ]);
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     /**
@@ -613,5 +622,371 @@ class BookingAndPaymentTest extends TestCase
             'payment_status' => 'pending',
             'status' => 'processing',
         ]);
+    }
+
+    /**
+     * Test 11: Razorpay Order creation creates a 10-minute temporary inventory hold and blocks concurrent booking.
+     */
+    public function test_razorpay_order_creates_temporary_hold_and_blocks_inventory(): void
+    {
+        $checkIn = Carbon::tomorrow()->format('Y-m-d');
+        $checkOut = Carbon::tomorrow()->addDays(2)->format('Y-m-d');
+
+        Http::fake([
+            'https://api.razorpay.com/v1/orders' => Http::response([
+                'id' => 'order_holdTest123',
+                'entity' => 'order',
+                'amount' => 1008000,
+                'currency' => 'INR',
+                'status' => 'created',
+            ], 200),
+        ]);
+
+        $response = $this->actingAs($this->customer)->postJson(route('booking.razorpay.create-order'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in_date' => $checkIn,
+            'check_out_date' => $checkOut,
+            'adults' => 2,
+            'children' => 0,
+            'first_name' => 'Aditi',
+            'last_name' => 'Sharma',
+            'email' => 'aditi.sharma@example.com',
+            'phone' => '+91 98765 43210',
+            'payment_choice' => 'full',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'order_id' => 'order_holdTest123',
+        ]);
+
+        // Verify hold reservation exists in database
+        $hold = Reservation::where('status', 'hold')
+            ->where('room_type_id', $this->roomType->id)
+            ->first();
+
+        $this->assertNotNull($hold);
+        $this->assertEquals($this->room->id, $hold->room_id);
+        $this->assertNotNull($hold->hold_expires_at);
+        $this->assertTrue(Carbon::parse($hold->hold_expires_at)->isFuture());
+        $this->assertStringContainsString('order_holdTest123', $hold->internal_notes);
+
+        // Guest B attempts to order the exact same dates while hold is active
+        $guestB = User::create([
+            'name' => 'Guest B',
+            'email' => 'guestb@example.com',
+            'password' => bcrypt('Password123!'),
+            'role' => 'customer',
+            'phone' => '+91 92222 33333',
+        ]);
+
+        $conflictResponse = $this->actingAs($guestB)->postJson(route('booking.razorpay.create-order'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in_date' => $checkIn,
+            'check_out_date' => $checkOut,
+            'adults' => 2,
+            'children' => 0,
+            'first_name' => 'Guest',
+            'last_name' => 'B',
+            'email' => 'guestb@example.com',
+            'phone' => '+91 92222 33333',
+            'payment_choice' => 'full',
+        ]);
+
+        $conflictResponse->assertStatus(422);
+        $conflictResponse->assertJson([
+            'success' => false,
+        ]);
+    }
+
+    /**
+     * Test 12: Completing checkout confirms an existing temporary hold in-place without duplicate reservations.
+     */
+    public function test_held_reservation_confirmed_on_payment_store(): void
+    {
+        $checkIn = Carbon::tomorrow()->format('Y-m-d');
+        $checkOut = Carbon::tomorrow()->addDays(2)->format('Y-m-d');
+        $orderId = 'order_confirmHold456';
+        $paymentId = 'pay_confirmHold789';
+
+        Http::fake([
+            'https://api.razorpay.com/v1/orders' => Http::response([
+                'id' => $orderId,
+                'entity' => 'order',
+                'amount' => 1008000,
+                'currency' => 'INR',
+                'status' => 'created',
+            ], 200),
+        ]);
+
+        // Step 1: Create Razorpay order (creates hold)
+        $this->actingAs($this->customer)->postJson(route('booking.razorpay.create-order'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in_date' => $checkIn,
+            'check_out_date' => $checkOut,
+            'adults' => 2,
+            'children' => 0,
+            'first_name' => 'Aditi',
+            'last_name' => 'Sharma',
+            'email' => 'aditi.sharma@example.com',
+            'phone' => '+91 98765 43210',
+            'payment_choice' => 'full',
+        ])->assertStatus(200);
+
+        $this->assertEquals(1, Reservation::where('status', 'hold')->count());
+
+        // Step 2: Complete payment store with valid signature
+        $secret = Setting::get('razorpay_key_secret');
+        $validSignature = hash_hmac('sha256', $orderId . '|' . $paymentId, $secret);
+
+        $response = $this->actingAs($this->customer)->post(route('booking.store'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in_date' => $checkIn,
+            'check_out_date' => $checkOut,
+            'adults' => 2,
+            'children' => 0,
+            'first_name' => 'Aditi',
+            'last_name' => 'Sharma',
+            'email' => 'aditi.sharma@example.com',
+            'phone' => '+91 98765 43210',
+            'payment_method' => 'card',
+            'payment_choice' => 'full',
+            'razorpay_order_id' => $orderId,
+            'razorpay_payment_id' => $paymentId,
+            'razorpay_signature' => $validSignature,
+        ]);
+
+        $response->assertStatus(302);
+
+        // Hold should be transitioned to confirmed
+        $this->assertEquals(0, Reservation::where('status', 'hold')->count());
+        $confirmed = Reservation::where('status', 'confirmed')->first();
+        $this->assertNotNull($confirmed);
+        $this->assertStringStartsWith('KR-', $confirmed->booking_code);
+        $this->assertEquals('paid', $confirmed->payment_status);
+        $this->assertEquals(10080.00, (float) $confirmed->paid_amount);
+
+        // Exactly 1 total reservation in DB
+        $this->assertEquals(1, Reservation::count());
+    }
+
+    /**
+     * Test 13: Razorpay Webhook auto-confirms abandoned held reservation if user closes tab.
+     */
+    public function test_webhook_auto_confirms_abandoned_held_reservation(): void
+    {
+        $checkIn = Carbon::tomorrow()->format('Y-m-d');
+        $checkOut = Carbon::tomorrow()->addDays(2)->format('Y-m-d');
+        $orderId = 'order_webhookRecover123';
+        $paymentId = 'pay_webhookRecover999';
+
+        Http::fake([
+            'https://api.razorpay.com/v1/orders' => Http::response([
+                'id' => $orderId,
+                'entity' => 'order',
+                'amount' => 1008000,
+                'currency' => 'INR',
+                'status' => 'created',
+            ], 200),
+        ]);
+
+        // Step 1: Create hold
+        $this->actingAs($this->customer)->postJson(route('booking.razorpay.create-order'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in_date' => $checkIn,
+            'check_out_date' => $checkOut,
+            'adults' => 2,
+            'children' => 0,
+            'first_name' => 'Aditi',
+            'last_name' => 'Sharma',
+            'email' => 'aditi.sharma@example.com',
+            'phone' => '+91 98765 43210',
+            'payment_choice' => 'full',
+        ])->assertStatus(200);
+
+        $hold = Reservation::where('status', 'hold')->first();
+        $this->assertNotNull($hold);
+
+        // Step 2: Post webhook payment.captured
+        $webhookSecret = 'test_webhook_secret_999';
+        Setting::set('razorpay_webhook_secret', $webhookSecret, 'payment');
+
+        $payload = json_encode([
+            'event' => 'payment.captured',
+            'payload' => [
+                'payment' => [
+                    'entity' => [
+                        'id' => $paymentId,
+                        'order_id' => $orderId,
+                        'amount' => 1008000,
+                        'currency' => 'INR',
+                        'status' => 'captured',
+                        'method' => 'upi',
+                    ],
+                ],
+            ],
+        ]);
+
+        $signature = hash_hmac('sha256', $payload, $webhookSecret);
+
+        $response = $this->call('POST', route('webhooks.razorpay'), [], [], [], [
+            'HTTP_X-Razorpay-Signature' => $signature,
+            'CONTENT_TYPE' => 'application/json',
+        ], $payload);
+
+        $response->assertStatus(200);
+
+        // Verify hold is now confirmed
+        $recovered = Reservation::find($hold->id);
+        $this->assertEquals('confirmed', $recovered->status);
+        $this->assertEquals('paid', $recovered->payment_status);
+        $this->assertStringStartsWith('KR-', $recovered->booking_code);
+
+        // Financial payment record created
+        $this->assertDatabaseHas('payments', [
+            'payable_type' => Reservation::class,
+            'payable_id' => $hold->id,
+            'transaction_id' => $paymentId,
+            'status' => 'successful',
+        ]);
+    }
+
+    /**
+     * Test 14: Stay spanning weekend applies weekend_price (₹5200) instead of base_price (₹4500).
+     */
+    public function test_weekend_pricing_applied_on_friday_and_saturday_nights(): void
+    {
+        // 2026-10-09 is Friday, 2026-10-11 is Sunday (2 nights: Friday + Saturday)
+        $checkIn = '2026-10-09';
+        $checkOut = '2026-10-11';
+
+        $response = $this->postJson(route('api.availability.check'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'adults' => 2,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'count' => 1,
+            'nights' => 2,
+        ]);
+
+        // 2 weekend nights @ ₹5200 = ₹10,400 subtotal. Tax 12% = ₹1248. Total = ₹11,648.
+        $this->assertEquals(10400.00, (float) $response->json('results.0.total_price'));
+        $this->assertEquals(11648.00, (float) $response->json('results.0.grand_total'));
+        $this->assertEquals(5200.00, (float) $response->json('results.0.base_price'));
+    }
+
+    /**
+     * Test 15: Child age > 12 is reclassified as adult for occupancy validation.
+     */
+    public function test_child_age_reclassification_over_12(): void
+    {
+        $checkIn = '2026-10-12';
+        $checkOut = '2026-10-14';
+
+        // Room max_adults = 2.
+        // If 2 adults + 1 child of age 14 -> child reclassified as adult -> 3 adults.
+        // Exceeds max_adults (2), so availability check should return 0 available rooms.
+        $response = $this->postJson(route('api.availability.check'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'adults' => 2,
+            'children' => 1,
+            'child_ages' => [14],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(0, $response->json('count'));
+
+        // If 1 adult + 1 child of age 14 -> 2 adults, 0 children -> within max_adults (2)
+        $validResponse = $this->postJson(route('api.availability.check'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'adults' => 1,
+            'children' => 1,
+            'child_ages' => [14],
+        ]);
+
+        $validResponse->assertStatus(200);
+        $this->assertEquals(1, $validResponse->json('count'));
+    }
+
+    /**
+     * Test 16: Safe room release on cancellation: room stays occupied if another guest is active today.
+     */
+    public function test_cancellation_preserves_current_guest_room_status(): void
+    {
+        // Active in-house guest today (2026-10-05)
+        Reservation::create([
+            'booking_code' => 'KR-INHOUSE-01',
+            'branch_id' => $this->branch->id,
+            'room_type_id' => $this->roomType->id,
+            'room_id' => $this->room->id,
+            'guest_id' => $this->guest->id,
+            'check_in_date' => '2026-10-04',
+            'check_out_date' => '2026-10-08',
+            'adults' => 2,
+            'status' => 'checked_in',
+            'nightly_rate' => 4500,
+            'subtotal' => 18000,
+            'tax_amount' => 2160,
+            'total_amount' => 20160,
+            'paid_amount' => 20160,
+        ]);
+
+        $this->room->update(['operational_status' => 'occupied']);
+
+        // Future guest books the same room starting next week
+        $futureGuestUser = User::create([
+            'name' => 'Future Guest',
+            'email' => 'future@example.com',
+            'password' => bcrypt('Password123!'),
+            'role' => 'customer',
+            'phone' => '+91 97777 88888',
+        ]);
+        $futureGuest = Guest::create([
+            'user_id' => $futureGuestUser->id,
+            'first_name' => 'Future',
+            'last_name' => 'Guest',
+            'email' => 'future@example.com',
+            'phone' => '+91 97777 88888',
+        ]);
+
+        $futureReservation = Reservation::create([
+            'booking_code' => 'KR-FUTURE-01',
+            'branch_id' => $this->branch->id,
+            'room_type_id' => $this->roomType->id,
+            'room_id' => $this->room->id,
+            'guest_id' => $futureGuest->id,
+            'check_in_date' => '2026-10-15',
+            'check_out_date' => '2026-10-17',
+            'adults' => 2,
+            'status' => 'confirmed',
+            'nightly_rate' => 4500,
+            'subtotal' => 9000,
+            'tax_amount' => 1080,
+            'total_amount' => 10080,
+            'paid_amount' => 10080,
+        ]);
+
+        // Future guest cancels their reservation
+        $response = $this->actingAs($futureGuestUser)->postJson(route('customer.reservation.cancel', ['id' => $futureReservation->id]), [
+            'reason' => 'Schedule changed',
+        ]);
+
+        $response->assertStatus(200);
+
+        // Future reservation is cancelled
+        $this->assertEquals('cancelled', $futureReservation->fresh()->status);
+
+        // Room 101 must REMAIN occupied because KR-INHOUSE-01 is currently checked in!
+        $this->assertEquals('occupied', $this->room->fresh()->operational_status);
     }
 }
