@@ -113,7 +113,7 @@ class ChatController extends Controller
             ]);
 
             // Welcome greeting message from Concierge
-            $welcomeText = "Namaste! Welcome to Village Cottages. How may our concierge team assist your holiday plans, room selection, or dining experience today?";
+            $welcomeText = "Namaste! Welcome to Country Side Cottages. How may our concierge team assist your holiday plans, room selection, or dining experience today?";
             if ($activeReservation) {
                 $bName = $activeReservation->branch ? $activeReservation->branch->name : 'our cottages';
                 $roomLabel = $activeReservation->room ? "Room {$activeReservation->room->room_number}" : ($activeReservation->roomType ? $activeReservation->roomType->name : 'cottage');

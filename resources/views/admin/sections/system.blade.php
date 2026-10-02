@@ -378,7 +378,7 @@
             $smtpUsername = \App\Models\Setting::get('smtp_username', env('MAIL_USERNAME', ''));
             $smtpPassword = \App\Models\Setting::get('smtp_password', env('MAIL_PASSWORD', ''));
             $smtpFromAddress = \App\Models\Setting::get('smtp_from_address', env('MAIL_FROM_ADDRESS', ''));
-            $smtpFromName = \App\Models\Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Village Cottages'));
+            $smtpFromName = \App\Models\Setting::get('smtp_from_name', env('MAIL_FROM_NAME', 'Country Side Cottages'));
             $smtpRecipient = \App\Models\Setting::get('smtp_recipient_email', env('ADMIN_NOTIFICATION_EMAIL', ''));
             $isSmtpConfigured = !empty($smtpHost) && !empty($smtpUsername) && !empty($smtpRecipient);
 
@@ -501,7 +501,7 @@
                         <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
                             Sender Email Address (From)
                         </label>
-                        <input type="email" name="smtp_from_address" id="smtp_from_address" value="{{ $smtpFromAddress }}" placeholder="noreply@villagecottages.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
+                        <input type="email" name="smtp_from_address" id="smtp_from_address" value="{{ $smtpFromAddress }}" placeholder="noreply@countrysidecottages.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary font-mono text-xs">
                         <p class="text-[10px] text-brand-muted mt-1">Display address for outgoing notification emails.</p>
                     </div>
 
@@ -509,7 +509,7 @@
                         <label class="block font-bold text-brand-text mb-1 uppercase tracking-wider text-[10px]">
                             Sender Display Name
                         </label>
-                        <input type="text" name="smtp_from_name" id="smtp_from_name" value="{{ $smtpFromName }}" placeholder="Village Cottages" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary text-xs">
+                        <input type="text" name="smtp_from_name" id="smtp_from_name" value="{{ $smtpFromName }}" placeholder="Country Side Cottages" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary text-xs">
                         <p class="text-[10px] text-brand-muted mt-1">Sender name shown in recipient inbox.</p>
                     </div>
                 </div>
@@ -596,7 +596,7 @@
                     <div class="space-y-1">
                         <span class="font-bold block">How to get your free Telegram Bot Token & Chat ID in 2 minutes:</span>
                         <ol class="list-decimal list-inside text-[11px] text-sky-900 space-y-0.5">
-                            <li>Open Telegram, search for <b>@BotFather</b>, send <code class="font-mono font-bold bg-white/80 px-1 py-0.5 rounded border border-sky-300">/newbot</code>, give it a name (e.g. <i>Village Alerts</i>), and copy the <b>HTTP API Token</b>.</li>
+                            <li>Open Telegram, search for <b>@BotFather</b>, send <code class="font-mono font-bold bg-white/80 px-1 py-0.5 rounded border border-sky-300">/newbot</code>, give it a name (e.g. <i>Country Side Alerts</i>), and copy the <b>HTTP API Token</b>.</li>
                             <li>Open your new bot in Telegram and click <b>START</b> (or add the bot to your management group as an admin).</li>
                             <li>To find your Chat ID: message <b>@userinfobot</b> in Telegram — it will reply with your numeric <b>Id</b> (e.g. <code class="font-mono font-bold bg-white/80 px-1 py-0.5 rounded border border-sky-300">123456789</code>). For groups, use <b>@GetIDsBot</b>.</li>
                             <li>Paste the Token and Chat ID above, click <b>Save</b>, then hit <b>Send Test Telegram Ping</b>!</li>

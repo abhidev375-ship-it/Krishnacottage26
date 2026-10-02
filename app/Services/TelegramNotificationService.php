@@ -25,7 +25,7 @@ class TelegramNotificationService
     {
         $guestName = $reservation->guest ? $reservation->guest->full_name : 'Guest';
         $guestPhone = $reservation->guest ? $reservation->guest->phone : 'N/A';
-        $branchName = $reservation->branch ? $reservation->branch->name : 'Village Cottages';
+        $branchName = $reservation->branch ? $reservation->branch->name : 'Country Side Cottages';
         $roomTypeName = $reservation->roomType ? $reservation->roomType->name : 'Cottage Suite';
         $checkIn = Carbon::parse($reservation->check_in_date)->format('d M Y');
         $checkOut = Carbon::parse($reservation->check_out_date)->format('d M Y');
@@ -33,7 +33,7 @@ class TelegramNotificationService
         $total = number_format($reservation->total_amount, 2);
         $paymentStatus = strtoupper($reservation->payment_status ?? 'PENDING');
 
-        $html = "🏨 <b>NEW ROOM RESERVATION — VILLAGE COTTAGES</b>\n\n"
+        $html = "🏨 <b>NEW ROOM RESERVATION — COUNTRY SIDE COTTAGES</b>\n\n"
             . "• <b>Booking Ref:</b> <code>#{$reservation->booking_code}</code>\n"
             . "• <b>Guest:</b> " . htmlspecialchars($guestName, ENT_QUOTES) . " (" . htmlspecialchars($guestPhone, ENT_QUOTES) . ")\n"
             . "• <b>Branch:</b> " . htmlspecialchars($branchName, ENT_QUOTES) . "\n"
@@ -93,7 +93,7 @@ class TelegramNotificationService
             ? Carbon::parse($order->scheduled_at)->format('d M Y, h:i A')
             : 'Immediate / As Soon As Possible';
 
-        $html = "🍽️ <b>NEW KITCHEN ORDER — VILLAGE DINING</b>\n\n"
+        $html = "🍽️ <b>NEW KITCHEN ORDER — COUNTRY SIDE DINING</b>\n\n"
             . "• <b>Order Ref:</b> <code>#{$order->order_number}</code>\n"
             . "• <b>Type:</b> {$type} (<b>{$location}</b>)\n"
             . "• <b>Guest:</b> " . htmlspecialchars($order->customer_name, ENT_QUOTES) . "\n"
@@ -127,7 +127,7 @@ class TelegramNotificationService
         $reqCheckout = Carbon::parse($ext->requested_checkout_date)->format('d M Y');
         $amount = number_format($ext->standard_amount, 2);
 
-        $html = "🛎️ <b>STAY EXTENSION REQUEST — VILLAGE COTTAGES</b>\n\n"
+        $html = "🛎️ <b>STAY EXTENSION REQUEST — COUNTRY SIDE COTTAGES</b>\n\n"
             . "• <b>Guest:</b> " . htmlspecialchars($guestName, ENT_QUOTES) . " (<b>{$villa}</b>)\n"
             . "• <b>Booking Ref:</b> <code>#{$reservation->booking_code}</code>\n"
             . "• <b>Current Checkout:</b> {$curCheckout}\n"
@@ -155,7 +155,7 @@ class TelegramNotificationService
         $branchName = $booking->branch ? $booking->branch->name : 'Resort Concierge';
         $villa = ($booking->reservation && $booking->reservation->room) ? " (Villa {$booking->reservation->room->room_number})" : '';
 
-        $html = "🌿 <b>EXPERIENCE & SPA BOOKING — VILLAGE CONCIERGE</b>\n\n"
+        $html = "🌿 <b>EXPERIENCE & SPA BOOKING — COUNTRY SIDE CONCIERGE</b>\n\n"
             . "• <b>Experience:</b> " . htmlspecialchars($facilityName, ENT_QUOTES) . "\n"
             . "• <b>Guest:</b> " . htmlspecialchars($guestName, ENT_QUOTES) . "{$villa}\n"
             . "• <b>Scheduled Date:</b> {$date}\n"
@@ -213,7 +213,7 @@ class TelegramNotificationService
         $pickup = Carbon::parse($taxi->pickup_date)->format('d M Y') . " at " . $taxi->pickup_time;
         $stops = $taxi->selected_locations ? $taxi->selected_locations->pluck('name')->implode(', ') : 'Custom Excursion';
 
-        $html = "🚕 <b>CAB & EXCURSION REQUEST — VILLAGE CONCIERGE</b>\n\n"
+        $html = "🚕 <b>CAB & EXCURSION REQUEST — COUNTRY SIDE CONCIERGE</b>\n\n"
             . "• <b>Ref:</b> <code>#{$taxi->booking_reference}</code>\n"
             . "• <b>Guest:</b> " . htmlspecialchars($guestName, ENT_QUOTES) . " (<b>{$villa}</b>)\n"
             . "• <b>Pickup:</b> {$pickup}\n"
@@ -240,7 +240,7 @@ class TelegramNotificationService
         $total = number_format($order->total_amount, 2);
         $itemCount = $order->items ? $order->items->sum('quantity') : 1;
 
-        $html = "📦 <b>NEW SPICE ORDER — VILLAGE SPICES STORE</b>\n\n"
+        $html = "📦 <b>NEW SPICE ORDER — COUNTRY SIDE SPICES STORE</b>\n\n"
             . "• <b>Order Ref:</b> <code>#{$order->order_number}</code>\n"
             . "• <b>Customer:</b> " . htmlspecialchars($order->customer_name, ENT_QUOTES) . "\n"
             . "• <b>Delivery Mode:</b> {$mode} (" . htmlspecialchars($location, ENT_QUOTES) . ")\n"
@@ -265,7 +265,7 @@ class TelegramNotificationService
         $cashback = number_format($order->refund_amount ?? 0, 2);
         $reason = mb_strimwidth($order->cancellation_reason ?? 'Customer requested cancellation/return', 0, 100, '...');
 
-        $html = "🔄 <b>SPICE RETURN REQUEST — VILLAGE SPICES</b>\n\n"
+        $html = "🔄 <b>SPICE RETURN REQUEST — COUNTRY SIDE SPICES</b>\n\n"
             . "• <b>Order Ref:</b> <code>#{$order->order_number}</code>\n"
             . "• <b>Customer:</b> " . htmlspecialchars($order->customer_name, ENT_QUOTES) . "\n"
             . "• <b>Eligible Cashback:</b> ₹{$cashback}\n"
@@ -287,7 +287,7 @@ class TelegramNotificationService
     public function sendTestMessage(string $botToken, string $chatId): array
     {
         $time = Carbon::now()->format('d M Y, h:i:s A');
-        $html = "👋 <b>Namaste from Village Cottages & Resorts!</b>\n\n"
+        $html = "👋 <b>Namaste from Country Side Cottages & Resorts!</b>\n\n"
             . "This test ping confirms that your <b>Telegram Notification Bot</b> is active and successfully linked to this chat.\n\n"
             . "• <b>Chat ID:</b> <code>{$chatId}</code>\n"
             . "• <b>Timestamp:</b> {$time}\n\n"

@@ -173,7 +173,7 @@ class AdminController extends Controller
         $spiceReturnOrders = SpiceOrder::with(['items', 'returnRule'])->where('refund_status', '!=', 'none')->orderByDesc('updated_at')->get();
         $spiceReturnPolicyDescription = Setting::get(
             'spice_return_policy_description',
-            'All Village Spices are harvested and vacuum-ground on-demand after receiving your order to guarantee plantation freshness. You can cancel your order with a 100% full refund at any time before dispatch. Unopened, factory-sealed spice packs can be returned within 7 days of delivery under our 90% freshness guarantee.'
+            'All Country Side Spices are harvested and vacuum-ground on-demand after receiving your order to guarantee plantation freshness. You can cancel your order with a 100% full refund at any time before dispatch. Unopened, factory-sealed spice packs can be returned within 7 days of delivery under our 90% freshness guarantee.'
         );
         $globalSpiceReturnsEnabled = (bool) Setting::get('spice_returns_enabled', true);
         $inventoryLogs = SpiceInventoryLog::with(['product', 'user'])->latest('created_at')->take(15)->get();
@@ -232,7 +232,7 @@ class AdminController extends Controller
         $homepageContent = $this->getHomepageContent();
 
         $cancellationRules = CancellationRule::with('branch')->orderBy('sort_order')->orderByDesc('hours_before_checkin')->get();
-        $cancellationPolicy = Setting::get('cancellation_policy_description', 'At Village Cottages, cancellations made 72+ hours prior receive 100% cashback. 48-72h prior receive 75%, and 24-48h prior receive 50%. Instant automated payback.');
+        $cancellationPolicy = Setting::get('cancellation_policy_description', 'At Country Side Cottages, cancellations made 72+ hours prior receive 100% cashback. 48-72h prior receive 75%, and 24-48h prior receive 50%. Instant automated payback.');
         $stayExtensionRequests = StayExtensionRequest::with(['reservation.room', 'reservation.roomType', 'reservation.branch', 'guest', 'user', 'reviewer'])
             ->latest()
             ->take(30)
@@ -564,7 +564,7 @@ class AdminController extends Controller
             'hero_eyebrow' => $branchCount . ' Kerala Retreat Destinations · One Experience',
             'hero_heading_1' => 'Come away to',
             'hero_heading_2' => 'somewhere better.',
-            'hero_description' => 'Stay slow. Eat well. Explore more. Village Cottages brings private wooden cottages, authentic plantation dining, and estate-harvested spices into one considered Kerala journey.',
+            'hero_description' => 'Stay slow. Eat well. Explore more. Country Side Cottages brings private wooden cottages, authentic plantation dining, and estate-harvested spices across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali into one considered Kerala journey.',
             'hero_image_main' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=85',
             'hero_image_secondary' => 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=700&q=85',
             'hero_card_title' => 'Authentic Kerala Living',
@@ -580,7 +580,7 @@ class AdminController extends Controller
             'stay_image' => 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=85',
             'stay_image_title' => 'Rooms for slower stays.',
             'stay_image_subtitle' => 'Room details, amenities and availability.',
-            'experience_eyebrow' => 'The Village experience',
+            'experience_eyebrow' => 'The Country Side experience',
             'experience_heading_1' => 'More than a room.',
             'experience_heading_2' => 'A complete stay.',
             'experience_image_main' => 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1000&q=85',
@@ -598,14 +598,14 @@ class AdminController extends Controller
             'experience_card_4_title' => 'Family moments',
             'experience_card_4_desc' => 'Easy days, shared time and comfortable spaces.',
             'experience_card_5_title' => 'Events & celebrations',
-            'experience_card_5_desc' => 'Gatherings, celebrations and special occasions at Village Cottages.',
+            'experience_card_5_desc' => 'Gatherings, celebrations and special occasions at Country Side Cottages.',
             'experience_card_6_title' => 'Dining experiences',
             'experience_card_6_desc' => 'Restaurant, menu browsing and direct food ordering.',
             'experience_card_7_title' => 'Concierge & enquiry',
             'experience_card_7_desc' => 'Ask questions directly while planning or during your stay.',
             'experience_card_8_title' => 'Around your branch',
             'experience_card_8_desc' => 'Discover places nearby, with branch-specific suggestions.',
-            'gallery_eyebrow' => 'See Village Cottages',
+            'gallery_eyebrow' => 'See Country Side Cottages',
             'gallery_heading' => 'A stay you can picture.',
             'gallery_images' => [
                 [
@@ -627,9 +627,9 @@ class AdminController extends Controller
             'dining_image' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=800&q=85',
             'dining_title' => 'Local table',
             'dining_description' => 'Seasonal dishes, branch menus and direct food ordering.',
-            'spices_eyebrow' => 'Village Spices',
+            'spices_eyebrow' => 'Country Side Spices',
             'spices_heading_1' => 'Take a little',
-            'spices_heading_2' => 'Village home.',
+            'spices_heading_2' => 'Country Side home.',
             'spices_pinned_product_1_id' => 1,
             'spices_pinned_product_2_id' => 2,
             'locations_eyebrow' => 'Kerala Sanctuaries',
@@ -651,26 +651,26 @@ class AdminController extends Controller
             'review_quote' => '“Everything felt easy — from the room to dinner to knowing what was nearby.”',
             'review_author' => 'Ananya & Ravi',
             'review_subtitle' => 'Garden Residence · completed stay',
-            'cta_eyebrow' => 'Your next Village moment',
+            'cta_eyebrow' => 'Your next Country Side moment',
             'cta_heading_1' => 'Stay for the place.',
             'cta_heading_2' => 'Remember the feeling.',
-            'cta_description' => 'Choose a branch, check your dates, discover what is around you and talk directly to Village Cottages whenever you need.',
-            'footer_brand_title' => 'Village Cottages',
+            'cta_description' => 'Choose a branch, check your dates, discover what is around you and talk directly to Country Side Cottages whenever you need.',
+            'footer_brand_title' => 'Country Side Cottages',
             'footer_brand_tagline' => 'Luxury Cottages of Kerala',
             'footer_brand_desc' => 'Immersive, slow-living cottages nestled in the spice hills, misty valleys, and tranquil backwaters of Kerala.',
             'footer_badge' => 'Eco-Conscious Botanical Cottages',
             'footer_dest_title' => 'Destinations',
             'footer_exp_title' => 'Experiences',
             'footer_exp_link_1' => 'Plantation Kitchen & Dining',
-            'footer_exp_link_2' => 'Village Spices Farm Shop',
+            'footer_exp_link_2' => 'Country Side Spices Farm Shop',
             'footer_exp_link_3' => 'Cottages Visual Gallery',
             'footer_exp_link_4' => 'Guided Nature Discoveries',
             'footer_concierge_title' => 'Direct Concierge',
             'footer_concierge_desc' => 'Front desk assistance 24/7 for bespoke retreat arrangements.',
             'footer_phone' => '+91 484 290 0000',
-            'footer_email' => 'concierge@villagecottages.com',
+            'footer_email' => 'concierge@countrysidecottages.com',
             'footer_chat_btn' => 'Chat with Concierge',
-            'footer_copyright' => 'Village Cottages Hospitality Ltd. All rights reserved.',
+            'footer_copyright' => 'Country Side Cottages Hospitality Ltd. All rights reserved.',
             'footer_support_link' => 'Help & Support',
             'footer_policy_note' => '🌿 Strictly No Swimming Pool Policy'
         ];

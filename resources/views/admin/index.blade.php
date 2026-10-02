@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Village Cottages — Administration & Operations</title>
+    <title>Country Side Cottages — Administration & Operations</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Google Fonts -->
@@ -86,10 +86,10 @@
         <div class="h-16 px-5 flex items-center justify-between border-b border-brand-primary/40 bg-brand-deep/95 shrink-0">
             <a href="/admin" class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-brand-accent flex items-center justify-center text-brand-deep font-extrabold text-base shadow-sm">
-                    V
+                    C
                 </div>
                 <div>
-                    <h1 class="font-bold text-sm tracking-wide text-white">Village Cottages</h1>
+                    <h1 class="font-bold text-sm tracking-wide text-white">Country Side Cottages</h1>
                     <p class="text-[10px] text-brand-accent uppercase tracking-widest font-semibold">Admin Panel</p>
                 </div>
             </a>
@@ -138,7 +138,7 @@
                     @endif
                 </a>
                 <a href="#spices" data-section="spices" onclick="navigateTo('spices')" class="nav-item flex items-center justify-between px-3 py-2 rounded-r-md text-white/70 cursor-pointer">
-                    <div class="flex items-center gap-3"><i data-lucide="leaf" class="w-4 h-4"></i> Village Spices Store</div>
+                    <div class="flex items-center gap-3"><i data-lucide="leaf" class="w-4 h-4"></i> Country Side Spices Store</div>
                     @if($lowStockProducts > 0)
                         <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white font-bold">{{ $lowStockProducts }} Low</span>
                     @endif
@@ -1169,7 +1169,7 @@
             }
         }
 
-        // ================= VILLAGE SPICES TABS & RETURN POLICY =================
+        // ================= COUNTRY SIDE SPICES TABS & RETURN POLICY =================
         function switchSpiceTab(tab) {
             const tabs = ['orders', 'products', 'policy', 'inventory'];
             tabs.forEach(t => {
@@ -2859,7 +2859,7 @@
                                 <i data-lucide="lock" class="w-6 h-6"></i>
                             </div>
                             <h4 class="font-bold text-brand-text text-sm">Conversation Locked by ${enq.locked_by}</h4>
-                            <p class="text-xs text-brand-muted max-w-sm">Under Village Cottages direct messaging protocols, only the committed staff member can read or respond to this conversation until they release the lock.</p>
+                            <p class="text-xs text-brand-muted max-w-sm">Under Country Side Cottages direct messaging protocols, only the committed staff member can read or respond to this conversation until they release the lock.</p>
                         </div>
                     `;
                 } else {
@@ -4793,7 +4793,7 @@
                     <!-- Top Left Pill Tag -->
                     <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-xs rounded-full px-3.5 py-1.5 text-[10px] font-bold uppercase text-[#063F34] border border-white/60 shadow-2xs flex items-center gap-1.5">
                         <i data-lucide="map-pin" class="w-3 h-3 text-[#0B5D4B]"></i>
-                        <span>${escapeAdminHtml(s.tag || 'Village Cottages')}</span>
+                        <span>${escapeAdminHtml(s.tag || 'Country Side Cottages')}</span>
                     </div>
 
                     <!-- Top Right Counter & Edit Button -->
@@ -4966,7 +4966,7 @@
                         <div class="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 flex items-center gap-2">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold uppercase tracking-wider border border-white/20">
                                 <i data-lucide="map-pin" class="w-3 h-3 text-brand-accent"></i>
-                                <span>${escapeAdminHtml(s.tag || s.subtitle || 'Village Cottages')}</span>
+                                <span>${escapeAdminHtml(s.tag || s.subtitle || 'Country Side Cottages')}</span>
                             </span>
                             ${s.badge ? `<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-brand-accent/25 backdrop-blur-md text-brand-accent text-[10px] font-bold border border-brand-accent/30">${escapeAdminHtml(s.badge)}</span>` : ''}
                         </div>

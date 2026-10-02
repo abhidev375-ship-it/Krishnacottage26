@@ -5,33 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#F4F1E8">
-    <title>@yield('title', 'Village Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu, Munnar, Kerala')</title>
+    <title>@yield('title', 'Country Side Cottages — Luxury Cottages & Homestay in Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola & Adimali, Kerala')</title>
 
     <!-- PRIMARY HIGH-RANKING SEO METADATA -->
-    <meta name="description" content="@yield('meta_description', 'Discover Village Cottages in Rajakkad, Idukki. Book luxury wooden cottages, nature homestays &amp; private hillside villas across Rajakkadu, Rajakumari, Adimali &amp; Munnar, Kerala with organic dining &amp; plantation views.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'village cottage idukki, village cottages rajakkad, village resort idukki, village homestay idukki, idukki cottages, idukki resorts, resorts in idukki, rajakkadu, resort in rajakkadu, home stay in idukki, home stay in rajakkadu, home stay in rajakumari, resort in rajakumari, resort in adimali, cottage in adimali, home stay in adimali, idukki, kerala, best resort in idukki, best cottage in idukki, best cottage in munnar, munnar resorts, munnar homestay, cottages in rajakkad idukki, kuthumkal waterfalls resort, mailadumpara cottages idukki, ponmudi lake resort rajakkad, adivaram idukki homestay, wooden cottages in idukki, plantation homestay in rajakkadu, budget homestay in rajakumari, family resort in adimali idukki, honeymoon cottage in munnar idukki, kerala eco cottage idukki, ayurvedic resort in idukki')">
+    <meta name="description" content="@yield('meta_description', 'Discover Country Side Cottages across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali. Book luxury wooden cottages, nature homestays &amp; private hillside villas in Kerala with organic dining &amp; cardamom plantation views.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'krishna cottage, krishna cottages, krishna cottage idukki, krishna cottages rajakkad, krishna cottage munnar, country side cottages, country side cottages idukki, country side cottages munnar, country side cottages rajakkadu, country side cottages rajakumari, country side cottages udumbanchola, country side cottages adimali, idukki cottages, idukki resorts, resorts in idukki, rajakkadu, resort in rajakkadu, resort in rajakkad, home stay in idukki, home stay in rajakkadu, home stay in rajakumari, resort in rajakumari, resort in udumbanchola, cottage in udumbanchola, home stay in udumbanchola, resort in adimali, cottage in adimali, home stay in adimali, idukki, kerala, best resort in idukki, best cottage in idukki, best cottage in munnar, munnar resorts, munnar homestay, cottages in rajakkad idukki, kuthumkal waterfalls resort, mailadumpara cottages idukki, ponmudi lake resort rajakkad, adivaram idukki homestay, wooden cottages in idukki, plantation homestay in rajakkadu, budget homestay in rajakumari, family resort in adimali idukki, honeymoon cottage in munnar idukki, kerala eco cottage idukki, ayurvedic resort in idukki')">
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="{{ url()->current() }}" />
 
-    <!-- GEO-LOCALIZATION TAGS (Rajakkad, Idukki, Kerala) -->
+    <!-- GEO-LOCALIZATION TAGS (Idukki District, Kerala) -->
     <meta name="geo.region" content="IN-KL" />
-    <meta name="geo.placename" content="Rajakkad, Idukki District, Kerala, India" />
+    <meta name="geo.placename" content="Idukki, Munnar, Rajakkad, Kerala, India" />
     <meta name="geo.position" content="9.9784;77.0673" />
     <meta name="ICBM" content="9.9784, 77.0673" />
 
     <!-- OPEN GRAPH / FACEBOOK SOCIAL SHARING -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Village Cottages" />
+    <meta property="og:site_name" content="Country Side Cottages" />
     <meta property="og:url" content="{{ url()->current() }}" />
-    <meta property="og:title" content="@yield('og_title', 'Village Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar')" />
-    <meta property="og:description" content="@yield('og_description', 'Authentic wooden cottages and peaceful hillside homestays in Rajakkad, Idukki, Kerala.')" />
+    <meta property="og:title" content="@yield('og_title', 'Country Side Cottages — Luxury Cottages & Homestay in Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola & Adimali')" />
+    <meta property="og:description" content="@yield('og_description', 'Authentic wooden cottages and peaceful hillside homestays across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali, Kerala.')" />
     <meta property="og:image" content="@yield('og_image', 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=85')" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- TWITTER CARDS -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="@yield('twitter_title', 'Village Cottages — Best Luxury Cottages & Homestay in Idukki, Rajakkadu & Munnar')" />
-    <meta name="twitter:description" content="@yield('twitter_description', 'Experience peaceful wooden cottages and estate living in Rajakkadu, Rajakumari, Adimali & Munnar, Idukki, Kerala.')" />
+    <meta name="twitter:title" content="@yield('twitter_title', 'Country Side Cottages — Luxury Cottages & Homestay in Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola & Adimali')" />
+    <meta name="twitter:description" content="@yield('twitter_description', 'Experience peaceful wooden cottages and estate living in Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola & Adimali, Kerala.')" />
+
+    <!-- STRUCTURED DATA / JSON-LD RICH SNIPPET -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "Resort",
+        "name": "Country Side Cottages",
+        "alternateName": ["Krishna Cottage", "Krishna Cottages", "Country Side Cottages Kerala", "Village Cottages"],
+        "url": "{{ url('/') }}",
+        "logo": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=400&q=80",
+        "description": "Luxury wooden cottages, nature homestays and private hillside villas across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali, Kerala.",
+        "telephone": "+91 94471 22334",
+        "email": "concierge@countrysidecottages.com",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Tea Garden Estate",
+            "addressLocality": "Rajakkad",
+            "addressRegion": "Idukki, Kerala",
+            "postalCode": "685566",
+            "addressCountry": "IN"
+        },
+        "areaServed": [
+            { "@type": "AdministrativeArea", "name": "Idukki" },
+            { "@type": "City", "name": "Munnar" },
+            { "@type": "City", "name": "Rajakkadu" },
+            { "@type": "City", "name": "Rajakumari" },
+            { "@type": "City", "name": "Udumbanchola" },
+            { "@type": "City", "name": "Adimali" }
+        ],
+        "priceRange": "₹₹₹"
+    }
+    </script>
 
     <!-- SPEED OPTIMIZATION & RESOURCE HINTS (Sub-3-Second Load Guarantee) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -168,9 +200,9 @@
         <div class="drawer-panel ml-auto flex h-full w-full max-w-[440px] flex-col rounded-[28px] bg-paper p-4 text-forest shadow-[0_30px_100px_rgba(0,0,0,.22)] md:p-5">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
-                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-forest text-sm font-bold text-paper">V</span>
+                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-forest text-sm font-bold text-paper">C</span>
                     <div>
-                        <p class="text-sm font-semibold">Village Cottages</p>
+                        <p class="text-sm font-semibold">Country Side Cottages</p>
                         <p class="mt-0.5 text-[9px] uppercase tracking-[.18em] text-forest/40">Luxury Cottages of Kerala</p>
                     </div>
                 </div>
@@ -198,7 +230,7 @@
                         <i data-lucide="arrow-right" class="w-4 h-4 {{ request()->routeIs('dining.*') ? 'text-emerald' : 'text-forest/30' }}"></i>
                     </a>
                     <a class="drawer-link rounded-2xl px-3 py-3 text-xl serif hover:bg-white flex items-center justify-between transition {{ request()->routeIs('spices.*') ? 'bg-mint text-emerald font-bold border-l-4 border-emerald' : 'text-forest' }}" href="{{ route('spices.index') }}">
-                        <span class="flex items-center"><span class="mr-3 text-[11px] font-sans {{ request()->routeIs('spices.*') ? 'text-emerald font-bold' : 'text-forest/40' }}">04</span>Village Spices</span>
+                        <span class="flex items-center"><span class="mr-3 text-[11px] font-sans {{ request()->routeIs('spices.*') ? 'text-emerald font-bold' : 'text-forest/40' }}">04</span>Country Side Spices</span>
                         <i data-lucide="arrow-right" class="w-4 h-4 {{ request()->routeIs('spices.*') ? 'text-emerald' : 'text-forest/30' }}"></i>
                     </a>
                     <a class="drawer-link rounded-2xl px-3 py-3 text-xl serif hover:bg-white flex items-center justify-between transition {{ request()->routeIs('facilities.*') ? 'bg-mint text-emerald font-bold border-l-4 border-emerald' : 'text-forest' }}" href="{{ route('facilities.index') }}">
@@ -466,8 +498,8 @@
         let selectedTargetRoom = null;
         let branchDiningItems = [];
         let guestContact = {
-            name: localStorage.getItem('village_guest_name') || localStorage.getItem('krishna_guest_name') || '',
-            phone: localStorage.getItem('village_guest_phone') || localStorage.getItem('krishna_guest_phone') || ''
+            name: localStorage.getItem('countryside_guest_name') || localStorage.getItem('village_guest_name') || localStorage.getItem('krishna_guest_name') || '',
+            phone: localStorage.getItem('countryside_guest_phone') || localStorage.getItem('village_guest_phone') || localStorage.getItem('krishna_guest_phone') || ''
         };
 
         const conciergeModal = document.getElementById('conciergeModal');
@@ -830,7 +862,7 @@
             msgDiv.innerHTML = `
                 ${!isCustomer ? `
                 <div class="flex items-center gap-1.5 mb-1 px-1">
-                    <span class="text-[10px] font-bold text-forest">Village Concierge</span>
+                    <span class="text-[10px] font-bold text-forest">Country Side Concierge</span>
                     <span class="text-[9px] text-forest/40">&middot; ${timeStr}</span>
                 </div>` : ''}
                 <div class="max-w-[85%] sm:max-w-[78%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed ${isCustomer ? 'bg-forest text-paper rounded-br-xs shadow-card' : 'bg-white text-forest soft-border rounded-bl-xs shadow-xs'}">
@@ -939,10 +971,12 @@
             const phone = document.getElementById('guestInputPhone').value.trim();
             if (name) {
                 guestContact.name = name;
+                localStorage.setItem('countryside_guest_name', name);
                 localStorage.setItem('village_guest_name', name);
             }
             if (phone) {
                 guestContact.phone = phone;
+                localStorage.setItem('countryside_guest_phone', phone);
                 localStorage.setItem('village_guest_phone', phone);
             }
             const label = document.getElementById('guestDisplayLabel');

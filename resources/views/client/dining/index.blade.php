@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Heritage Dining & Kitchen | Village Cottages')
+@section('title', 'Heritage Dining & Kitchen | Country Side Cottages')
 
 @section('content')
 <!-- HERO SECTION -->
@@ -273,9 +273,10 @@
 
 @push('scripts')
 <script>
-    let diningCart = JSON.parse(localStorage.getItem('village_dining_cart') || localStorage.getItem('krishna_dining_cart')) || [];
+    let diningCart = JSON.parse(localStorage.getItem('countryside_dining_cart') || localStorage.getItem('village_dining_cart') || localStorage.getItem('krishna_dining_cart')) || [];
 
     function saveCart() {
+        localStorage.setItem('countryside_dining_cart', JSON.stringify(diningCart));
         localStorage.setItem('village_dining_cart', JSON.stringify(diningCart));
         updateCartUI();
     }

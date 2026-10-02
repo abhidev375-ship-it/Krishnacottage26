@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Authentic Facilities & Experiences | Village Cottages')
+@section('title', 'Authentic Facilities & Experiences | Country Side Cottages')
 
 @section('content')
 <!-- HERO SECTION -->
@@ -9,7 +9,7 @@
         <span class="eyebrow text-brass block mb-2">Authentic Kerala Living</span>
         <h1 class="serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">Facilities & In-House Experiences</h1>
         <p class="text-xs sm:text-sm text-paper/70 max-w-2xl mx-auto mt-3 leading-relaxed">
-            Slow, mindful spaces crafted for nature communion, botanical healing, and serene plantation life across Village Cottages destinations.
+            Slow, mindful spaces crafted for nature communion, botanical healing, and serene plantation life across Country Side Cottages destinations in Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali.
         </p>
 
         <!-- AUTHENTIC LIVING PROMISE (strictly no pool) -->

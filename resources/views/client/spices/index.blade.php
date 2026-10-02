@@ -1,13 +1,13 @@
 @extends('layouts.customer')
 
-@section('title', 'Village Spices | Single-Origin Plantation Harvest')
+@section('title', 'Country Side Spices | Single-Origin Plantation Harvest')
 
 @section('content')
 <!-- HERO SECTION -->
 <div class="bg-forest text-paper py-6 sm:py-10 md:py-12 px-4 sm:px-6 relative overflow-hidden">
     <div class="mx-auto max-w-[1480px] text-center relative z-10">
         <span class="eyebrow text-brass block mb-2">High-Altitude Single-Estate Spices</span>
-        <h1 class="serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">Village Spices Shop</h1>
+        <h1 class="serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">Country Side Spices Shop</h1>
         <p class="text-xs sm:text-sm text-paper/70 max-w-2xl mx-auto mt-3 leading-relaxed">
             Sun-dried, unadulterated cardamom, black peppercorns, cloves, and wild cinnamon harvested directly from our shade-grown plantation reserves.
         </p>
@@ -242,7 +242,7 @@
                 <span class="eyebrow text-emerald font-bold uppercase tracking-wider text-[10px]">Zero Stale Stock &middot; Single-Estate Ethics</span>
                 <h2 class="serif text-2xl sm:text-3xl font-bold text-forest">Fresh Pack-on-Order &amp; Return Policy</h2>
                 <p class="text-xs sm:text-sm text-forest/70 max-w-3xl leading-relaxed mt-1">
-                    {{ $policyDescription ?? 'All Village Spices are harvested and vacuum-ground on-demand after receiving your order to guarantee plantation freshness. You can cancel your order with a 100% full refund at any time before dispatch.' }}
+                    {{ $policyDescription ?? 'All Country Side Spices are harvested and vacuum-ground on-demand after receiving your order to guarantee plantation freshness. You can cancel your order with a 100% full refund at any time before dispatch.' }}
                 </p>
             </div>
             <div class="shrink-0 flex items-center gap-2">
@@ -335,7 +335,7 @@
                 <span class="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-brass"><i data-lucide="shopping-bag" class="w-4 h-4"></i></span>
                 <div>
                     <h3 class="serif text-lg font-bold">Your Spice Basket</h3>
-                    <p class="text-[9px] uppercase tracking-widest text-paper/60">Village Farm Harvest</p>
+                    <p class="text-[9px] uppercase tracking-widest text-paper/60">Country Side Farm Harvest</p>
                 </div>
             </div>
             <button onclick="closeSpiceCart()" class="text-paper/70 hover:text-paper p-1.5 rounded-lg hover:bg-white/10 transition">
@@ -385,9 +385,10 @@
 <script>
     // Cart storage schema:
     // [{ id, name, type: 'packet'|'loose', price, qty, weight_kg, size, tax_rate }]
-    let spiceCart = JSON.parse(localStorage.getItem('village_spices_cart') || localStorage.getItem('krishna_spices_cart')) || [];
+    let spiceCart = JSON.parse(localStorage.getItem('countryside_spices_cart') || localStorage.getItem('village_spices_cart') || localStorage.getItem('krishna_spices_cart')) || [];
 
     function saveSpiceCart() {
+        localStorage.setItem('countryside_spices_cart', JSON.stringify(spiceCart));
         localStorage.setItem('village_spices_cart', JSON.stringify(spiceCart));
         updateSpiceCartUI();
     }

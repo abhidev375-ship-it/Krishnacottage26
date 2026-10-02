@@ -189,7 +189,7 @@
                 </label>
                 <label class="flex items-center justify-between p-3 rounded-lg border border-gray-200 bg-white hover:border-brand-primary/40 cursor-pointer transition">
                     <div>
-                        <span class="font-bold text-brand-text block">Village Spices E-Commerce Spotlight</span>
+                        <span class="font-bold text-brand-text block">Country Side Spices E-Commerce Spotlight</span>
                         <span class="text-[11px] text-brand-muted">Cardamom, pepper, cinnamon showcase & buy online</span>
                     </div>
                     <input type="checkbox" onchange="toggleHomepageModule('spices', this.checked)" {{ ($homepageModules['spices'] ?? true) ? 'checked' : '' }} class="rounded text-brand-primary w-4 h-4 cursor-pointer">
@@ -217,7 +217,7 @@
                 </div>
                 <div class="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200 space-y-1">
                     <span class="font-bold text-emerald-900 block">Editorial Guideline</span>
-                    <p class="text-emerald-800 text-[11px]">Village Cottages features eco-conscious experiences and wildlife encounters near national reserves and tea estates. Real-time availability is synchronized across all public engines.</p>
+                    <p class="text-emerald-800 text-[11px]">Country Side Cottages features eco-conscious experiences and wildlife encounters near national reserves and tea estates across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali. Real-time availability is synchronized across all public engines.</p>
                 </div>
             </div>
         </div>

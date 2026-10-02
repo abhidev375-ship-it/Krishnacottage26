@@ -4,8 +4,8 @@
         <div class=w-12 h-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mx-auto>
             <i data-lucide=shopping-bag class=w-6 h-6></i>
         </div>
-        <h3 class=text-base font-bold text-brand-text>Village Spices Orders & Dispatch</h3>
-        <p class=text-xs text-brand-muted max-w-md mx-auto>Order fulfillment, dispatch, and courier tracking have been consolidated into the unified <strong>Village Spices Hub</strong>.</p>
+        <h3 class=text-base font-bold text-brand-text>Country Side Spices Orders & Dispatch</h3>
+        <p class=text-xs text-brand-muted max-w-md mx-auto>Order fulfillment, dispatch, and courier tracking have been consolidated into the unified <strong>Country Side Spices Hub</strong>.</p>
         <button onclick=navigateTo('spices'); switchSpiceTab('orders'); class=px-4 py-2 bg-brand-primary hover:bg-brand-deep text-white text-xs font-bold rounded-xl shadow-xs transition inline-flex items-center gap-1.5 touch-tap>
             <span>Open Orders & Dispatch Hub</span>
             <i data-lucide=arrow-right class=w-4 h-4></i>

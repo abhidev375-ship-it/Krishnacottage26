@@ -89,7 +89,7 @@ class RazorpayService
             'currency' => 'INR',
             'receipt' => substr($receiptId, 0, 40),
             'notes' => array_merge([
-                'merchant' => 'Village Cottages',
+                'merchant' => 'Country Side Cottages',
                 'created_at' => date('Y-m-d H:i:s'),
             ], $notes),
         ];

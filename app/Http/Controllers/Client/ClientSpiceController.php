@@ -54,7 +54,7 @@ class ClientSpiceController extends Controller
         $returnRules = SpiceReturnRule::active()->orderBy('sort_order')->get();
         $policyDescription = Setting::get(
             'spice_return_policy_description',
-            'All Village Spices are harvested and vacuum-ground on-demand after receiving your order to guarantee plantation freshness. You can cancel your order with a 100% full refund at any time before dispatch. Unopened, factory-sealed spice packs can be returned within 7 days of delivery under our 90% freshness guarantee.'
+            'All Country Side Spices are harvested and vacuum-ground on-demand after receiving your order to guarantee plantation freshness. You can cancel your order with a 100% full refund at any time before dispatch. Unopened, factory-sealed spice packs can be returned within 7 days of delivery under our 90% freshness guarantee.'
         );
 
         $globalReturnsEnabled = (bool) Setting::get('spice_returns_enabled', true);
@@ -166,7 +166,7 @@ class ClientSpiceController extends Controller
                 'amount' => $order['amount'],
                 'amount_rupees' => $total,
                 'currency' => $order['currency'],
-                'name' => 'Village Spices',
+                'name' => 'Country Side Spices',
                 'description' => 'Single-Estate Spices Direct from Plantation',
                 'prefill' => [
                     'name' => $validated['customer_name'],
@@ -313,7 +313,7 @@ class ClientSpiceController extends Controller
             'customer_phone' => $validated['customer_phone'],
             'delivery_mode' => $deliveryMode,
             'room_number' => $validated['room_number'] ?? null,
-            'shipping_address_line1' => $isVilla ? ('Village Cottages / ' . ($validated['room_number'] ?? 'In-House Villa')) : $validated['shipping_address_line1'],
+            'shipping_address_line1' => $isVilla ? ('Country Side Cottages / ' . ($validated['room_number'] ?? 'In-House Villa')) : $validated['shipping_address_line1'],
             'shipping_address_line2' => $isVilla ? 'Resort Hand Delivery' : ($validated['shipping_address_line2'] ?? null),
             'shipping_city' => $isVilla ? 'Resort Estate' : $validated['shipping_city'],
             'shipping_state' => $isVilla ? 'Kerala' : $validated['shipping_state'],

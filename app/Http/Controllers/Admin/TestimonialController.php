@@ -246,7 +246,7 @@ class TestimonialController extends Controller
             }
 
             $guestName = $foodReview->order->guest->full_name ?? $foodReview->guest_name ?? 'Delighted Food Lover';
-            $stayTitle = ($foodReview->menuItem->name ?? 'Dining Experience') . ' · ' . ($foodReview->branch->name ?? 'Village Dining');
+            $stayTitle = ($foodReview->menuItem->name ?? 'Dining Experience') . ' · ' . ($foodReview->branch->name ?? 'Country Side Dining');
             $quote = $foodReview->comment ?? 'Exceptional flavors and warm hospitality.';
             $rating = $foodReview->rating ?? 5;
             $branchId = $foodReview->branch_id;
@@ -258,7 +258,7 @@ class TestimonialController extends Controller
             }
 
             $guestName = $review->guest->full_name ?? $review->guest_name ?? 'Delighted Guest';
-            $stayTitle = $review->title ?: (($review->roomType->name ?? 'Resort Stay') . ' · ' . ($review->branch->name ?? 'Village Cottages'));
+            $stayTitle = $review->title ?: (($review->roomType->name ?? 'Resort Stay') . ' · ' . ($review->branch->name ?? 'Country Side Cottages'));
             $quote = $review->comment;
             $rating = $review->rating ?? 5;
             $branchId = $review->branch_id;

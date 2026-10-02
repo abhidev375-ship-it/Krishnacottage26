@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Staff & Administration Login — Village Cottages</title>
+  <title>Staff & Administration Login — Country Side Cottages</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -22,7 +22,7 @@
         <i data-lucide="shield-check" class="w-7 h-7 text-[#C7A76A]"></i>
       </div>
       <h1 class="text-2xl font-bold tracking-tight text-white">Management Console</h1>
-      <p class="text-xs text-white/50">Village Cottages Operations & Central Admin</p>
+      <p class="text-xs text-white/50">Country Side Cottages Operations & Central Admin</p>
     </div>
 
     <!-- Login Card -->
@@ -63,10 +63,10 @@
             <input 
               type="email" 
               name="email" 
-              value="{{ old('email', 'admin@villagecottages.com') }}" 
+              value="{{ old('email', 'admin@countrysidecottages.com') }}" 
               required 
               autofocus 
-              placeholder="admin@villagecottages.com" 
+              placeholder="admin@countrysidecottages.com" 
               class="w-full bg-[#04251F]/70 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-xs font-semibold text-white placeholder:text-white/30 focus:outline-hidden focus:border-[#C7A76A] transition"
             />
           </div>

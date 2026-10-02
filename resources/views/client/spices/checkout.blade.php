@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Checkout | Village Spices')
+@section('title', 'Checkout | Country Side Spices')
 
 @section('content')
 <div class="mx-auto max-w-[1280px] px-4 sm:px-6 py-5 sm:py-8">
@@ -99,7 +99,7 @@
                 <div id="villa-room-input-container" class="p-4 rounded-2xl bg-mint/50 border border-emerald/15 flex items-center justify-between">
                     <div>
                         <span class="text-[10px] uppercase font-bold text-emerald tracking-wider block">Assigned Delivery Unit</span>
-                        <span class="font-bold text-forest text-sm">Villa {{ $activeStay->room ? $activeStay->room->room_number : 'In-House Suite' }} &middot; {{ $activeStay->branch ? $activeStay->branch->name : 'Village Cottages' }}</span>
+                        <span class="font-bold text-forest text-sm">Villa {{ $activeStay->room ? $activeStay->room->room_number : 'In-House Suite' }} &middot; {{ $activeStay->branch ? $activeStay->branch->name : 'Country Side Cottages' }}</span>
                     </div>
                     <input type="hidden" name="room_number" value="{{ $activeStay->room ? $activeStay->room->room_number : 'In-House Suite' }}">
                     <span class="text-[10px] bg-white px-2 py-1 rounded-md text-forest font-mono">Room Folio Ready</span>
@@ -399,7 +399,7 @@
     }
 
     function recalculateBill() {
-        const cart = JSON.parse(localStorage.getItem('village_spices_cart') || localStorage.getItem('krishna_spices_cart')) || [];
+        const cart = JSON.parse(localStorage.getItem('countryside_spices_cart') || localStorage.getItem('village_spices_cart') || localStorage.getItem('krishna_spices_cart')) || [];
         const container = document.getElementById('checkout-items-list');
         const jsonInput = document.getElementById('input-items-json');
         const submitBtn = document.getElementById('submit-spice-btn');
@@ -574,7 +574,7 @@
                     return;
                 }
 
-                const cart = JSON.parse(localStorage.getItem('village_spices_cart') || localStorage.getItem('krishna_spices_cart')) || [];
+                const cart = JSON.parse(localStorage.getItem('countryside_spices_cart') || localStorage.getItem('village_spices_cart') || localStorage.getItem('krishna_spices_cart')) || [];
                 if (cart.length === 0) {
                     e.preventDefault();
                     showError('Your shopping cart is empty. Please add spices before checking out.');
@@ -585,6 +585,7 @@
 
                 // Offline payment methods: COD or Charge to Room Folio
                 if (paymentMethod === 'cod' || paymentMethod === 'charge_to_room') {
+                    localStorage.removeItem('countryside_spices_cart');
                     localStorage.removeItem('village_spices_cart');
                     localStorage.removeItem('krishna_spices_cart');
                     return;
@@ -592,6 +593,7 @@
 
                 // If payment tokens already set, allow standard submission
                 if (document.getElementById('razorpay_payment_id').value) {
+                    localStorage.removeItem('countryside_spices_cart');
                     localStorage.removeItem('village_spices_cart');
                     localStorage.removeItem('krishna_spices_cart');
                     return;
@@ -642,7 +644,7 @@
                         key: data.key_id,
                         amount: data.amount,
                         currency: data.currency || 'INR',
-                        name: data.name || 'Village Spices',
+                        name: data.name || 'Country Side Spices',
                         description: data.description || 'Harvest Spice Order',
                         order_id: data.order_id,
                         prefill: prefillData,
@@ -651,6 +653,7 @@
                             document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
                             document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
                             document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                            localStorage.removeItem('countryside_spices_cart');
                             localStorage.removeItem('village_spices_cart');
                             localStorage.removeItem('krishna_spices_cart');
                             btnText.textContent = 'Finalizing Order...';

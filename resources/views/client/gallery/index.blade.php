@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Photo Gallery & Visual Journal | Village Cottages')
+@section('title', 'Photo Gallery & Visual Journal | Country Side Cottages')
 
 @section('content')
 <!-- HERO SECTION -->
@@ -228,7 +228,7 @@
             'name' => $a->name ?: 'Cottage Album',
             'branch' => $a->branch ? $a->branch->name : 'Cottages-Wide',
             'category' => ucfirst($a->category),
-            'description' => $a->description ?: 'Visual moments captured at Village Cottages.',
+            'description' => $a->description ?: 'Visual moments captured at Country Side Cottages.',
             'cover_url' => $a->cover_image_url ?: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
             'images' => $a->images->values()->map(function($img) {
                 return [

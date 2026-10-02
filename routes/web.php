@@ -84,7 +84,7 @@ Route::get('/facilities', [ClientPageController::class, 'facilities'])->name('fa
 Route::get('/dining', [ClientDiningController::class, 'index'])->name('dining.index');
 Route::post('/dining/order', [ClientDiningController::class, 'placeOrder'])->name('dining.order');
 
-// Village Spices Shop & Checkout
+// Country Side Spices Shop & Checkout
 Route::get('/spices', [ClientSpiceController::class, 'index'])->name('spices.index');
 Route::get('/spices/checkout', [ClientSpiceController::class, 'checkout'])->name('spices.checkout');
 Route::post('/spices/order', [ClientSpiceController::class, 'placeOrder'])->name('spices.order');
@@ -200,7 +200,7 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Admin Panel Routes (Village Cottages Management)
+| Admin Panel Routes (Country Side Cottages Management)
 |--------------------------------------------------------------------------
 */
 

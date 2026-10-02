@@ -8,7 +8,7 @@
             
             <!-- Central Monogram Crest -->
             <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-forest text-paper shadow-md flex items-center justify-center font-serif text-base sm:text-lg font-bold border border-brass/30">
-                <span>V</span>
+                <span>C</span>
             </div>
             
             <!-- Subtle Orbiting Ping Dot -->
@@ -17,7 +17,7 @@
 
         <!-- Micro Brand Label -->
         <div class="mt-3 text-center">
-            <span class="text-[9.5px] uppercase tracking-[0.28em] font-bold text-forest/85 block">Village</span>
+            <span class="text-[9.5px] uppercase tracking-[0.28em] font-bold text-forest/85 block">Country Side</span>
             <span class="text-[8px] uppercase tracking-[0.22em] font-semibold text-forest/60 block mt-0.5">Cottages</span>
         </div>
     </div>

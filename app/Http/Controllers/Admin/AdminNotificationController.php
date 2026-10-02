@@ -384,7 +384,7 @@ class AdminNotificationController extends Controller
              Setting::set('smtp_password', trim($validated['smtp_password']), 'system', 'SMTP Password');
          }
          Setting::set('smtp_from_address', trim($validated['smtp_from_address'] ?? ''), 'system', 'SMTP Outbound From Address');
-         Setting::set('smtp_from_name', trim($validated['smtp_from_name'] ?? 'Village Cottages'), 'system', 'SMTP Outbound Sender Name');
+         Setting::set('smtp_from_name', trim($validated['smtp_from_name'] ?? 'Country Side Cottages'), 'system', 'SMTP Outbound Sender Name');
          Setting::set('smtp_recipient_email', trim($validated['smtp_recipient_email'] ?? ''), 'system', 'Admin Recipient Email for Operational Alerts');
 
          return response()->json([

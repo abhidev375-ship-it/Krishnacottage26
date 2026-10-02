@@ -406,7 +406,7 @@ class InHouseGuestController extends Controller
                 $smsService = app(SmsNotificationService::class);
                 $smsService->dispatchSms(
                     $reservation->guest->phone,
-                    "Dear {$reservation->guest->first_name}, staff message from Village Cottages: \"{$validated['message']}\"",
+                    "Dear {$reservation->guest->first_name}, staff message from Country Side Cottages: \"{$validated['message']}\"",
                     $reservation->branch_id,
                     $enquiry->id,
                     'Guest'

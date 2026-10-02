@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Nearby Discoveries & Excursions | Village Cottages')
+@section('title', 'Nearby Discoveries & Excursions | Country Side Cottages')
 
 @section('content')
 <!-- HERO SECTION -->

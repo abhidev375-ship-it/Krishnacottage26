@@ -8,7 +8,7 @@
     $faqs = $contactContent['faqs'] ?? [];
 @endphp
 
-@section('title', 'Concierge & Contact | Village Cottages')
+@section('title', 'Concierge & Contact | Country Side Cottages')
 
 @section('content')
 <!-- HERO SECTION -->
@@ -176,7 +176,7 @@
                                 <option value="general" {{ old('topic') === 'general' ? 'selected' : '' }}>General Concierge & Assistance</option>
                                 <option value="booking_related" {{ old('topic') === 'booking_related' ? 'selected' : '' }}>Villa Booking & Retreat Reservations</option>
                                 <option value="dining" {{ old('topic') === 'dining' ? 'selected' : '' }}>Plantation Dining & Special Meals</option>
-                                <option value="spices" {{ old('topic') === 'spices' ? 'selected' : '' }}>Village Spices Farm Shop</option>
+                                <option value="spices" {{ old('topic') === 'spices' ? 'selected' : '' }}>Country Side Spices Farm Shop</option>
                                 <option value="events" {{ old('topic') === 'events' ? 'selected' : '' }}>Weddings, Retreats & Private Celebrations</option>
                             </select>
                         </div>
@@ -232,7 +232,7 @@
                     <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
                     Your details are securely held under strict privacy protocols.
                 </span>
-                <span class="hidden sm:inline text-forest/40">Village Cottages Hospitality</span>
+                <span class="hidden sm:inline text-forest/40">Country Side Cottages Hospitality</span>
             </div>
         </div>
 

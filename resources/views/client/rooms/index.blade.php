@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'Rooms & Cottages | Village Cottages')
+@section('title', 'Rooms & Cottages | Country Side Cottages')
 
 @section('content')
 <!-- AIRBNB-STYLE FLOATING SEARCH & FILTER BAR -->
@@ -195,7 +195,7 @@
         </div>
         <div class="hidden sm:flex items-center gap-2 text-xs font-semibold text-emerald bg-mint px-3 py-1.5 rounded-xl border border-emerald/20">
             <i data-lucide="shield-check" class="w-4 h-4 text-emerald"></i>
-            <span>Village Cottages Hospitality Guarantee</span>
+            <span>Country Side Cottages Hospitality Guarantee</span>
         </div>
     </div>
 
@@ -265,7 +265,7 @@
                         </div>
                     </div>
 
-                    <p class="text-xs text-forest/55 mt-1">{{ $room->branch ? $room->branch->name : 'Village Cottages' }} &middot; {{ $room->bed_type ?? 'King Bed' }}</p>
+                    <p class="text-xs text-forest/55 mt-1">{{ $room->branch ? $room->branch->name : 'Country Side Cottages' }} &middot; {{ $room->bed_type ?? 'King Bed' }}</p>
 
                     <p class="text-xs text-forest/70 line-clamp-2 mt-2 leading-relaxed">
                         {{ $room->short_description ?: 'Crafted with authentic reclaimed teakwood, stone verandas, and sweeping plantation vistas.' }}
