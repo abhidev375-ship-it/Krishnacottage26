@@ -63,11 +63,10 @@
             <input 
               type="email" 
               name="email" 
-              value="{{ old('email', 'admin@countrysidecottages.com') }}" 
+              value="{{ old('email') }}" 
               required 
               autofocus 
-              placeholder="admin@countrysidecottages.com" 
-              class="w-full bg-[#04251F]/70 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-xs font-semibold text-white placeholder:text-white/30 focus:outline-hidden focus:border-[#C7A76A] transition"
+              class="w-full bg-[#04251F]/70 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-xs font-semibold text-white focus:outline-hidden focus:border-[#C7A76A] transition"
             />
           </div>
         </div>
@@ -80,10 +79,8 @@
             <input 
               type="password" 
               name="password" 
-              value="password123" 
               required 
-              placeholder="••••••••" 
-              class="w-full bg-[#04251F]/70 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-xs font-semibold text-white placeholder:text-white/30 focus:outline-hidden focus:border-[#C7A76A] transition"
+              class="w-full bg-[#04251F]/70 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-xs font-semibold text-white focus:outline-hidden focus:border-[#C7A76A] transition"
             />
           </div>
         </div>
