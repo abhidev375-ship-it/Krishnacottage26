@@ -2499,20 +2499,58 @@ async function handleCategoryFormSubmit(e) {
                 <input type="email" name="resort_contact_email" value="{{ \App\Models\Setting::get('resort_contact_email', 'concierge@villagecottages.com') }}" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs">
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-[11px] font-semibold text-gray-700 mb-1">Default Room GST Tax (%)</label>
-                    <input type="number" name="tax_gst_rate" value="{{ \App\Models\Setting::get('tax_gst_rate', 12) }}" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-mono">
+            <!-- RESORT TAXATION & LEGAL COMPLIANCE (GST) -->
+            <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <i data-lucide="receipt" class="w-4 h-4 text-amber-700"></i>
+                        <span class="font-bold text-xs text-brand-text">Resort Taxation & Legal Compliance (GST)</span>
+                    </div>
+                    <span class="text-[10px] text-amber-800 uppercase font-bold tracking-wider bg-amber-100 px-2 py-0.5 rounded-full">Common Settings</span>
                 </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1">Room Tariff GST Tax (%) *</label>
+                        <input type="number" name="tax_gst_rate" step="0.5" min="0" max="28" value="{{ \App\Models\Setting::get('tax_gst_rate', \App\Models\Setting::get('gst_room_standard', 12)) }}" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-mono font-bold text-brand-primary">
+                        <p class="text-[10px] text-brand-muted mt-0.5">Applied dynamically across all room bookings.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1">Restaurant &amp; Dining GST (%) *</label>
+                        <input type="number" name="gst_dining_standard" step="0.5" min="0" max="28" value="{{ \App\Models\Setting::get('gst_dining_standard', 5) }}" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-mono">
+                        <p class="text-[10px] text-brand-muted mt-0.5">Standard restaurant food tax.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1">Resort GSTIN Number</label>
+                        <input type="text" name="resort_gstin" value="{{ \App\Models\Setting::get('resort_gstin', '32AAAAA0000A1Z5') }}" placeholder="e.g. 32AAAAA0000A1Z5" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-mono uppercase">
+                        <p class="text-[10px] text-brand-muted mt-0.5">Printed on guest receipts and invoices.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1">Advance Booking Deposit Option (%) *</label>
+                        <input type="number" name="deposit_advance_percentage" value="{{ \App\Models\Setting::get('deposit_advance_percentage', 20) }}" min="10" max="100" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-mono">
+                        <p class="text-[10px] text-brand-muted mt-0.5">Default guest confirmation deposit.</p>
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-amber-200/50">
+                    <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="checkbox" name="gst_slab_mode_enabled" value="1" {{ \App\Models\Setting::get('gst_slab_mode_enabled', '0') == '1' ? 'checked' : '' }} class="mt-0.5 w-4 h-4 rounded text-brand-primary focus:ring-brand-primary">
+                        <div>
+                            <span class="font-bold text-[11px] text-brand-text">Airbnb-Style Statutory Slabs (Auto 18% for tariff &gt; ₹7,500/night)</span>
+                            <p class="text-[10px] text-brand-muted">When enabled, automatically levies 18% GST if the room tariff exceeds ₹7,500/night (SAC 996311 compliance), and your base rate for tariffs up to ₹7,500.</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-700 mb-1">Free Cancellation Window (Hours)</label>
                     <input type="number" name="cancellation_window_hours" value="{{ \App\Models\Setting::get('cancellation_window_hours', 48) }}" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-mono">
                 </div>
-            </div>
-
-            <div>
-                <label class="block text-[11px] font-semibold text-gray-700 mb-1">Advance Booking Deposit Option (%)</label>
-                <input type="number" name="deposit_advance_percentage" value="{{ \App\Models\Setting::get('deposit_advance_percentage', 20) }}" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-mono">
             </div>
 
             <div class="pt-3 border-t border-gray-200 flex justify-end gap-2">

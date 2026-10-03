@@ -266,6 +266,66 @@
             </div>
         </div>
 
+        <!-- RESORT TAXATION & LEGAL COMPLIANCE (GST) (ADM-28) -->
+        @php
+            $liveRoomGst = (float) \App\Models\Setting::get('tax_gst_rate', \App\Models\Setting::get('gst_room_standard', 12.0));
+            $liveDiningGst = (float) \App\Models\Setting::get('gst_dining_standard', 5.0);
+            $liveGstin = \App\Models\Setting::get('resort_gstin', '32AAAAA0000A1Z5');
+            $liveSlabMode = (bool) \App\Models\Setting::get('gst_slab_mode_enabled', false);
+        @endphp
+        <div class="bg-brand-surface rounded-xl border border-gray-200/70 p-5 space-y-4 shadow-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center text-white shadow-xs">
+                        <i data-lucide="receipt" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm text-brand-text flex items-center gap-2">
+                            Resort Taxation &amp; Legal Compliance (GST)
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                                ● {{ $liveRoomGst }}% ROOM GST ACTIVE
+                            </span>
+                        </h3>
+                        <p class="text-[11px] text-brand-muted">Centrally manages GST percentage, property GSTIN number, dining tax, and Airbnb-style tariff slabs.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="openModal('modal-settings')" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-xs">
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                        <span>Edit Tax Settings</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <div class="p-3 rounded-lg bg-gray-50 border border-gray-200/70 space-y-1">
+                    <span class="text-[10px] text-brand-muted uppercase font-bold tracking-wider">Room Tariff GST</span>
+                    <div class="text-base font-extrabold text-brand-primary font-mono">{{ $liveRoomGst }}%</div>
+                    <span class="text-[10px] text-emerald-700 font-medium">Applied across all room stays</span>
+                </div>
+
+                <div class="p-3 rounded-lg bg-gray-50 border border-gray-200/70 space-y-1">
+                    <span class="text-[10px] text-brand-muted uppercase font-bold tracking-wider">Food &amp; Dining GST</span>
+                    <div class="text-base font-extrabold text-amber-700 font-mono">{{ $liveDiningGst }}%</div>
+                    <span class="text-[10px] text-brand-muted">Restaurant menu items</span>
+                </div>
+
+                <div class="p-3 rounded-lg bg-gray-50 border border-gray-200/70 space-y-1">
+                    <span class="text-[10px] text-brand-muted uppercase font-bold tracking-wider">Property GSTIN</span>
+                    <div class="text-xs font-extrabold text-gray-800 font-mono tracking-wide">{{ $liveGstin }}</div>
+                    <span class="text-[10px] text-brand-muted">State code 32 (Kerala)</span>
+                </div>
+
+                <div class="p-3 rounded-lg bg-gray-50 border border-gray-200/70 space-y-1">
+                    <span class="text-[10px] text-brand-muted uppercase font-bold tracking-wider">Statutory Slabs</span>
+                    <div class="text-xs font-bold {{ $liveSlabMode ? 'text-emerald-700' : 'text-gray-600' }}">
+                        {{ $liveSlabMode ? 'ACTIVE (18% > ₹7.5k)' : 'FLAT TARIFF RATE' }}
+                    </div>
+                    <span class="text-[10px] text-brand-muted">{{ $liveSlabMode ? 'SAC 996311 compliance' : 'Fixed percentage' }}</span>
+                </div>
+            </div>
+        </div>
+
         <!-- RAZORPAY PAYMENT GATEWAY SETTINGS (ADM-28) -->
         @php
             $razorpayKeyId = \App\Models\Setting::get('razorpay_key_id', config('services.razorpay.key_id', ''));

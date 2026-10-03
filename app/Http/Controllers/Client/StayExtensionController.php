@@ -12,6 +12,7 @@ use App\Models\Payment;
 use App\Models\Reservation;
 use App\Models\ReservationStatusLog;
 use App\Models\Room;
+use App\Models\Setting;
 use App\Models\StayExtensionRequest;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -64,7 +65,8 @@ class StayExtensionController extends Controller
                 $sameRoomAvailable = true;
                 $rate = (float) $reservation->nightly_rate;
                 $subtotal = $rate * $extraNights;
-                $tax = round($subtotal * 0.12, 2);
+                $gstRate = (float) Setting::get('tax_gst_rate', Setting::get('gst_room_standard', 12.0));
+                $tax = round($subtotal * ($gstRate / 100), 2);
                 $standardTotal = $subtotal + $tax;
 
                 $currentRoomInfo = [
@@ -97,14 +99,16 @@ class StayExtensionController extends Controller
             })
             ->values();
 
+        $gstRate = (float) Setting::get('tax_gst_rate', Setting::get('gst_room_standard', 12.0));
+
         // Group A: Single Room Upgrades / Alternates satisfying total guest party
         $singleRooms = $freeRooms->filter(function ($r) use ($totalGuests) {
             $cap = $r->roomType ? (int) $r->roomType->max_guests : 2;
             return $cap >= $totalGuests;
-        })->map(function ($r) use ($extraNights) {
+        })->map(function ($r) use ($extraNights, $gstRate) {
             $rate = (float) ($r->roomType ? $r->roomType->base_price : 3000);
             $sub = $rate * $extraNights;
-            $tax = round($sub * 0.12, 2);
+            $tax = round($sub * ($gstRate / 100), 2);
             return [
                 'room_ids' => [$r->id],
                 'display_label' => "Villa {$r->room_number} (" . ($r->roomType ? $r->roomType->name : 'Cottage') . ")",
@@ -130,7 +134,7 @@ class StayExtensionController extends Controller
                         $rate1 = (float) ($r1->roomType ? $r1->roomType->base_price : 3000);
                         $rate2 = (float) ($r2->roomType ? $r2->roomType->base_price : 3000);
                         $combinedSub = ($rate1 + $rate2) * $extraNights;
-                        $combinedTax = round($combinedSub * 0.12, 2);
+                        $combinedTax = round($combinedSub * ($gstRate / 100), 2);
 
                         $multiRoomCombinations->push([
                             'room_ids' => [$r1->id, $r2->id],

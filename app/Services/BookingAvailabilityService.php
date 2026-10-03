@@ -153,9 +153,22 @@ class BookingAvailabilityService
 
         $subtotal = round($subtotalPerRoom * $roomsCount, 2);
         $averageNightlyRate = round($subtotalPerRoom / $nights, 2);
-        $tax = round($subtotal * 0.12, 2); // 12% GST
+
+        // Fetch dynamic room GST rate configured by admin in Common Settings (default: 12.0%)
+        $gstRate = (float) Setting::get('tax_gst_rate', Setting::get('gst_room_standard', 12.0));
+
+        // Airbnb-style statutory slab compliance (SAC 996311): if enabled and tariff > ₹7,500/night, auto-apply 18% GST
+        $slabModeEnabled = (bool) Setting::get('gst_slab_mode_enabled', false);
+        if ($slabModeEnabled && $averageNightlyRate > 7500) {
+            $gstRate = 18.0;
+        }
+
+        $tax = round($subtotal * ($gstRate / 100), 2);
         $total = round($subtotal + $tax, 2);
-        $deposit = round($total * 0.20, 2); // 20% advance option
+
+        // Advance deposit percentage configured by admin in Common Settings (default: 20%)
+        $depositPct = (float) Setting::get('deposit_advance_percentage', 20.0);
+        $deposit = round($total * ($depositPct / 100), 2);
 
         $amountToPayNow = ($paymentChoice === 'deposit_20') ? $deposit : $total;
         $balanceDueAtCheckIn = round($total - $amountToPayNow, 2);
@@ -170,8 +183,10 @@ class BookingAvailabilityService
             'weekend_nights' => $weekendNights,
             'nightly_breakdown' => $nightlyBreakdown,
             'subtotal' => $subtotal,
+            'tax_rate' => $gstRate,
             'tax' => $tax,
             'total' => $total,
+            'deposit_percentage' => $depositPct,
             'deposit' => $deposit,
             'amount_to_pay_now' => $amountToPayNow,
             'balance_due_at_checkin' => $balanceDueAtCheckIn,

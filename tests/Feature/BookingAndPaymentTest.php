@@ -989,4 +989,101 @@ class BookingAndPaymentTest extends TestCase
         // Room 101 must REMAIN occupied because KR-INHOUSE-01 is currently checked in!
         $this->assertEquals('occupied', $this->room->fresh()->operational_status);
     }
+
+    /**
+     * Test 17: Admin-configurable room GST rate in common settings immediately updates booking calculations.
+     */
+    public function test_admin_configurable_gst_rate_in_common_settings(): void
+    {
+        $checkIn = Carbon::tomorrow()->format('Y-m-d');
+        $checkOut = Carbon::tomorrow()->addDays(2)->format('Y-m-d');
+
+        // Admin updates Common Settings to 5% GST
+        Setting::set('tax_gst_rate', 5.0, 'tax');
+
+        $response = $this->postJson(route('api.availability.check'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'adults' => 2,
+        ]);
+
+        $response->assertStatus(200);
+        // Subtotal = 9000. 5% tax = 450. Total = 9450.
+        $this->assertEquals(9000.00, (float) $response->json('results.0.total_price'));
+        $this->assertEquals(450.00, (float) $response->json('results.0.tax'));
+        $this->assertEquals(9450.00, (float) $response->json('results.0.grand_total'));
+
+        // Admin changes Common Settings to 18% GST
+        Setting::set('tax_gst_rate', 18.0, 'tax');
+
+        $response18 = $this->postJson(route('api.availability.check'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'adults' => 2,
+        ]);
+
+        $response18->assertStatus(200);
+        // Subtotal = 9000. 18% tax = 1620. Total = 10620.
+        $this->assertEquals(9000.00, (float) $response18->json('results.0.total_price'));
+        $this->assertEquals(1620.00, (float) $response18->json('results.0.tax'));
+        $this->assertEquals(10620.00, (float) $response18->json('results.0.grand_total'));
+    }
+
+    /**
+     * Test 18: Airbnb-style statutory slab compliance automatically applies 18% GST for luxury tariffs > ₹7,500/night.
+     */
+    public function test_airbnb_style_statutory_gst_slab_mode(): void
+    {
+        $checkIn = Carbon::tomorrow()->format('Y-m-d');
+        $checkOut = Carbon::tomorrow()->addDays(2)->format('Y-m-d');
+
+        // Common settings: Base GST 12% with statutory slab mode enabled
+        Setting::set('tax_gst_rate', 12.0, 'tax');
+        Setting::set('gst_slab_mode_enabled', '1', 'tax');
+
+        // 1. Standard Room (Rate: ₹4500 <= ₹7500) -> 12% GST
+        $standardResp = $this->postJson(route('api.availability.check'), [
+            'room_type_id' => $this->roomType->id,
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'adults' => 2,
+        ]);
+        $this->assertEquals(1080.00, (float) $standardResp->json('results.0.tax'));
+        $this->assertEquals(10080.00, (float) $standardResp->json('results.0.grand_total'));
+
+        // 2. Luxury Presidential Villa (Rate: ₹10,000 > ₹7500) -> Auto upgrades to 18% GST
+        $luxuryType = RoomType::create([
+            'branch_id' => $this->branch->id,
+            'name' => 'Royal Presidential Villa',
+            'slug' => 'royal-presidential-villa',
+            'base_price' => 10000.00,
+            'weekend_price' => 12000.00,
+            'max_guests' => 4,
+            'max_adults' => 2,
+            'max_children' => 2,
+            'is_active' => true,
+            'is_bookable' => true,
+        ]);
+        Room::create([
+            'branch_id' => $this->branch->id,
+            'room_type_id' => $luxuryType->id,
+            'room_number' => '901',
+            'operational_status' => 'available',
+            'housekeeping_status' => 'clean',
+        ]);
+
+        $luxuryResp = $this->postJson(route('api.availability.check'), [
+            'room_type_id' => $luxuryType->id,
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'adults' => 2,
+        ]);
+
+        // 2 nights @ 10,000 = 20,000. Since > ₹7500, slab mode auto-applies 18% GST = 3600. Total = 23,600.
+        $this->assertEquals(20000.00, (float) $luxuryResp->json('results.0.total_price'));
+        $this->assertEquals(3600.00, (float) $luxuryResp->json('results.0.tax'));
+        $this->assertEquals(23600.00, (float) $luxuryResp->json('results.0.grand_total'));
+    }
 }

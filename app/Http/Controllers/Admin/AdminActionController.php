@@ -1432,6 +1432,23 @@ class AdminActionController extends Controller
             Setting::set($key, $val, 'resort_config');
         }
 
+        // Specifically sync taxation settings into 'tax' group
+        if ($request->has('tax_gst_rate')) {
+            $gstRate = (float) $request->input('tax_gst_rate', 12.0);
+            Setting::set('tax_gst_rate', $gstRate, 'tax', 'Room tariff GST rate percentage');
+            Setting::set('gst_room_standard', $gstRate, 'tax', 'Standard room tariff GST rate percentage');
+        }
+        if ($request->has('gst_dining_standard')) {
+            Setting::set('gst_dining_standard', (float) $request->input('gst_dining_standard', 5.0), 'tax', 'Food & dining GST percentage');
+        }
+        if ($request->has('resort_gstin')) {
+            Setting::set('resort_gstin', strtoupper(trim($request->input('resort_gstin', ''))), 'tax', 'Official Resort GSTIN registration number');
+        }
+        if ($request->has('deposit_advance_percentage')) {
+            Setting::set('deposit_advance_percentage', (float) $request->input('deposit_advance_percentage', 20.0), 'booking', 'Advance booking deposit percentage');
+        }
+        Setting::set('gst_slab_mode_enabled', $request->boolean('gst_slab_mode_enabled') ? '1' : '0', 'tax', 'Auto-apply 18% GST if room tariff exceeds ₹7,500/night');
+
         $this->logAudit('update_settings', 'Setting', 1, null, [], $request->except(['_token', 'login_page_image_file']));
 
         return response()->json([
