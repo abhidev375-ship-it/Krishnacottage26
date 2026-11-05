@@ -169,6 +169,12 @@ Route::get('/nearby', [ClientPageController::class, 'nearby'])->name('nearby.ind
 Route::get('/contact', [ClientPageController::class, 'contact'])->name('contact.index');
 Route::post('/contact', [ClientPageController::class, 'submitContact'])->name('contact.submit');
 
+// Google Search Console Site Ownership Verification
+Route::get('/google79360b2ce87627d0.html', function () {
+    return response('google-site-verification: google79360b2ce87627d0.html', 200)
+        ->header('Content-Type', 'text/html');
+});
+
 // Dynamic XML Sitemap for Google & Search Engine Indexing
 Route::get('/sitemap.xml', function () {
     $configuredUrl = config('app.url');
