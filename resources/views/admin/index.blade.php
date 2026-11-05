@@ -2462,6 +2462,8 @@
                 resort_email: document.getElementById('field-resort-email')?.value.trim() || '',
                 resort_address: document.getElementById('field-resort-address')?.value.trim() || '',
                 frontdesk_hours: document.getElementById('field-resort-hours')?.value.trim() || '',
+                google_site_verification: document.getElementById('field-google-verification')?.value.trim() || '',
+                google_analytics_id: document.getElementById('field-ga4-id')?.value.trim() || '',
             };
 
             try {

@@ -313,6 +313,30 @@
                             class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-medium leading-relaxed">{{ \App\Models\Setting::get('resort_address', 'Tea Garden Estate, Rajakkad, Idukki District, Kerala - 685566') }}</textarea>
                         <p class="text-[10px] text-brand-muted mt-1">Physical address displayed in the footer and contact directory card.</p>
                     </div>
+
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-blue-600"></i>
+                            Google Search Console Verification Code
+                        </label>
+                        <input type="text" name="google_site_verification" id="field-google-verification"
+                            value="{{ \App\Models\Setting::get('google_site_verification') }}"
+                            placeholder="e.g. AbC_123xYz456..."
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-mono">
+                        <p class="text-[10px] text-brand-muted mt-1">HTML tag verification code from Google Search Console (auto-injects meta tag).</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
+                            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-amber-600"></i>
+                            Google Analytics 4 (GA4) Measurement ID
+                        </label>
+                        <input type="text" name="google_analytics_id" id="field-ga4-id"
+                            value="{{ \App\Models\Setting::get('google_analytics_id') }}"
+                            placeholder="e.g. G-XXXXXXXXXX"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-mono">
+                        <p class="text-[10px] text-brand-muted mt-1">Live visitor tracking and booking conversion tracking ID.</p>
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-between pt-3 border-t border-gray-100">

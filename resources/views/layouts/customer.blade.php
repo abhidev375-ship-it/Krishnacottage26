@@ -13,6 +13,25 @@
     <meta name="robots" content="@yield('meta_robots', 'index, follow')" />
     <link rel="canonical" href="@yield('canonical_url', url()->current())" />
 
+    @php
+        $gVerifyCode = \App\Models\Setting::get('google_site_verification', env('GOOGLE_SITE_VERIFICATION'));
+        $ga4Id = \App\Models\Setting::get('google_analytics_id', env('GOOGLE_ANALYTICS_ID'));
+    @endphp
+    @if(!empty($gVerifyCode))
+    <!-- GOOGLE SEARCH CONSOLE VERIFICATION -->
+    <meta name="google-site-verification" content="{{ $gVerifyCode }}" />
+    @endif
+    @if(!empty($ga4Id))
+    <!-- GOOGLE ANALYTICS 4 (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $ga4Id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ $ga4Id }}');
+    </script>
+    @endif
+
     <!-- GEO-LOCALIZATION TAGS (Idukki District, Kerala) -->
     <meta name="geo.region" content="IN-KL" />
     <meta name="geo.placename" content="Idukki, Munnar, Rajakkad, Kerala, India" />
@@ -41,7 +60,7 @@
         "@@type": "Resort",
         "name": "{{ addslashes(\App\Models\Setting::get('resort_name', 'Country Side Cottages')) }}",
         "alternateName": ["Krishna Cottage", "Krishna Cottages", "Country Side Cottages Kerala", "Village Cottages"],
-        "url": "{{ url('/') }}",
+        "url": "{{ !str_contains(url('/'), 'localhost') ? url('/') : 'https://countrysidecottages.in' }}",
         "logo": "{{ asset('uploads/homepage/krishna_1788796146_NLXh47tR.jpg') }}",
         "description": "Luxury wooden cottages, nature homestays and private hillside villas across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali, Kerala.",
         "telephone": "{{ \App\Models\Setting::get('resort_phone', \App\Models\Setting::get('resort_contact_phone', '+91 94471 22334')) }}",

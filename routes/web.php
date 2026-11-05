@@ -171,7 +171,12 @@ Route::post('/contact', [ClientPageController::class, 'submitContact'])->name('c
 
 // Dynamic XML Sitemap for Google & Search Engine Indexing
 Route::get('/sitemap.xml', function () {
-    $baseUrl = rtrim(config('app.url', url('/')), '/');
+    $configuredUrl = config('app.url');
+    if (!empty($configuredUrl) && !str_contains($configuredUrl, 'localhost') && !str_contains($configuredUrl, '127.0.0.1')) {
+        $baseUrl = rtrim($configuredUrl, '/');
+    } else {
+        $baseUrl = 'https://countrysidecottages.in';
+    }
     $branches = \App\Models\Branch::where('status', 'active')->get();
     $roomTypes = \App\Models\RoomType::where('is_active', true)
         ->where('is_bookable', true)

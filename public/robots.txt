@@ -19,5 +19,5 @@ Disallow: /chat/
 Disallow: /clear-cache
 Disallow: /webhooks/
 
-# Sitemap directive (points to relative /sitemap.xml on whichever domain it is served)
-Sitemap: /sitemap.xml
+# Sitemap directive
+Sitemap: https://countrysidecottages.in/sitemap.xml
