@@ -39,13 +39,13 @@
     {
         "@@context": "https://schema.org",
         "@@type": "Resort",
-        "name": "Country Side Cottages",
+        "name": "{{ addslashes(\App\Models\Setting::get('resort_name', 'Country Side Cottages')) }}",
         "alternateName": ["Krishna Cottage", "Krishna Cottages", "Country Side Cottages Kerala", "Village Cottages"],
         "url": "{{ url('/') }}",
         "logo": "{{ asset('uploads/homepage/krishna_1788796146_NLXh47tR.jpg') }}",
         "description": "Luxury wooden cottages, nature homestays and private hillside villas across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali, Kerala.",
-        "telephone": "+91 94471 22334",
-        "email": "concierge@countrysidecottages.com",
+        "telephone": "{{ \App\Models\Setting::get('resort_phone', \App\Models\Setting::get('resort_contact_phone', '+91 94471 22334')) }}",
+        "email": "{{ \App\Models\Setting::get('resort_email', \App\Models\Setting::get('resort_contact_email', 'concierge@countrysidecottages.com')) }}",
         "address": {
             "@@type": "PostalAddress",
             "streetAddress": "Tea Garden Estate",

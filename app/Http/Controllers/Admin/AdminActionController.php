@@ -1693,6 +1693,36 @@ class AdminActionController extends Controller
             Setting::set($key, $val, 'resort_config');
         }
 
+        // Specifically synchronize primary resort contact information for Footer and Client Contact Page
+        if ($request->has('resort_name')) {
+            $name = trim($request->input('resort_name'));
+            Setting::set('resort_name', $name, 'resort_config', 'Official resort brand name');
+            Setting::set('resort_brand_title', $name, 'resort_config', 'Official resort brand name');
+        }
+
+        if ($request->has('resort_phone') || $request->has('resort_contact_phone')) {
+            $phone = trim($request->input('resort_phone') ?: $request->input('resort_contact_phone'));
+            Setting::set('resort_phone', $phone, 'resort_config', 'Central resort contact phone number');
+            Setting::set('resort_contact_phone', $phone, 'resort_config', 'Central resort contact phone number');
+        }
+
+        if ($request->has('resort_email') || $request->has('resort_contact_email')) {
+            $email = trim($request->input('resort_email') ?: $request->input('resort_contact_email'));
+            Setting::set('resort_email', $email, 'resort_config', 'Official concierge and support email');
+            Setting::set('resort_contact_email', $email, 'resort_config', 'Official concierge and support email');
+        }
+
+        if ($request->has('resort_address')) {
+            Setting::set('resort_address', trim($request->input('resort_address')), 'resort_config', 'Physical resort and estate address');
+        }
+
+        if ($request->has('frontdesk_hours')) {
+            Setting::set('frontdesk_hours', trim($request->input('frontdesk_hours')), 'resort_config', 'Front desk and concierge operating hours');
+        }
+
+        // Flush homepage & view caches so footer and contact page update immediately
+        \Illuminate\Support\Facades\Cache::forget('homepage_payload');
+
         // Specifically sync taxation settings into 'tax' group
         if ($request->has('tax_gst_rate')) {
             $gstRate = (float) $request->input('tax_gst_rate', 12.0);
@@ -1714,8 +1744,12 @@ class AdminActionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Resort configuration and login background image updated successfully.',
+            'message' => 'Resort configuration updated successfully. Live on footer & contact page!',
             'login_page_image' => Setting::get('login_page_image'),
+            'resort_name' => Setting::get('resort_name'),
+            'resort_phone' => Setting::get('resort_phone'),
+            'resort_email' => Setting::get('resort_email'),
+            'resort_address' => Setting::get('resort_address'),
         ]);
     }
 

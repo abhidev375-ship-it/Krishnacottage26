@@ -5,18 +5,20 @@
             <h2 class="text-2xl font-bold text-brand-text">System & Administration</h2>
             <p class="text-brand-muted text-xs mt-0.5">Staff roles, immutable audit trails, central resort settings, and automated notifications.</p>
         </div>
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full no-scrollbar">
-            <button onclick="switchSystemTab('staff')" id="sys-tab-btn-staff" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-primary text-white transition shrink-0">Staff ({{ $staffMembers->count() }})</button>
-            <button onclick="switchSystemTab('cancellation')" id="sys-tab-btn-cancellation" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-brand-muted hover:bg-gray-200 transition shrink-0 flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> Cancellation Rules ({{ $cancellationRules->count() }})</button>
-            <button onclick="switchSystemTab('audit')" id="sys-tab-btn-audit" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-brand-muted hover:bg-gray-200 transition shrink-0">Audit Log ({{ $auditLogs->count() }})</button>
-            <button onclick="switchSystemTab('settings')" id="sys-tab-btn-settings" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-brand-muted hover:bg-gray-200 transition shrink-0">Settings</button>
-            <button onclick="switchSystemTab('templates')" id="sys-tab-btn-templates" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-brand-muted hover:bg-gray-200 transition shrink-0">Templates ({{ $notificationTemplates->count() }})</button>
-            <button onclick="switchSystemTab('notifs')" id="sys-tab-btn-notifs" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-brand-muted hover:bg-gray-200 transition shrink-0">Delivery Logs</button>
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full no-scrollbar">
+            <button onclick="switchSystemTab('settings')" id="sys-tab-btn-settings" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-brand-primary text-white transition shrink-0 flex items-center gap-1.5 shadow-xs">
+                <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                <span>Settings</span>
+            </button>
+            <button onclick="switchSystemTab('cancellation')" id="sys-tab-btn-cancellation" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-brand-muted hover:bg-gray-200 transition shrink-0 flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <span>Cancellation Rules ({{ $cancellationRules->count() }})</span>
+            </button>
         </div>
     </div>
 
     <!-- SUB-TAB 1: STAFF & PERMISSIONS (ADM-26) -->
-    <div id="sys-tab-staff" class="bg-brand-surface rounded-xl border border-gray-200/70 shadow-xs overflow-hidden">
+    <div id="sys-tab-staff" class="hidden bg-brand-surface rounded-xl border border-gray-200/70 shadow-xs overflow-hidden">
         <div class="p-3.5 border-b border-gray-100 flex justify-between items-center">
             <span class="text-xs text-brand-muted font-medium">Internal resort staff, managers, and permission roles</span>
             <button onclick="openModal('modal-staff')" class="px-3 py-1.5 rounded-lg bg-brand-primary hover:bg-brand-deep text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
@@ -231,12 +233,99 @@
     </div>
 
     <!-- SUB-TAB 3: SETTINGS (ADM-28) -->
-    <div id="sys-tab-settings" class="hidden space-y-4">
+    <div id="sys-tab-settings" class="space-y-4">
         <div class="flex justify-between items-center bg-white p-3.5 rounded-xl border border-gray-200/70 shadow-xs">
             <span class="text-xs text-brand-muted font-medium">Global resort contact, taxation rates, cancellation policies</span>
             <button onclick="openModal('modal-settings')" class="px-3 py-1.5 rounded-lg bg-brand-primary hover:bg-brand-deep text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
                 <i data-lucide="settings" class="w-3.5 h-3.5"></i> Edit Settings
             </button>
+        </div>
+
+        <!-- EDITABLE RESORT CONFIGURATION CARD -->
+        <div class="bg-brand-surface rounded-xl border border-gray-200/70 p-5 shadow-xs space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
+                <div>
+                    <h3 class="font-bold text-sm text-brand-text flex items-center gap-2">
+                        <i data-lucide="building-2" class="w-4 h-4 text-brand-primary"></i>
+                        <span>Resort Configuration & Public Contact</span>
+                    </h3>
+                    <p class="text-[11px] text-brand-muted mt-0.5">Edit resort name, mobile numbers, email, and address. Updates automatically sync live to the website footer, client contact page, and invoices.</p>
+                </div>
+                <span class="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full self-start sm:self-auto flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Live Sync Enabled
+                </span>
+            </div>
+
+            <form id="form-resort-settings" onsubmit="handleResortSettingsSubmit(event)" class="space-y-4">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1">
+                            Resort Name / Brand Title <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="resort_name" id="field-resort-name"
+                            value="{{ \App\Models\Setting::get('resort_name', 'Country Side Cottages') }}"
+                            placeholder="e.g. Country Side Cottages"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-medium">
+                        <p class="text-[10px] text-brand-muted mt-1">Displayed in website footer, header, and official guest correspondence.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1">
+                            Central Phone / Mobile Number <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="resort_phone" id="field-resort-phone"
+                            value="{{ \App\Models\Setting::get('resort_phone', \App\Models\Setting::get('resort_contact_phone', '+91 94471 22334')) }}"
+                            placeholder="e.g. +91 94471 22334"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-mono font-medium">
+                        <p class="text-[10px] text-brand-muted mt-1">Direct concierge telephone shown on footer and contact page.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1">
+                            Concierge & Support Email <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="email" name="resort_email" id="field-resort-email"
+                            value="{{ \App\Models\Setting::get('resort_email', \App\Models\Setting::get('resort_contact_email', 'concierge@countrysidecottages.com')) }}"
+                            placeholder="e.g. concierge@countrysidecottages.com"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-medium">
+                        <p class="text-[10px] text-brand-muted mt-1">Official inbox for guest enquiries and confirmations.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1">
+                            Front Desk / Operating Hours
+                        </label>
+                        <input type="text" name="frontdesk_hours" id="field-resort-hours"
+                            value="{{ \App\Models\Setting::get('frontdesk_hours', 'Open 24 Hours · 7 Days a Week') }}"
+                            placeholder="e.g. Open 24 Hours · 7 Days a Week"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-medium">
+                        <p class="text-[10px] text-brand-muted mt-1">Operating schedule displayed on contact page direct assistance card.</p>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-[11px] font-semibold text-gray-700 mb-1">
+                            Resort Physical Address / Estate Location <span class="text-rose-500">*</span>
+                        </label>
+                        <textarea name="resort_address" id="field-resort-address" rows="2"
+                            placeholder="e.g. Tea Garden Estate, Rajakkad, Idukki District, Kerala - 685566"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-brand-primary focus:outline-hidden text-xs font-medium leading-relaxed">{{ \App\Models\Setting::get('resort_address', 'Tea Garden Estate, Rajakkad, Idukki District, Kerala - 685566') }}</textarea>
+                        <p class="text-[10px] text-brand-muted mt-1">Physical address displayed in the footer and contact directory card.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <span class="text-[11px] text-brand-muted flex items-center gap-1.5">
+                        <i data-lucide="info" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        Live preview updates immediately on the website footer and contact page.
+                    </span>
+                    <button type="submit" id="btn-save-resort-config" class="px-5 py-2.5 rounded-lg bg-brand-primary hover:bg-brand-deep text-white font-bold text-xs flex items-center gap-2 shadow-xs transition cursor-pointer">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        <span id="btn-save-resort-config-text">Save Resort Configuration</span>
+                    </button>
+                </div>
+            </form>
         </div>
         <!-- AUTH EXPERIENCE & LOGIN IMAGE CARD (ADM-28) -->
         @php
@@ -675,6 +764,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @foreach($settings as $group => $items)
+        @if($group !== 'resort')
         <div class="bg-brand-surface rounded-xl border border-gray-200/70 p-4 space-y-3 shadow-xs">
             <h3 class="font-bold text-sm text-brand-text uppercase tracking-wider text-[11px] text-brand-primary border-b border-gray-100 pb-2">
                 {{ ucfirst($group) }} Configuration
@@ -691,7 +781,9 @@
                 @endforeach
             </div>
         </div>
+        @endif
         @endforeach
+        </div>
     </div>
 
     <!-- SUB-TAB 4: NOTIFICATION TEMPLATES (ADM-29) -->

@@ -1,6 +1,13 @@
 @php
     $content = $homepageContent ?? app(\App\Http\Controllers\Admin\AdminController::class)->getHomepageContent();
-    $fBrandTitle = $content['footer_brand_title'] ?? 'Country Side Cottages';
+
+    // Check dynamic live settings first, fallback to default content if not configured
+    $dbName = \App\Models\Setting::get('resort_name', \App\Models\Setting::get('resort_brand_title'));
+    $dbPhone = \App\Models\Setting::get('resort_phone', \App\Models\Setting::get('resort_contact_phone'));
+    $dbEmail = \App\Models\Setting::get('resort_email', \App\Models\Setting::get('resort_contact_email'));
+    $dbAddress = \App\Models\Setting::get('resort_address');
+
+    $fBrandTitle = !empty($dbName) ? $dbName : ($content['footer_brand_title'] ?? 'Country Side Cottages');
     $fBrandTagline = $content['footer_brand_tagline'] ?? 'Luxury Cottages of Kerala';
     $fBrandDesc = $content['footer_brand_desc'] ?? 'Immersive, slow-living cottages nestled in the spice hills, misty valleys, and tranquil backwaters of Kerala.';
     $fBadge = $content['footer_badge'] ?? 'Eco-Conscious Botanical Cottages';
@@ -12,8 +19,9 @@
     $fExpLink4 = $content['footer_exp_link_4'] ?? 'Guided Nature Discoveries';
     $fConciergeTitle = $content['footer_concierge_title'] ?? 'Direct Concierge';
     $fConciergeDesc = $content['footer_concierge_desc'] ?? 'Front desk assistance 24/7 for bespoke retreat arrangements.';
-    $fPhone = $content['footer_phone'] ?? '+91 484 290 0000';
-    $fEmail = $content['footer_email'] ?? 'concierge@countrysidecottages.com';
+    $fPhone = !empty($dbPhone) ? $dbPhone : ($content['footer_phone'] ?? '+91 94471 22334');
+    $fEmail = !empty($dbEmail) ? $dbEmail : ($content['footer_email'] ?? 'concierge@countrysidecottages.com');
+    $fAddress = !empty($dbAddress) ? $dbAddress : ($content['footer_address'] ?? 'Tea Garden Estate, Rajakkad, Idukki District, Kerala - 685566');
     $fChatBtn = $content['footer_chat_btn'] ?? 'Chat with Concierge';
     $fCopyright = $content['footer_copyright'] ?? 'Country Side Cottages Hospitality Ltd. All rights reserved.';
     $fSupportLink = $content['footer_support_link'] ?? 'Help & Support';
@@ -89,6 +97,12 @@
                         <i data-lucide="mail" class="w-3.5 h-3.5 shrink-0"></i>
                         <span>{{ $fEmail }}</span>
                     </a>
+                    @if(!empty($fAddress))
+                    <div class="flex items-start gap-2 text-paper/70 text-[11px] leading-relaxed pt-0.5">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 shrink-0 text-brass/80 mt-0.5"></i>
+                        <span>{{ $fAddress }}</span>
+                    </div>
+                    @endif
                 </div>
                 <button type="button" onclick="openChat()" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-brass px-3.5 py-2 text-[10px] font-bold text-forest hover:brightness-105 transition cursor-pointer">
                     <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>

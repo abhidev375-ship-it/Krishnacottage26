@@ -2448,6 +2448,57 @@
             } finally {
                 if (btn) btn.disabled = false;
                 if (btnText) btnText.textContent = 'Send Test Telegram Ping';
+        // ================= RESORT SETTINGS & CONTACT CONFIGURATION =================
+        async function handleResortSettingsSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-resort-config');
+            const text = document.getElementById('btn-save-resort-config-text');
+            if (btn) btn.disabled = true;
+            if (text) text.textContent = 'Saving...';
+
+            const payload = {
+                resort_name: document.getElementById('field-resort-name')?.value.trim() || '',
+                resort_phone: document.getElementById('field-resort-phone')?.value.trim() || '',
+                resort_email: document.getElementById('field-resort-email')?.value.trim() || '',
+                resort_address: document.getElementById('field-resort-address')?.value.trim() || '',
+                frontdesk_hours: document.getElementById('field-resort-hours')?.value.trim() || '',
+            };
+
+            try {
+                const res = await fetch('{{ route('admin.settings.update') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken || document.querySelector('meta[name="csrf-token"]')?.content
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (typeof showToast === 'function') {
+                        showToast(data.message || 'Resort configuration updated successfully!', 'success');
+                    } else if (typeof showToastNotification === 'function') {
+                        showToastNotification('✓ Saved', data.message || 'Resort configuration updated.');
+                    }
+                } else {
+                    const errMsg = data.message || 'Failed to save resort configuration.';
+                    if (typeof showToast === 'function') {
+                        showToast(errMsg, 'error');
+                    } else {
+                        alert(errMsg);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                if (typeof showToast === 'function') {
+                    showToast('Network error saving resort configuration.', 'error');
+                } else {
+                    alert('Network error saving resort configuration.');
+                }
+            } finally {
+                if (btn) btn.disabled = false;
+                if (text) text.textContent = 'Save Resort Configuration';
                 if (window.lucide) window.lucide.createIcons();
             }
         }

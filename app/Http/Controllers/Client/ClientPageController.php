@@ -94,10 +94,15 @@ class ClientPageController extends Controller
         $branches = Branch::where('status', 'active')->orderBy('sort_order')->get();
         $contactContent = Setting::get('contact_content', []);
 
-        $centralPhone = Setting::get('resort_phone', $contactContent['central_phone'] ?? '+91 94471 22334');
-        $centralEmail = Setting::get('resort_email', $contactContent['central_email'] ?? 'concierge@villagecottages.com');
-        $centralAddress = Setting::get('resort_address', $contactContent['central_address'] ?? 'Tea Garden Estate, Rajakkad, Idukki District, Kerala - 685566');
-        $frontdeskHours = Setting::get('frontdesk_hours', $contactContent['frontdesk_hours'] ?? 'Open 24 Hours · 7 Days a Week');
+        $dbPhone = Setting::get('resort_phone', Setting::get('resort_contact_phone'));
+        $dbEmail = Setting::get('resort_email', Setting::get('resort_contact_email'));
+        $dbAddress = Setting::get('resort_address');
+        $dbHours = Setting::get('frontdesk_hours');
+
+        $centralPhone = !empty($dbPhone) ? $dbPhone : ($contactContent['central_phone'] ?? '+91 94471 22334');
+        $centralEmail = !empty($dbEmail) ? $dbEmail : ($contactContent['central_email'] ?? 'concierge@countrysidecottages.com');
+        $centralAddress = !empty($dbAddress) ? $dbAddress : ($contactContent['central_address'] ?? 'Tea Garden Estate, Rajakkad, Idukki District, Kerala - 685566');
+        $frontdeskHours = !empty($dbHours) ? $dbHours : ($contactContent['frontdesk_hours'] ?? 'Open 24 Hours · 7 Days a Week');
 
         return view('client.contact', compact('branches', 'contactContent', 'centralPhone', 'centralEmail', 'centralAddress', 'frontdeskHours'));
     }
