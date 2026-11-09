@@ -2448,6 +2448,10 @@
             } finally {
                 if (btn) btn.disabled = false;
                 if (btnText) btnText.textContent = 'Send Test Telegram Ping';
+                if (window.lucide) window.lucide.createIcons();
+            }
+        }
+
         // ================= RESORT SETTINGS & CONTACT CONFIGURATION =================
         async function handleResortSettingsSubmit(e) {
             e.preventDefault();
@@ -6910,11 +6914,6 @@
                 }
             }
             refreshIcons();
-        }
-
-        // Backward compatibility
-        function toggleDashboardView(mode) {
-            switchDashboardMode(mode === 'visual' ? 'visual' : 'operations');
         }
 
         async function quickCheckIn(reservationId, guestName, roomNumber) {
