@@ -3120,7 +3120,7 @@
                 }
             }
 
-            const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Just now';
+            const timeStr = msg.created_at ? (new Date(msg.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })) : 'Just now';
 
             msgDiv.innerHTML = `
                 ${!isCustomer ? `
@@ -6579,7 +6579,7 @@
                         }">
                             ${m.is_internal_note ? '<div class="text-[9px] font-bold uppercase tracking-wider text-amber-800 mb-1">🔒 Internal Staff Note</div>' : ''}
                             <p>${m.message}</p>
-                            <span class="text-[9px] mt-1 block opacity-70 text-right">${new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            <span class="text-[9px] mt-1 block opacity-70 text-right">${new Date(m.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}, ${new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: true})}</span>
                         </div>
                     </div>
                 `).join('');

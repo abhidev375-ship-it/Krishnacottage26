@@ -891,7 +891,7 @@
                 }
             }
 
-            const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Just now';
+            const timeStr = msg.created_at ? (new Date(msg.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })) : 'Just now';
 
             let targetRoomBadge = '';
             if (msg.target_room) {

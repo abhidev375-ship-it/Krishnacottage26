@@ -55,7 +55,7 @@
                             @endif
                             <span class="font-bold text-xs text-brand-text truncate">{{ $enq->customer_name }}</span>
                         </div>
-                        <span class="text-[10px] text-brand-muted shrink-0">{{ $enq->last_message_at ? $enq->last_message_at->format('H:i') : $enq->created_at->format('d M') }}</span>
+                        <span class="text-[10px] text-brand-muted shrink-0">{{ $enq->last_message_at ? $enq->last_message_at->format('d M Y, h:i A') : $enq->created_at->format('d M Y, h:i A') }}</span>
                     </div>
 
                     <div class="text-xs text-brand-primary font-medium mt-1 flex items-center gap-1.5 truncate">
@@ -246,12 +246,12 @@
                             <span class="text-[10px] font-bold text-brand-primary flex items-center gap-1">
                                 <i data-lucide="user-check" class="w-3 h-3"></i> {{ $msg->user ? $msg->user->name : 'Staff Member' }}
                             </span>
-                            <span class="text-[9px] text-brand-muted">&middot; {{ $msg->created_at->format('H:i') }}</span>
+                            <span class="text-[9px] text-brand-muted">&middot; {{ $msg->created_at->format('d M Y, h:i A') }}</span>
                         </div>
                         @else
                         <div class="flex items-center gap-1.5 mb-1 px-1">
                             <span class="text-[10px] font-bold text-brand-text">{{ $activeEnq->customer_name }}</span>
-                            <span class="text-[9px] text-brand-muted">&middot; {{ $msg->created_at->format('H:i') }}</span>
+                            <span class="text-[9px] text-brand-muted">&middot; {{ $msg->created_at->format('d M Y, h:i A') }}</span>
                         </div>
                         @endif
 
@@ -311,7 +311,7 @@
                             </div>
                             @endif
                         </div>
-                        <span class="text-[9px] text-brand-muted mt-0.5 px-1">{{ $msg->created_at->format('d M, H:i') }}</span>
+                        <span class="text-[9px] text-brand-muted mt-0.5 px-1">{{ $msg->created_at->format('d M Y, h:i A') }}</span>
                     </div>
                     @endforeach
                 @endif
