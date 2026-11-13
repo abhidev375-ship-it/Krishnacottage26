@@ -5882,6 +5882,10 @@
             document.getElementById('edit-branch-cover-url').value = b.cover_image_url || '';
             document.getElementById('edit-branch-latitude').value = b.latitude || '';
             document.getElementById('edit-branch-longitude').value = b.longitude || '';
+            const mapUrlEl = document.getElementById('edit-branch-map-url');
+            if (mapUrlEl) {
+                mapUrlEl.value = (b.settings && b.settings.google_map_url) ? b.settings.google_map_url : (b.map_url || b.google_map_url || '');
+            }
             updateFieldThumbnailPreview('edit-branch-hero-url', b.hero_image_url || '');
             updateFieldThumbnailPreview('edit-branch-cover-url', b.cover_image_url || '');
             const titleEl = document.getElementById('edit-branch-modal-title');
@@ -5938,6 +5942,28 @@
             } catch (err) {
                 console.error(err);
                 showToast('Geocoding request failed. Please check your network or enter coordinates manually.', 'error');
+            }
+        }
+
+        function handleGoogleMapsUrlInput(rawUrl, mode = 'add') {
+            if (!rawUrl) return;
+            const url = rawUrl.trim();
+            const latInput = document.getElementById(mode === 'edit' ? 'edit-branch-latitude' : 'add-branch-latitude');
+            const lngInput = document.getElementById(mode === 'edit' ? 'edit-branch-longitude' : 'add-branch-longitude');
+
+            // Check if Google Maps URL contains coordinates (@lat,lng or q=lat,lng or ll=lat,lng)
+            const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+            const qMatch = url.match(/[?&](?:q|ll|destination)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+            const match = atMatch || qMatch;
+
+            if (match && match[1] && match[2]) {
+                const lat = parseFloat(match[1]);
+                const lng = parseFloat(match[2]);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    if (latInput) latInput.value = lat.toFixed(6);
+                    if (lngInput) lngInput.value = lng.toFixed(6);
+                    showToast(`GPS Coordinates extracted from Google Maps (${lat.toFixed(4)}, ${lng.toFixed(4)})`, 'success');
+                }
             }
         }
 

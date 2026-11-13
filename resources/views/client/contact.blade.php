@@ -320,8 +320,7 @@
                     @foreach($branches as $b)
                     @php
                         $cleanBranchPhone = $b->phone ? preg_replace('/[^0-9+]/', '', $b->phone) : null;
-                        $encodedAddress = urlencode(($b->name . ', ' . ($b->address ?? '') . ', ' . $b->city . ', Kerala, India'));
-                        $mapUrl = "https://www.google.com/maps/search/?api=1&query={$encodedAddress}";
+                        $mapUrl = $b->google_map_url;
                     @endphp
                     <div class="pt-3.5 first:pt-0 transition rounded-xl p-2.5 -mx-2.5 cursor-pointer hover:bg-paper/40" id="branch-card-{{ $b->id }}" onclick="selectBranchCard({{ $b->id }})">
                         <div class="flex items-start justify-between gap-2">

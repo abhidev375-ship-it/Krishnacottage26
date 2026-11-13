@@ -71,11 +71,30 @@ class AdminActionController extends Controller
             'email' => 'nullable|email|max:100',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+            'google_map_url' => 'nullable|string|max:1000',
+            'map_url' => 'nullable|string|max:1000',
             'tagline' => 'nullable|string|max:255',
             'hero_image_url' => 'nullable|string',
             'cover_image_url' => 'nullable|string',
             'status' => 'required|in:active,inactive,maintenance',
         ]);
+
+        $mapUrl = trim((string)$request->input('google_map_url', $request->input('map_url', '')));
+        if (!empty($mapUrl)) {
+            $settings = [];
+            $settings['google_map_url'] = $mapUrl;
+            $validated['settings'] = $settings;
+            if (\Illuminate\Support\Facades\Schema::hasColumn('branches', 'map_url')) {
+                $validated['map_url'] = $mapUrl;
+            }
+
+            if (empty($validated['latitude']) || empty($validated['longitude'])) {
+                if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $mapUrl, $m) || preg_match('/[?&](?:q|ll|destination)=(-?\d+\.\d+),(-?\d+\.\d+)/', $mapUrl, $m)) {
+                    $validated['latitude'] = (float)$m[1];
+                    $validated['longitude'] = (float)$m[2];
+                }
+            }
+        }
 
         $validated['slug'] = Str::slug($validated['name']);
         $validated['is_published'] = $request->boolean('is_published', true);
@@ -105,11 +124,30 @@ class AdminActionController extends Controller
             'email' => 'nullable|email|max:100',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+            'google_map_url' => 'nullable|string|max:1000',
+            'map_url' => 'nullable|string|max:1000',
             'tagline' => 'nullable|string|max:255',
             'hero_image_url' => 'nullable|string',
             'cover_image_url' => 'nullable|string',
             'status' => 'required|in:active,inactive,maintenance',
         ]);
+
+        $mapUrl = trim((string)$request->input('google_map_url', $request->input('map_url', '')));
+        if (!empty($mapUrl)) {
+            $settings = is_array($branch->settings) ? $branch->settings : [];
+            $settings['google_map_url'] = $mapUrl;
+            $validated['settings'] = $settings;
+            if (\Illuminate\Support\Facades\Schema::hasColumn('branches', 'map_url')) {
+                $validated['map_url'] = $mapUrl;
+            }
+
+            if (empty($validated['latitude']) || empty($validated['longitude'])) {
+                if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $mapUrl, $m) || preg_match('/[?&](?:q|ll|destination)=(-?\d+\.\d+),(-?\d+\.\d+)/', $mapUrl, $m)) {
+                    $validated['latitude'] = (float)$m[1];
+                    $validated['longitude'] = (float)$m[2];
+                }
+            }
+        }
 
         $prev = $branch->toArray();
         $branch->update($validated);

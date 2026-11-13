@@ -28,6 +28,7 @@ class Branch extends Model
         'email',
         'latitude',
         'longitude',
+        'map_url',
         'hero_image_url',
         'cover_image_url',
         'status',
@@ -35,6 +36,26 @@ class Branch extends Model
         'sort_order',
         'settings',
     ];
+
+    protected $appends = ['google_map_url'];
+
+    /**
+     * Get the Google Maps URL for the branch.
+     */
+    public function getGoogleMapUrlAttribute(): string
+    {
+        if (!empty($this->attributes['map_url'] ?? null)) {
+            return $this->attributes['map_url'];
+        }
+        if (!empty($this->settings['google_map_url'] ?? null)) {
+            return $this->settings['google_map_url'];
+        }
+        if (!empty($this->latitude) && !empty($this->longitude)) {
+            return "https://www.google.com/maps/search/?api=1&query={$this->latitude},{$this->longitude}";
+        }
+        $query = urlencode(trim(($this->name ?? '') . ' ' . ($this->address ?? '') . ' ' . ($this->city ?? '') . ' Kerala'));
+        return "https://www.google.com/maps/search/?api=1&query={$query}";
+    }
 
     protected function casts(): array
     {

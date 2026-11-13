@@ -58,10 +58,13 @@
                 <h4 class="eyebrow text-brass mb-4">{{ $fDestTitle }}</h4>
                 <ul class="space-y-2 text-xs text-paper/75">
                     @forelse($footerBranches as $b)
-                        <li>
-                            <a href="{{ route('rooms.index', ['branch_id' => $b->id]) }}" class="hover:text-brass transition flex items-center gap-1.5">
-                                <i data-lucide="map-pin" class="w-3 h-3 text-brass/70"></i>
-                                <span>{{ $b->display_name ?: ($b->name . ' (' . $b->city . ')') }}</span>
+                        <li class="flex items-center justify-between gap-1.5">
+                            <a href="{{ route('rooms.index', ['branch_id' => $b->id]) }}" class="hover:text-brass transition flex items-center gap-1.5 truncate">
+                                <i data-lucide="map-pin" class="w-3 h-3 text-brass/70 shrink-0"></i>
+                                <span class="truncate">{{ $b->display_name ?: ($b->name . ' (' . $b->city . ')') }}</span>
+                            </a>
+                            <a href="{{ $b->google_map_url }}" target="_blank" rel="noopener noreferrer" class="text-[10px] text-brass/70 hover:text-paper shrink-0 font-medium underline" title="View on Google Maps">
+                                Map
                             </a>
                         </li>
                     @empty

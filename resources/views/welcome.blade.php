@@ -1345,14 +1345,19 @@
                             <p class="text-xs text-forest/60 line-clamp-2">
                                 {{ $b->tagline ?: ($b->city . ', Kerala. Private wooden cottages immersed in nature.') }}
                             </p>
-                            @if($b->phone)
-                                <div class="pt-2">
+                            <div class="pt-2 flex items-center gap-3 flex-wrap">
+                                @if($b->phone)
                                     <a href="tel:{{ preg_replace('/[^0-9+]/', '', $b->phone) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald hover:underline">
                                         <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
                                         <span>{{ $b->phone }}</span>
                                     </a>
-                                </div>
-                            @endif
+                                @endif
+                                <a href="{{ $b->google_map_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-semibold text-brass hover:text-emerald transition" title="View {{ $b->name }} on Google Maps">
+                                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                                    <span>Google Maps</span>
+                                    <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-70"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="p-5 pt-0">

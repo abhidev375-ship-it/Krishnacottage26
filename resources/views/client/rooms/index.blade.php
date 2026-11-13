@@ -304,7 +304,18 @@
                         </div>
                     </div>
 
-                    <p class="text-xs text-forest/55 mt-1">{{ $room->branch ? $room->branch->name : 'Country Side Cottages' }} &middot; {{ $room->bed_type ?? 'King Bed' }}</p>
+                    <p class="text-xs text-forest/55 mt-1 flex items-center gap-1.5 flex-wrap">
+                        @if($room->branch)
+                            <a href="{{ $room->branch->google_map_url }}" target="_blank" rel="noopener noreferrer" class="hover:text-emerald transition inline-flex items-center gap-1 font-medium text-forest/70 underline" title="View {{ $room->branch->name }} on Google Maps" onclick="event.stopPropagation();">
+                                <i data-lucide="map-pin" class="w-3 h-3 text-emerald"></i>
+                                <span>{{ $room->branch->name }}</span>
+                            </a>
+                        @else
+                            <span>Country Side Cottages</span>
+                        @endif
+                        <span>&middot;</span>
+                        <span>{{ $room->bed_type ?? 'King Bed' }}</span>
+                    </p>
 
                     <p class="text-xs text-forest/70 line-clamp-2 mt-2 leading-relaxed">
                         {{ $room->short_description ?: 'Crafted with authentic reclaimed teakwood, stone verandas, and sweeping plantation vistas.' }}
