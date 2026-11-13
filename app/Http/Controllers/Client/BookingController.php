@@ -84,9 +84,10 @@ class BookingController extends Controller
                 $q->whereHas('branch', function ($bq) use ($locationParam) {
                     $bq->where('city', 'LIKE', "%{$locationParam}%")
                        ->orWhere('name', 'LIKE', "%{$locationParam}%")
-                       ->orWhere('display_name', 'LIKE', "%{$locationParam}%");
-                })->orWhere('city', 'LIKE', "%{$locationParam}%")
-                  ->orWhere('name', 'LIKE', "%{$locationParam}%");
+                       ->orWhere('display_name', 'LIKE', "%{$locationParam}%")
+                       ->orWhere('address', 'LIKE', "%{$locationParam}%");
+                })->orWhere('name', 'LIKE', "%{$locationParam}%")
+                  ->orWhere('description', 'LIKE', "%{$locationParam}%");
             })->exists();
 
             if ($locationMatches) {
@@ -94,9 +95,10 @@ class BookingController extends Controller
                     $q->whereHas('branch', function ($bq) use ($locationParam) {
                         $bq->where('city', 'LIKE', "%{$locationParam}%")
                            ->orWhere('name', 'LIKE', "%{$locationParam}%")
-                           ->orWhere('display_name', 'LIKE', "%{$locationParam}%");
-                    })->orWhere('city', 'LIKE', "%{$locationParam}%")
-                      ->orWhere('name', 'LIKE', "%{$locationParam}%");
+                           ->orWhere('display_name', 'LIKE', "%{$locationParam}%")
+                           ->orWhere('address', 'LIKE', "%{$locationParam}%");
+                    })->orWhere('name', 'LIKE', "%{$locationParam}%")
+                      ->orWhere('description', 'LIKE', "%{$locationParam}%");
                 });
             }
         }
