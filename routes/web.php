@@ -192,6 +192,9 @@ Route::get('/sitemap.xml', function () {
     $urls = [
         ['loc' => $baseUrl, 'priority' => '1.0', 'changefreq' => 'daily', 'lastmod' => date('Y-m-d')],
         ['loc' => $baseUrl . '/stay', 'priority' => '0.9', 'changefreq' => 'daily', 'lastmod' => date('Y-m-d')],
+        ['loc' => $baseUrl . '/stay?location=rajakkad', 'priority' => '0.9', 'changefreq' => 'daily', 'lastmod' => date('Y-m-d')],
+        ['loc' => $baseUrl . '/stay?location=munnar', 'priority' => '0.9', 'changefreq' => 'daily', 'lastmod' => date('Y-m-d')],
+        ['loc' => $baseUrl . '/stay?location=adimali', 'priority' => '0.9', 'changefreq' => 'daily', 'lastmod' => date('Y-m-d')],
         ['loc' => $baseUrl . '/dining', 'priority' => '0.8', 'changefreq' => 'weekly', 'lastmod' => date('Y-m-d')],
         ['loc' => $baseUrl . '/spices', 'priority' => '0.8', 'changefreq' => 'weekly', 'lastmod' => date('Y-m-d')],
         ['loc' => $baseUrl . '/facilities', 'priority' => '0.7', 'changefreq' => 'monthly', 'lastmod' => date('Y-m-d')],

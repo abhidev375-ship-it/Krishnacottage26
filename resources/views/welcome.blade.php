@@ -1375,6 +1375,158 @@
 
 
 <!-- =========================================================================
+     7.5. LOCAL DESTINATION GUIDE & FAQS (RAJAKKAD, MUNNAR, ADIMALI)
+     ========================================================================= -->
+<section class="py-14 sm:py-20 bg-[#FAF7F0] border-t border-forest/10">
+    <div class="mx-auto max-w-[1480px] px-4 md:px-6 lg:px-8">
+        
+        <div class="max-w-3xl mx-auto text-center mb-12 space-y-2">
+            <span class="eyebrow text-emerald font-bold">DESTINATION GUIDE &amp; FAQS</span>
+            <h2 class="serif text-3xl sm:text-4xl lg:text-5xl font-bold text-forest tracking-tight">
+                Cottages &amp; Home Stay across Rajakkad, Munnar &amp; Adimali
+            </h2>
+            <p class="text-xs sm:text-sm text-forest/70 leading-relaxed">
+                Whether you seek private hillside wooden cottages, an authentic plantation home stay, or a peaceful family retreat in Idukki, Country Side Cottages provides authentic nature living away from commercial crowds.
+            </p>
+        </div>
+
+        <!-- 3 Location Spotlight Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
+            <!-- 1. Rajakkad -->
+            <div class="rounded-3xl bg-white border border-forest/10 p-6 sm:p-7 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            Cardamom Hills
+                        </span>
+                        <span class="text-xs text-brass font-bold flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Idukki
+                        </span>
+                    </div>
+                    <h3 class="serif text-xl sm:text-2xl font-bold text-forest mb-2">
+                        Cottages &amp; Home Stay in Rajakkad
+                    </h3>
+                    <p class="text-xs text-forest/70 leading-relaxed mb-4">
+                        Perched amid shade-grown cardamom and pepper plantations, our Rajakkad cottages offer misty valley views, slow-cooked clay pot dining, and authentic heritage homestays.
+                    </p>
+                </div>
+                <div class="pt-4 border-t border-forest/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <a href="{{ route('rooms.index', ['location' => 'rajakkad']) }}" class="flex-1 text-center py-2 px-3 rounded-xl bg-forest hover:bg-forest/90 text-paper text-xs font-semibold shadow-xs transition">
+                        Cottages in Rajakkad
+                    </a>
+                    <a href="{{ route('rooms.index', ['location' => 'rajakkad']) }}" class="flex-1 text-center py-2 px-3 rounded-xl bg-paper hover:bg-forest/5 text-forest border border-forest/20 text-xs font-semibold transition">
+                        Home Stay
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. Munnar -->
+            <div class="rounded-3xl bg-white border border-forest/10 p-6 sm:p-7 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-brass/15 text-brass-darker border border-brass/30">
+                            Mist &amp; Tea Gardens
+                        </span>
+                        <span class="text-xs text-brass font-bold flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> High Forest
+                        </span>
+                    </div>
+                    <h3 class="serif text-xl sm:text-2xl font-bold text-forest mb-2">
+                        Cottages &amp; Home Stay in Munnar
+                    </h3>
+                    <p class="text-xs text-forest/70 leading-relaxed mb-4">
+                        Surrounded by cool mountain air and rolling tea slopes, our nature home stays and wooden cottages near Munnar offer private verandas, trekking trails, and star-lit evenings.
+                    </p>
+                </div>
+                <div class="pt-4 border-t border-forest/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <a href="{{ route('rooms.index', ['location' => 'munnar']) }}" class="flex-1 text-center py-2 px-3 rounded-xl bg-forest hover:bg-forest/90 text-paper text-xs font-semibold shadow-xs transition">
+                        Cottages in Munnar
+                    </a>
+                    <a href="{{ route('rooms.index', ['location' => 'munnar']) }}" class="flex-1 text-center py-2 px-3 rounded-xl bg-paper hover:bg-forest/5 text-forest border border-forest/20 text-xs font-semibold transition">
+                        Home Stay
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. Adimali -->
+            <div class="rounded-3xl bg-white border border-forest/10 p-6 sm:p-7 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-blue-50 text-blue-800 border border-blue-200">
+                            Scenic Gateway
+                        </span>
+                        <span class="text-xs text-brass font-bold flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Idukki Route
+                        </span>
+                    </div>
+                    <h3 class="serif text-xl sm:text-2xl font-bold text-forest mb-2">
+                        Cottages &amp; Home Stay in Adimali
+                    </h3>
+                    <p class="text-xs text-forest/70 leading-relaxed mb-4">
+                        Conveniently situated along the gateway route between Cochin, Adimali, and Munnar, offering peaceful family cottages, cascading waterfall excursions, and local hospitality.
+                    </p>
+                </div>
+                <div class="pt-4 border-t border-forest/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <a href="{{ route('rooms.index', ['location' => 'adimali']) }}" class="flex-1 text-center py-2 px-3 rounded-xl bg-forest hover:bg-forest/90 text-paper text-xs font-semibold shadow-xs transition">
+                        Cottages in Adimali
+                    </a>
+                    <a href="{{ route('rooms.index', ['location' => 'adimali']) }}" class="flex-1 text-center py-2 px-3 rounded-xl bg-paper hover:bg-forest/5 text-forest border border-forest/20 text-xs font-semibold transition">
+                        Home Stay
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crawlable FAQ Accordion with HTML details/summary -->
+        <div class="max-w-3xl mx-auto space-y-3.5">
+            <h3 class="serif text-2xl font-bold text-forest text-center mb-6">Frequently Asked Questions</h3>
+
+            <details class="group bg-white rounded-2xl border border-forest/10 p-4 sm:p-5 shadow-xs transition open:border-forest/25">
+                <summary class="flex items-center justify-between font-bold text-xs sm:text-sm text-forest cursor-pointer list-none select-none">
+                    <span>Which are the best cottages and home stay in Rajakkad?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-forest/60 group-open:rotate-180 transition-transform shrink-0 ml-2"></i>
+                </summary>
+                <p class="text-xs text-forest/70 leading-relaxed mt-3 pt-3 border-t border-forest/10">
+                    Country Side Cottages offers the highest-rated wooden cottages and tranquil plantation home stay in Rajakkad, Idukki. Guests enjoy hillside valley views, authentic Kerala clay pot dining, and direct access to organic cardamom and spice trails.
+                </p>
+            </details>
+
+            <details class="group bg-white rounded-2xl border border-forest/10 p-4 sm:p-5 shadow-xs transition open:border-forest/25">
+                <summary class="flex items-center justify-between font-bold text-xs sm:text-sm text-forest cursor-pointer list-none select-none">
+                    <span>Where can I book luxury cottages and home stay in Munnar?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-forest/60 group-open:rotate-180 transition-transform shrink-0 ml-2"></i>
+                </summary>
+                <p class="text-xs text-forest/70 leading-relaxed mt-3 pt-3 border-t border-forest/10">
+                    Country Side Cottages features nature homestays and private wooden cottages near Munnar, nestled among rolling hills and misty tea estates with 24/7 concierge service and instant online reservations.
+                </p>
+            </details>
+
+            <details class="group bg-white rounded-2xl border border-forest/10 p-4 sm:p-5 shadow-xs transition open:border-forest/25">
+                <summary class="flex items-center justify-between font-bold text-xs sm:text-sm text-forest cursor-pointer list-none select-none">
+                    <span>Are there family-friendly cottages and home stay in Adimali, Idukki?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-forest/60 group-open:rotate-180 transition-transform shrink-0 ml-2"></i>
+                </summary>
+                <p class="text-xs text-forest/70 leading-relaxed mt-3 pt-3 border-t border-forest/10">
+                    Yes, Country Side Cottages provides authentic family cottages and peaceful home stay in Adimali, offering spacious bedrooms, organic plantation breakfasts, and a scenic gateway stay between Cochin and Munnar.
+                </p>
+            </details>
+
+            <details class="group bg-white rounded-2xl border border-forest/10 p-4 sm:p-5 shadow-xs transition open:border-forest/25">
+                <summary class="flex items-center justify-between font-bold text-xs sm:text-sm text-forest cursor-pointer list-none select-none">
+                    <span>What amenities and dining options are provided across all cottages?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-forest/60 group-open:rotate-180 transition-transform shrink-0 ml-2"></i>
+                </summary>
+                <p class="text-xs text-forest/70 leading-relaxed mt-3 pt-3 border-t border-forest/10">
+                    All cottages and homestays feature artisan king teak beds, private mountain-view verandas, climate control, high-speed Wi-Fi, open-air rain showers, organic Kerala toiletries, and farm-to-table estate dining with strictly no artificial swimming pools for ecological harmony.
+                </p>
+            </details>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- =========================================================================
      8. WARM CALL-TO-ACTION BANNER
      ========================================================================= -->
 <section class="py-12 sm:py-16 bg-[#F4F1E8]">

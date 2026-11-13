@@ -1,15 +1,22 @@
 @extends('layouts.customer')
 
-@section('title', 'Rooms & Cottages | Country Side Cottages')
+@section('title', $seoTitle ?? 'Rooms & Cottages | Country Side Cottages — Luxury Stays in Idukki, Munnar, Rajakkad & Adimali')
+@section('meta_description', $seoDescription ?? 'Book luxury wooden cottages, private hillside villas & peaceful plantation home stays in Rajakkad, Munnar, and Adimali across Idukki, Kerala.')
 
 @section('content')
 <!-- AIRBNB-STYLE FLOATING SEARCH & FILTER BAR -->
 <div class="bg-forest text-paper pt-5 pb-8 sm:pt-7 sm:pb-12 px-4 sm:px-6 relative z-40 overflow-visible">
     <div class="mx-auto max-w-[1480px] relative z-10">
         <div class="text-center max-w-2xl mx-auto mb-4 sm:mb-6">
-            <span class="eyebrow text-brass block mb-1">Authentic Kerala Cottages</span>
-            <h1 class="serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">Book Your Stay</h1>
-            <p class="text-xs sm:text-sm text-paper/70 mt-2">Private forest villas, heritage wooden cottages, and lakeside pavilions surrounded by nature.</p>
+            <span class="eyebrow text-brass block mb-1">
+                {{ !empty($selectedLocation) ? "Authentic Stays in {$selectedLocation}" : "Authentic Kerala Cottages & Home Stay" }}
+            </span>
+            <h1 class="serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
+                {{ !empty($selectedLocation) ? "Cottages & Home Stay in {$selectedLocation}" : "Book Your Stay" }}
+            </h1>
+            <p class="text-xs sm:text-sm text-paper/70 mt-2">
+                {{ !empty($selectedLocation) ? "Discover handcrafted wooden cottages and peaceful nature home stay in {$selectedLocation}, Idukki district." : "Private forest villas, heritage wooden cottages, and lakeside pavilions surrounded by nature." }}
+            </p>
         </div>
 
         <!-- SEARCH BAR CAPSULE (AIRBNB STYLE) -->

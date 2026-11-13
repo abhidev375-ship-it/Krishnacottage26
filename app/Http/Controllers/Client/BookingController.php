@@ -66,10 +66,40 @@ class BookingController extends Controller
         $minPrice = $request->query('min_price');
         $maxPrice = $request->query('max_price');
         $amenityFilter = $request->query('amenity');
+        $locationParam = strtolower(trim((string)$request->query('location', $request->query('city', $request->query('destination', '')))));
+        $seoTitle = null;
+        $seoDescription = null;
+        $selectedLocation = null;
 
         $query = RoomType::with(['branch', 'category', 'amenitiesList', 'rooms'])
             ->where('is_active', true)
             ->where('is_bookable', true);
+
+        if (!empty($locationParam)) {
+            $selectedLocation = ucfirst($locationParam);
+            $seoTitle = "Cottages & Home Stay in {$selectedLocation} | Country Side Cottages";
+            $seoDescription = "Book luxury wooden cottages and peaceful nature home stay in {$selectedLocation}, Idukki, Kerala. Experience organic cardamom plantation views and authentic Kerala dining.";
+
+            $locationMatches = (clone $query)->where(function ($q) use ($locationParam) {
+                $q->whereHas('branch', function ($bq) use ($locationParam) {
+                    $bq->where('city', 'LIKE', "%{$locationParam}%")
+                       ->orWhere('name', 'LIKE', "%{$locationParam}%")
+                       ->orWhere('display_name', 'LIKE', "%{$locationParam}%");
+                })->orWhere('city', 'LIKE', "%{$locationParam}%")
+                  ->orWhere('name', 'LIKE', "%{$locationParam}%");
+            })->exists();
+
+            if ($locationMatches) {
+                $query->where(function ($q) use ($locationParam) {
+                    $q->whereHas('branch', function ($bq) use ($locationParam) {
+                        $bq->where('city', 'LIKE', "%{$locationParam}%")
+                           ->orWhere('name', 'LIKE', "%{$locationParam}%")
+                           ->orWhere('display_name', 'LIKE', "%{$locationParam}%");
+                    })->orWhere('city', 'LIKE', "%{$locationParam}%")
+                      ->orWhere('name', 'LIKE', "%{$locationParam}%");
+                });
+            }
+        }
 
         if ($branchId) {
             $query->where('branch_id', $branchId);
@@ -173,7 +203,11 @@ class BookingController extends Controller
             'nights',
             'minPrice',
             'maxPrice',
-            'amenityFilter'
+            'amenityFilter',
+            'seoTitle',
+            'seoDescription',
+            'selectedLocation',
+            'locationParam'
         ));
     }
 

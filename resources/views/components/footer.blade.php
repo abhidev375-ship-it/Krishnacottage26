@@ -111,6 +111,39 @@
             </div>
         </div>
 
+        <!-- HIGH-IMPACT LOCAL SEO KEYWORD SILO (Rajakkad, Munnar, Adimali) -->
+        <div class="border-t border-paper/10 mt-10 pt-6">
+            <span class="text-[10px] uppercase tracking-[0.2em] text-brass font-bold block mb-3">Popular Cottage &amp; Homestay Searches</span>
+            <div class="flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-paper/75">
+                <a href="{{ route('rooms.index', ['location' => 'rajakkad']) }}" class="hover:text-brass transition flex items-center gap-1.5">
+                    <span class="text-brass/70">📍</span>
+                    <span class="font-medium">Cottages in Rajakkad</span>
+                </a>
+                <a href="{{ route('rooms.index', ['location' => 'rajakkad']) }}" class="hover:text-brass transition flex items-center gap-1.5">
+                    <span class="text-brass/70">🏡</span>
+                    <span class="font-medium">Home Stay in Rajakkad</span>
+                </a>
+                <span class="text-paper/20 hidden md:inline">|</span>
+                <a href="{{ route('rooms.index', ['location' => 'munnar']) }}" class="hover:text-brass transition flex items-center gap-1.5">
+                    <span class="text-brass/70">📍</span>
+                    <span class="font-medium">Cottages in Munnar</span>
+                </a>
+                <a href="{{ route('rooms.index', ['location' => 'munnar']) }}" class="hover:text-brass transition flex items-center gap-1.5">
+                    <span class="text-brass/70">🏡</span>
+                    <span class="font-medium">Home Stay in Munnar</span>
+                </a>
+                <span class="text-paper/20 hidden md:inline">|</span>
+                <a href="{{ route('rooms.index', ['location' => 'adimali']) }}" class="hover:text-brass transition flex items-center gap-1.5">
+                    <span class="text-brass/70">📍</span>
+                    <span class="font-medium">Cottages in Adimali</span>
+                </a>
+                <a href="{{ route('rooms.index', ['location' => 'adimali']) }}" class="hover:text-brass transition flex items-center gap-1.5">
+                    <span class="text-brass/70">🏡</span>
+                    <span class="font-medium">Home Stay in Adimali</span>
+                </a>
+            </div>
+        </div>
+
         <!-- Bottom Copyright & Legal Links -->
         <div class="border-t border-paper/10 mt-12 pt-6 flex flex-col md:flex-row items-center justify-between text-[11px] text-paper/50 gap-4">
             <p>&copy; {{ date('Y') }} {{ $fCopyright }}</p>

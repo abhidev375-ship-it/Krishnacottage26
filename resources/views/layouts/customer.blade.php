@@ -8,8 +8,8 @@
     <title>@yield('title', 'Country Side Cottages — Luxury Cottages & Homestay in Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola & Adimali, Kerala')</title>
 
     <!-- PRIMARY HIGH-RANKING SEO METADATA -->
-    <meta name="description" content="@yield('meta_description', 'Discover Country Side Cottages across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali. Book luxury wooden cottages, nature homestays &amp; private hillside villas in Kerala with organic dining &amp; cardamom plantation views.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'krishna cottage, krishna cottages, country side cottages, idukki cottages, idukki resorts, rajakkadu resort, munnar homestay, wooden cottages in idukki, plantation homestay in rajakkadu, family resort in adimali idukki, honeymoon cottage in munnar, kerala eco cottage idukki')">
+    <meta name="description" content="@yield('meta_description', 'Book best-rated wooden cottages and peaceful home stay in Rajakkad, Munnar, and Adimali across Idukki, Kerala. Experience organic plantation dining, mist-covered mountain views, and authentic hospitality at Country Side Cottages.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'cottages in rajakkad, home stay in rajakkad, homestay in rajakkad, cottages in munnar, home stay in munnar, homestay in munnar, cottages in adimali, home stay in adimali, homestay in adimali, krishna cottage, krishna cottages, country side cottages, idukki cottages, idukki resorts, rajakkadu resort, wooden cottages in idukki, plantation homestay in rajakkadu, family resort in adimali idukki, honeymoon cottage in munnar, kerala eco cottage idukki')">
     <meta name="robots" content="@yield('meta_robots', 'index, follow')" />
     <link rel="canonical" href="@yield('canonical_url', url()->current())" />
 
@@ -59,10 +59,10 @@
         "@@context": "https://schema.org",
         "@@type": "Resort",
         "name": "{{ addslashes(\App\Models\Setting::get('resort_name', 'Country Side Cottages')) }}",
-        "alternateName": ["Krishna Cottage", "Krishna Cottages", "Country Side Cottages Kerala", "Village Cottages"],
+        "alternateName": ["Krishna Cottage", "Krishna Cottages", "Country Side Cottages Kerala", "Village Cottages", "Country Side Homestay"],
         "url": "{{ !str_contains(url('/'), 'localhost') ? url('/') : 'https://countrysidecottages.in' }}",
         "logo": "{{ asset('uploads/homepage/krishna_1788796146_NLXh47tR.jpg') }}",
-        "description": "Luxury wooden cottages, nature homestays and private hillside villas across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali, Kerala.",
+        "description": "Premier handcrafted wooden cottages and peaceful plantation home stay across Rajakkad, Munnar, Adimali, and Idukki, Kerala.",
         "telephone": "{{ \App\Models\Setting::get('resort_phone', \App\Models\Setting::get('resort_contact_phone', '+91 94471 22334')) }}",
         "email": "{{ \App\Models\Setting::get('resort_email', \App\Models\Setting::get('resort_contact_email', 'concierge@countrysidecottages.com')) }}",
         "address": {
@@ -79,14 +79,100 @@
             "longitude": 77.0673
         },
         "areaServed": [
-            { "@@type": "AdministrativeArea", "name": "Idukki" },
+            { "@@type": "City", "name": "Rajakkad" },
             { "@@type": "City", "name": "Munnar" },
-            { "@@type": "City", "name": "Rajakkadu" },
+            { "@@type": "City", "name": "Adimali" },
+            { "@@type": "AdministrativeArea", "name": "Idukki" },
             { "@@type": "City", "name": "Rajakumari" },
-            { "@@type": "City", "name": "Udumbanchola" },
-            { "@@type": "City", "name": "Adimali" }
+            { "@@type": "City", "name": "Udumbanchola" }
+        ],
+        "subOrganization": [
+            {
+                "@@type": "LodgingBusiness",
+                "name": "Country Side Cottages & Home Stay - Rajakkad",
+                "description": "Authentic wooden cottages and serene cardamom plantation home stay in Rajakkad, Idukki.",
+                "url": "{{ url('/stay?location=rajakkad') }}",
+                "address": {
+                    "@@type": "PostalAddress",
+                    "addressLocality": "Rajakkad",
+                    "addressRegion": "Idukki, Kerala",
+                    "postalCode": "685566",
+                    "addressCountry": "IN"
+                },
+                "geo": { "@@type": "GeoCoordinates", "latitude": 9.9784, "longitude": 77.0673 }
+            },
+            {
+                "@@type": "LodgingBusiness",
+                "name": "Country Side Cottages & Home Stay - Munnar",
+                "description": "Highland cottages and mist-shrouded nature home stay near Munnar tea hills.",
+                "url": "{{ url('/stay?location=munnar') }}",
+                "address": {
+                    "@@type": "PostalAddress",
+                    "addressLocality": "Munnar",
+                    "addressRegion": "Idukki, Kerala",
+                    "postalCode": "685612",
+                    "addressCountry": "IN"
+                },
+                "geo": { "@@type": "GeoCoordinates", "latitude": 10.0889, "longitude": 77.0595 }
+            },
+            {
+                "@@type": "LodgingBusiness",
+                "name": "Country Side Cottages & Home Stay - Adimali",
+                "description": "Family wooden cottages and nature home stay in Adimali gateway to Idukki hills.",
+                "url": "{{ url('/stay?location=adimali') }}",
+                "address": {
+                    "@@type": "PostalAddress",
+                    "addressLocality": "Adimali",
+                    "addressRegion": "Idukki, Kerala",
+                    "postalCode": "685561",
+                    "addressCountry": "IN"
+                },
+                "geo": { "@@type": "GeoCoordinates", "latitude": 10.0240, "longitude": 76.9538 }
+            }
         ],
         "priceRange": "₹₹₹"
+    }
+    </script>
+
+    <!-- GOOGLE FAQPAGES RICH SCHEMA FOR EXACT KEYWORD MATCHES -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@@type": "Question",
+                "name": "Which are the best cottages and home stay in Rajakkad?",
+                "acceptedAnswer": {
+                    "@@type": "Answer",
+                    "text": "Country Side Cottages offers the highest-rated wooden cottages and tranquil plantation home stay in Rajakkad, Idukki. Guests enjoy hillside valley views, authentic Kerala clay pot dining, and direct access to organic cardamom and spice trails."
+                }
+            },
+            {
+                "@@type": "Question",
+                "name": "Where to book luxury cottages and home stay in Munnar?",
+                "acceptedAnswer": {
+                    "@@type": "Answer",
+                    "text": "Country Side Cottages features nature homestays and private wooden cottages near Munnar, nestled among rolling hills and misty tea estates with 24/7 concierge service and instant online reservations."
+                }
+            },
+            {
+                "@@type": "Question",
+                "name": "Are there family cottages and home stay in Adimali, Idukki?",
+                "acceptedAnswer": {
+                    "@@type": "Answer",
+                    "text": "Yes, Country Side Cottages provides authentic family cottages and peaceful home stay in Adimali, offering spacious bedrooms, organic plantation breakfasts, and a scenic gateway stay between Cochin and Munnar."
+                }
+            },
+            {
+                "@@type": "Question",
+                "name": "What amenities are provided in Country Side Cottages across Rajakkad, Munnar, and Adimali?",
+                "acceptedAnswer": {
+                    "@@type": "Answer",
+                    "text": "All cottages and homestays feature artisan king teak beds, private mountain-view verandas, climate control, high-speed Wi-Fi, open-air rain showers, organic Kerala toiletries, and farm-to-table estate dining with strictly no artificial swimming pools for ecological harmony."
+                }
+            }
+        ]
     }
     </script>
 
