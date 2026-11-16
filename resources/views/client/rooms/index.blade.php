@@ -1,7 +1,20 @@
 @extends('layouts.customer')
 
+@php
+    $canonicalUrl = !empty($locationParam) ? url('/stay?location=' . $locationParam) : url('/stay');
+@endphp
+
+@section('canonical_url', $canonicalUrl)
 @section('title', $seoTitle ?? 'Rooms & Cottages | Country Side Cottages — Luxury Stays in Idukki, Munnar, Rajakkad & Adimali')
 @section('meta_description', $seoDescription ?? 'Book luxury wooden cottages, private hillside villas & peaceful plantation home stays in Rajakkad, Munnar, and Adimali across Idukki, Kerala.')
+
+@if(!empty($selectedLocation) && strtolower($selectedLocation) === 'munnar')
+    @section('meta_keywords', 'cottages in munnar, home stay in munnar, homestay in munnar, cloud mountain munnar, luxury cottage munnar, mountain cottage munnar, country side cottages munnar')
+@elseif(!empty($selectedLocation) && strtolower($selectedLocation) === 'rajakkad')
+    @section('meta_keywords', 'cottages in rajakkad, home stay in rajakkad, homestay in rajakkad, krishna studio apartment rajakkad, krishna holiday home rajakkad, country side cottages rajakkad')
+@elseif(!empty($selectedLocation) && strtolower($selectedLocation) === 'adimali')
+    @section('meta_keywords', 'cottages in adimali, home stay in adimali, homestay in adimali, luxury cottages adimali, country side cottages adimali')
+@endif
 
 @section('content')
 <!-- AIRBNB-STYLE FLOATING SEARCH & FILTER BAR -->
@@ -222,6 +235,31 @@
         </div>
     </div>
 
+    @if(!empty($selectedLocation) && strtolower($selectedLocation) === 'munnar')
+    <!-- PROMINENT MUNNAR FEATURED RETREAT HIGHLIGHT (Cloud Mountain) -->
+    <div class="mb-8 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-forest via-[#0d4538] to-forest text-paper border border-brass/30 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden">
+        <div class="space-y-1.5 relative z-10">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-brass/20 text-brass border border-brass/40 text-[10px] font-bold uppercase tracking-wider">
+                    <i data-lucide="award" class="w-3 h-3 text-brass"></i>
+                    ★ Top-Rated Munnar Cottage
+                </span>
+                <span class="text-paper/60 text-xs hidden sm:inline">&middot; Mountain Mist Sanctuary</span>
+            </div>
+            <h2 class="serif text-xl sm:text-2xl font-bold text-paper">Cloud Mountain — Luxury Cottage in Munnar</h2>
+            <p class="text-xs sm:text-sm text-paper/85 max-w-2xl leading-relaxed">
+                Perched peacefully on a mountaintop above the clouds in Munnar. Handcrafted European-style wooden cottage featuring panoramic tea valley vistas, private sunrise verandas, bonfire setups, and authentic Kerala estate dining.
+            </p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0 relative z-10 w-full sm:w-auto">
+            <a href="{{ url('/rooms/cloud-mountain-5rXjm') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-brass hover:bg-brass/90 text-forest font-bold text-xs shadow-md transition">
+                <span>Explore Cloud Mountain</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+        </div>
+    </div>
+    @endif
+
     @if($roomTypes->isEmpty())
     <div class="bg-white rounded-[24px] p-12 text-center soft-border shadow-card max-w-lg mx-auto">
         <div class="w-16 h-16 rounded-full bg-mint flex items-center justify-center text-emerald mx-auto mb-4">
@@ -263,6 +301,11 @@
                     <span class="bg-paper/95 backdrop-blur-md text-forest text-[10px] font-bold px-2.5 py-1 rounded-full shadow-xs">
                         {{ $room->size_sqft ?? 480 }} sq.ft
                     </span>
+                    @if($room->slug === 'cloud-mountain-5rXjm' || strtolower($room->branch?->city ?? '') === 'munnar')
+                    <span class="bg-brass text-forest text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
+                        ★ Munnar Highland
+                    </span>
+                    @endif
                 </div>
 
                 <div class="absolute top-3 right-3">

@@ -126,7 +126,10 @@ Route::get('/', function () {
 
 // Airbnb-Style Room Booking Engine
 Route::get('/stay', [BookingController::class, 'index'])->name('rooms.index');
-Route::get('/rooms', [BookingController::class, 'index']);
+Route::get('/rooms', function (\Illuminate\Http\Request $request) {
+    $queryString = $request->getQueryString();
+    return redirect()->to('/stay' . ($queryString ? '?' . $queryString : ''), 301);
+});
 Route::get('/rooms/{slug}', [BookingController::class, 'show'])->name('rooms.show');
 Route::get('/book/{id}', [BookingController::class, 'checkout'])->name('booking.checkout');
 Route::post('/book', [BookingController::class, 'store'])->name('booking.store');

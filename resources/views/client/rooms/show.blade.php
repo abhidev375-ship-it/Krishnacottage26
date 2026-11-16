@@ -1,10 +1,31 @@
 @extends('layouts.customer')
 
-@section('title', $roomType->name . ' — Luxury Cottage in ' . ($roomType->branch?->city ?? 'Kerala') . ' | Country Side Cottages')
-@section('meta_description', \Illuminate\Support\Str::limit(strip_tags($roomType->short_description ?: $roomType->description), 155))
-@section('og_image', $roomType->cover_image_url ?: asset('uploads/homepage/krishna_1788796146_NLXh47tR.jpg'))
-@section('og_title', $roomType->name . ' — Country Side Cottages')
-@section('og_description', \Illuminate\Support\Str::limit(strip_tags($roomType->short_description ?: $roomType->description), 155))
+@php
+    $isMunnar = ($roomType->slug === 'cloud-mountain-5rXjm' || strtolower($roomType->branch?->city ?? '') === 'munnar');
+    $roomTitle = $isMunnar 
+        ? "Cloud Mountain — Luxury Cottage & Homestay in Munnar | Country Side Cottages"
+        : $roomType->name . ' — Luxury Cottage in ' . ($roomType->branch?->city ?? 'Kerala') . ' | Country Side Cottages';
+
+    $roomDesc = $isMunnar
+        ? "Wake up above the clouds at Cloud Mountain — luxury European-style wooden cottage & peaceful nature homestay in Munnar, Kerala. Panoramic mountain views, private veranda, campfire & authentic dining."
+        : \Illuminate\Support\Str::limit(strip_tags($roomType->short_description ?: $roomType->description), 155);
+
+    $rawOgImage = $roomType->cover_image_url ?: asset('uploads/homepage/krishna_1788796146_NLXh47tR.jpg');
+    $resolvedOgImage = \Illuminate\Support\Str::startsWith($rawOgImage, 'http') ? $rawOgImage : url($rawOgImage);
+@endphp
+
+@section('canonical_url', route('rooms.show', $roomType->slug))
+@section('title', $roomTitle)
+@section('meta_description', $roomDesc)
+@if($isMunnar)
+@section('meta_keywords', 'cottages in munnar, home stay in munnar, homestay in munnar, cloud mountain munnar, luxury cottage in munnar, private cottage munnar, wooden cottage munnar, munnar resorts, country side cottages munnar')
+@endif
+@section('og_image', $resolvedOgImage)
+@section('og_title', $roomTitle)
+@section('og_description', $roomDesc)
+@section('twitter_image', $resolvedOgImage)
+@section('twitter_title', $roomTitle)
+@section('twitter_description', $roomDesc)
 @section('hide_mobile_nav', true)
 
 @push('schema')
@@ -16,7 +37,7 @@
     "itemListElement": [
         { "@@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}" },
         { "@@type": "ListItem", "position": 2, "name": "Stays", "item": "{{ route('rooms.index') }}" },
-        { "@@type": "ListItem", "position": 3, "name": "{{ addslashes($roomType->name) }}", "item": "{{ url()->current() }}" }
+        { "@@type": "ListItem", "position": 3, "name": "{{ addslashes($roomType->name) }}", "item": "{{ route('rooms.show', $roomType->slug) }}" }
     ]
 }
 </script>
@@ -339,6 +360,60 @@
                         <span>Get Directions (Google Maps)</span>
                     </a>
                 </div>
+
+                @if($isMunnar)
+                <!-- KEY MUNNAR ATTRACTIONS & SCENIC DISTANCES -->
+                <div class="mt-4 pt-3 border-t border-forest/10">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-forest/70 block mb-2 flex items-center gap-1.5">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald"></i>
+                        Key Munnar Attractions & Scenic Distances from Cloud Mountain
+                    </span>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs text-forest/80">
+                        <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white/70 border border-forest/5 shadow-xs">
+                            <i data-lucide="compass" class="w-4 h-4 text-emerald shrink-0"></i>
+                            <div>
+                                <span class="font-bold block text-forest text-[11px]">Munnar Town</span>
+                                <span class="text-[10px] text-forest/60">~18 km scenic drive</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white/70 border border-forest/5 shadow-xs">
+                            <i data-lucide="trees" class="w-4 h-4 text-emerald shrink-0"></i>
+                            <div>
+                                <span class="font-bold block text-forest text-[11px]">Eravikulam Park</span>
+                                <span class="text-[10px] text-forest/60">~28 km (Nilgiri Tahr)</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white/70 border border-forest/5 shadow-xs">
+                            <i data-lucide="waves" class="w-4 h-4 text-emerald shrink-0"></i>
+                            <div>
+                                <span class="font-bold block text-forest text-[11px]">Mattupetty Dam</span>
+                                <span class="text-[10px] text-forest/60">~25 km boating</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white/70 border border-forest/5 shadow-xs">
+                            <i data-lucide="mountain" class="w-4 h-4 text-emerald shrink-0"></i>
+                            <div>
+                                <span class="font-bold block text-forest text-[11px]">Anamudi Peak</span>
+                                <span class="text-[10px] text-forest/60">Highest peak views</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white/70 border border-forest/5 shadow-xs">
+                            <i data-lucide="cloud-fog" class="w-4 h-4 text-emerald shrink-0"></i>
+                            <div>
+                                <span class="font-bold block text-forest text-[11px]">Top Station</span>
+                                <span class="text-[10px] text-forest/60">~40 km clouds valley</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white/70 border border-forest/5 shadow-xs">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-emerald shrink-0"></i>
+                            <div>
+                                <span class="font-bold block text-forest text-[11px]">Tea & Spice Trails</span>
+                                <span class="text-[10px] text-forest/60">Direct onsite walks</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
             @endif
 

@@ -1,6 +1,8 @@
 @extends('layouts.customer')
 
+@section('canonical_url', route('facilities.index'))
 @section('title', 'Authentic Facilities & Experiences | Country Side Cottages')
+@section('meta_description', 'Discover mindful spaces crafted for nature communion, botanical healing, and serene plantation life across Country Side Cottages destinations in Idukki, Munnar, and Rajakkad.')
 
 @section('content')
 <!-- HERO SECTION -->

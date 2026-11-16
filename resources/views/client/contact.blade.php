@@ -8,6 +8,7 @@
     $faqs = $contactContent['faqs'] ?? [];
 @endphp
 
+@section('canonical_url', route('contact.index'))
 @section('title', 'Concierge & Contact | Country Side Cottages — Idukki, Munnar, Kerala')
 @section('meta_description', 'Get in touch with 24/7 Front Desk & Concierge at Country Side Cottages Kerala. Inquire about wooden cottage bookings, bespoke private dining, travel assistance, and resort locations.')
 

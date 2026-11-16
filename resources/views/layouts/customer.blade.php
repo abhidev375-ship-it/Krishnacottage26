@@ -5,18 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#F4F1E8">
-    <title>@yield('title', 'Country Side Cottages — Luxury Cottages & Homestay in Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola & Adimali, Kerala')</title>
-
-    <!-- PRIMARY HIGH-RANKING SEO METADATA -->
-    <meta name="description" content="@yield('meta_description', 'Book best-rated wooden cottages and peaceful home stay in Rajakkad, Munnar, and Adimali across Idukki, Kerala. Experience organic plantation dining, mist-covered mountain views, and authentic hospitality at Country Side Cottages.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'cottages in rajakkad, home stay in rajakkad, homestay in rajakkad, cottages in munnar, home stay in munnar, homestay in munnar, cottages in adimali, home stay in adimali, homestay in adimali, krishna cottage, krishna cottages, country side cottages, idukki cottages, idukki resorts, rajakkadu resort, wooden cottages in idukki, plantation homestay in rajakkadu, family resort in adimali idukki, honeymoon cottage in munnar, kerala eco cottage idukki')">
-    <meta name="robots" content="@yield('meta_robots', 'index, follow')" />
-    <link rel="canonical" href="@yield('canonical_url', url()->current())" />
 
     @php
+        $dbName = \App\Models\Setting::get('resort_name', 'Country Side Cottages');
+        $defaultSeoTitle = \App\Models\Setting::get('seo_meta_title', 'Country Side Cottages — Luxury Cottages & Homestay in Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola & Adimali, Kerala');
+        $defaultSeoDesc = \App\Models\Setting::get('seo_meta_description', 'Book best-rated wooden cottages and peaceful home stay in Rajakkad, Munnar, and Adimali across Idukki, Kerala. Experience organic plantation dining, mist-covered mountain views, and authentic hospitality at Country Side Cottages.');
+        $defaultSeoKeywords = \App\Models\Setting::get('seo_meta_keywords', 'cottages in rajakkad, home stay in rajakkad, homestay in rajakkad, cottages in munnar, home stay in munnar, homestay in munnar, cottages in adimali, home stay in adimali, homestay in adimali, krishna cottage, krishna cottages, country side cottages, idukki cottages, idukki resorts, rajakkadu resort, wooden cottages in idukki, plantation homestay in rajakkadu, family resort in adimali idukki, honeymoon cottage in munnar, kerala eco cottage idukki');
+        $defaultSeoOgImage = \App\Models\Setting::get('seo_og_image', asset('uploads/homepage/krishna_1788796146_NLXh47tR.jpg'));
+        $defaultSeoRobots = \App\Models\Setting::get('seo_meta_robots', 'index, follow');
         $gVerifyCode = \App\Models\Setting::get('google_site_verification', env('GOOGLE_SITE_VERIFICATION'));
         $ga4Id = \App\Models\Setting::get('google_analytics_id', env('GOOGLE_ANALYTICS_ID'));
     @endphp
+    <title>@yield('title', $defaultSeoTitle)</title>
+
+    <!-- PRIMARY HIGH-RANKING SEO METADATA -->
+    <meta name="description" content="@yield('meta_description', $defaultSeoDesc)">
+    <meta name="keywords" content="@yield('meta_keywords', $defaultSeoKeywords)">
+    <meta name="robots" content="@yield('meta_robots', $defaultSeoRobots)" />
+    <link rel="canonical" href="@yield('canonical_url', url()->current())" />
+
     @if(!empty($gVerifyCode))
     <!-- GOOGLE SEARCH CONSOLE VERIFICATION -->
     <meta name="google-site-verification" content="{{ $gVerifyCode }}" />
@@ -40,18 +47,37 @@
 
     <!-- OPEN GRAPH / FACEBOOK SOCIAL SHARING -->
     <meta property="og:type" content="@yield('og_type', 'website')" />
-    <meta property="og:site_name" content="Country Side Cottages" />
-    <meta property="og:url" content="{{ url()->current() }}" />
-    <meta property="og:title" content="@yield('og_title', View::getSection('title', 'Country Side Cottages — Luxury Cottages & Homestay in Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola & Adimali'))" />
-    <meta property="og:description" content="@yield('og_description', View::getSection('meta_description', 'Authentic wooden cottages and peaceful hillside homestays across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali, Kerala.'))" />
-    <meta property="og:image" content="@yield('og_image', asset('uploads/homepage/krishna_1788796146_NLXh47tR.jpg'))" />
+    <meta property="og:site_name" content="{{ $dbName }}" />
+    <meta property="og:url" content="@yield('canonical_url', url()->current())" />
+    <meta property="og:title" content="@yield('og_title', View::getSection('title', $defaultSeoTitle))" />
+    <meta property="og:description" content="@yield('og_description', View::getSection('meta_description', $defaultSeoDesc))" />
+    <meta property="og:image" content="@yield('og_image', $defaultSeoOgImage)" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- TWITTER CARDS -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="@yield('twitter_title', View::getSection('og_title', View::getSection('title')))" />
-    <meta name="twitter:description" content="@yield('twitter_description', View::getSection('og_description', View::getSection('meta_description')))" />
-    <meta name="twitter:image" content="@yield('twitter_image', View::getSection('og_image', asset('uploads/homepage/krishna_1788796146_NLXh47tR.jpg')))" />
+    <meta name="twitter:title" content="@yield('twitter_title', View::getSection('og_title', View::getSection('title', $defaultSeoTitle)))" />
+    <meta name="twitter:description" content="@yield('twitter_description', View::getSection('og_description', View::getSection('meta_description', $defaultSeoDesc)))" />
+    <meta name="twitter:image" content="@yield('twitter_image', View::getSection('og_image', $defaultSeoOgImage))" />
+
+    <!-- GOOGLE WEBSITE & SITELINKS SEARCH BOX SCHEMA -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "WebSite",
+        "name": "{{ addslashes($dbName) }}",
+        "alternateName": ["Country Side Cottages", "Krishna Cottage", "Krishna Cottages Munnar", "Country Side Homestay"],
+        "url": "{{ url('/') }}",
+        "potentialAction": {
+            "@@type": "SearchAction",
+            "target": {
+                "@@type": "EntryPoint",
+                "urlTemplate": "{{ url('/stay') }}?location={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
 
     <!-- STRUCTURED DATA / JSON-LD RICH SNIPPET -->
     <script type="application/ld+json">

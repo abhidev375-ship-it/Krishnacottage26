@@ -1,5 +1,6 @@
 @extends('layouts.customer')
 
+@section('canonical_url', route('dining.index'))
 @section('title', 'Plantation Kitchen & Heritage Kerala Dining | Country Side Cottages')
 @section('meta_description', 'Experience authentic farm-to-table Kerala gastronomy cooked in clay pots with estate-harvested spices, organic coconut oil, and traditional recipes at Country Side Cottages.')
 

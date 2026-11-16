@@ -1,5 +1,6 @@
 @extends('layouts.customer')
 
+@section('canonical_url', route('spices.index'))
 @section('title', 'Country Side Spices | Single-Origin Kerala Plantation Harvest')
 @section('meta_description', 'Shop fresh, unadulterated high-altitude green cardamom, black tellicherry pepper, cloves, and wild cinnamon directly harvested from Country Side Cottages shade-grown plantations.')
 

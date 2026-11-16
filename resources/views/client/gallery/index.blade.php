@@ -1,6 +1,8 @@
 @extends('layouts.customer')
 
+@section('canonical_url', route('gallery.index'))
 @section('title', 'Photo Gallery & Visual Journal | Country Side Cottages')
+@section('meta_description', 'Browse high-resolution photographs of handcrafted wooden cottages, misty morning verandas, organic spice plantations, and scenic dining across Country Side Cottages.')
 
 @section('content')
 <!-- HERO SECTION -->

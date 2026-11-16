@@ -1,6 +1,8 @@
 @extends('layouts.customer')
 
+@section('canonical_url', route('nearby.index'))
 @section('title', 'Nearby Discoveries & Excursions | Country Side Cottages')
+@section('meta_description', 'Explore cascading waterfalls, mist-shrouded peaks, ancient spice trade paths, and tea estates near Country Side Cottages in Munnar, Rajakkad, and Idukki.')
 
 @section('content')
 <!-- HERO SECTION -->

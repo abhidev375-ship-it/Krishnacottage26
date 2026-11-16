@@ -2468,6 +2468,11 @@
                 frontdesk_hours: document.getElementById('field-resort-hours')?.value.trim() || '',
                 google_site_verification: document.getElementById('field-google-verification')?.value.trim() || '',
                 google_analytics_id: document.getElementById('field-ga4-id')?.value.trim() || '',
+                seo_meta_title: document.getElementById('field-seo-title')?.value.trim() || '',
+                seo_meta_description: document.getElementById('field-seo-desc')?.value.trim() || '',
+                seo_meta_keywords: document.getElementById('field-seo-keywords')?.value.trim() || '',
+                seo_og_image: document.getElementById('field-seo-og-image')?.value.trim() || '',
+                seo_meta_robots: document.getElementById('field-seo-robots')?.value.trim() || 'index, follow',
             };
 
             try {

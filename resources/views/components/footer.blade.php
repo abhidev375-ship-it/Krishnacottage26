@@ -135,6 +135,10 @@
                     <span class="text-brass/70">🏡</span>
                     <span class="font-medium">Home Stay in Munnar</span>
                 </a>
+                <a href="{{ url('/rooms/cloud-mountain-5rXjm') }}" class="hover:text-brass transition flex items-center gap-1.5">
+                    <span class="text-brass">⭐</span>
+                    <span class="font-medium text-brass">Cloud Mountain Munnar</span>
+                </a>
                 <span class="text-paper/20 hidden md:inline">|</span>
                 <a href="{{ route('rooms.index', ['location' => 'adimali']) }}" class="hover:text-brass transition flex items-center gap-1.5">
                     <span class="text-brass/70">📍</span>

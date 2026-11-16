@@ -71,6 +71,7 @@
     $galleryAlbumsList = $galleryAlbumsList->filter(fn($a) => $a->images && $a->images->isNotEmpty())->take(6);
 @endphp
 
+@section('canonical_url', url('/'))
 @section('title', 'Country Side Cottages — Luxury Cottages & Homestay in Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola & Adimali, Kerala')
 @section('meta_description', 'Discover Country Side Cottages across Idukki, Munnar, Rajakkadu, Rajakumari, Udumbanchola, and Adimali. Book handcrafted wooden cottages, authentic plantation dining, and nature homestays with cardamom plantation views.')
 
