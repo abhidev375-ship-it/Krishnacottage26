@@ -77,8 +77,20 @@ class BookingController extends Controller
 
         if (!empty($locationParam)) {
             $selectedLocation = ucfirst($locationParam);
-            $seoTitle = "Cottages & Home Stay in {$selectedLocation} | Country Side Cottages";
-            $seoDescription = "Book luxury wooden cottages and peaceful nature home stay in {$selectedLocation}, Idukki, Kerala. Experience organic cardamom plantation views and authentic Kerala dining.";
+            $normLoc = strtolower($locationParam);
+            if ($normLoc === 'munnar') {
+                $seoTitle = "Cottages in Munnar — Luxury Hillside Wooden Stays | Country Side Cottages";
+                $seoDescription = "Book top-rated cottages in Munnar with panoramic mountain mist views, European wooden architecture, private verandas, campfire & authentic Kerala dining.";
+            } elseif ($normLoc === 'rajakkad') {
+                $seoTitle = "Cottages in Rajakkad — Hillside Homestay & Nature Retreat | Country Side Cottages";
+                $seoDescription = "Book luxury wooden cottages and peaceful nature homestay in Rajakkad, Idukki. Experience organic cardamom plantation views and authentic Kerala clay pot dining.";
+            } elseif ($normLoc === 'adimali') {
+                $seoTitle = "Cottages in Adimali — Nature Homestay & Gateway Retreat | Country Side Cottages";
+                $seoDescription = "Book peaceful family cottages and nature homestay in Adimali, gateway to Munnar hills. Enjoy scenic forest views and home-style Kerala hospitality.";
+            } else {
+                $seoTitle = "Cottages in {$selectedLocation} — Luxury Stays & Homestay | Country Side Cottages";
+                $seoDescription = "Book luxury wooden cottages and peaceful nature homestay in {$selectedLocation}, Idukki, Kerala. Experience organic plantation views and authentic dining.";
+            }
 
             $locationMatches = (clone $query)->where(function ($q) use ($locationParam) {
                 $q->whereHas('branch', function ($bq) use ($locationParam) {

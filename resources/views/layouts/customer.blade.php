@@ -129,11 +129,14 @@
             },
             {
                 "@@type": "LodgingBusiness",
-                "name": "Country Side Cottages & Home Stay - Munnar",
-                "description": "Highland cottages and mist-shrouded nature home stay near Munnar tea hills.",
+                "name": "Country Side Cottages — Cloud Mountain Munnar",
+                "alternateName": ["Cloud Mountain Cottage Munnar", "Cottages in Munnar"],
+                "description": "Handcrafted luxury wooden cottages, private verandas, and mist-shrouded nature home stay in Munnar, Kerala.",
                 "url": "{{ url('/stay?location=munnar') }}",
+                "priceRange": "₹₹",
                 "address": {
                     "@@type": "PostalAddress",
+                    "streetAddress": "Pazhayaviduthi, Munnar",
                     "addressLocality": "Munnar",
                     "addressRegion": "Idukki, Kerala",
                     "postalCode": "685612",
@@ -172,6 +175,14 @@
                 "acceptedAnswer": {
                     "@@type": "Answer",
                     "text": "Country Side Cottages offers the highest-rated wooden cottages and tranquil plantation home stay in Rajakkad, Idukki. Guests enjoy hillside valley views, authentic Kerala clay pot dining, and direct access to organic cardamom and spice trails."
+                }
+            },
+            {
+                "@@type": "Question",
+                "name": "Which are the best cottages in Munnar with mountain view?",
+                "acceptedAnswer": {
+                    "@@type": "Answer",
+                    "text": "Cloud Mountain at Country Side Cottages is widely rated among the best wooden cottages in Munnar. Perched on a quiet mountaintop above the clouds, it features authentic European timber architecture, private sunrise verandas, evening bonfires, and farm-to-table Kerala dining."
                 }
             },
             {

@@ -25,7 +25,7 @@
                 {{ !empty($selectedLocation) ? "Authentic Stays in {$selectedLocation}" : "Authentic Kerala Cottages & Home Stay" }}
             </span>
             <h1 class="serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
-                {{ !empty($selectedLocation) ? "Cottages & Home Stay in {$selectedLocation}" : "Book Your Stay" }}
+                {{ !empty($selectedLocation) ? "Cottages in {$selectedLocation}" : "Book Your Stay" }}
             </h1>
             <p class="text-xs sm:text-sm text-paper/70 mt-2">
                 {{ !empty($selectedLocation) ? "Discover handcrafted wooden cottages and peaceful nature home stay in {$selectedLocation}, Idukki district." : "Private forest villas, heritage wooden cottages, and lakeside pavilions surrounded by nature." }}
@@ -425,6 +425,79 @@
             </div>
         </div>
         @endforeach
+    </div>
+    @endif
+
+    @if(!empty($selectedLocation) && strtolower($selectedLocation) === 'munnar')
+    <!-- RICH EDITORIAL & LOCAL SEO CONTENT FOR COTTAGES IN MUNNAR -->
+    <div class="mt-14 pt-10 border-t border-forest/10 space-y-8">
+        <!-- Section 1: Intro & Distinct Advantages -->
+        <div class="max-w-4xl">
+            <span class="eyebrow text-brass block mb-2">Hillside Serenity &amp; Nature Living</span>
+            <h2 class="serif text-2xl sm:text-3xl font-bold text-forest mb-3">
+                Handcrafted Wooden Cottages in Munnar Surrounded by Mist &amp; Tea Trails
+            </h2>
+            <p class="text-xs sm:text-sm text-forest/75 leading-relaxed">
+                Looking for the quintessential high-altitude escape? Country Side Cottages provides authentic European-style wooden cottages perched high above the clouds in Munnar. Unlike crowded town-center hotels, our private residences offer expansive timber balconies, organic cardamom valley vistas, and absolute quietude surrounded by rolling tea plantations.
+            </p>
+        </div>
+
+        <!-- Section 2: 3 Core Highlights (Grid) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-paper/70 p-5 rounded-2xl border border-forest/10 shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-mint flex items-center justify-center text-emerald mb-3">
+                    <i data-lucide="mountain" class="w-5 h-5"></i>
+                </div>
+                <h3 class="serif text-base font-bold text-forest mb-1.5">Mountaintop Cloud Views</h3>
+                <p class="text-xs text-forest/70 leading-relaxed">
+                    Wake up to swirling fog and crisp mountain breezes right outside your bedroom window on private hillside verandas.
+                </p>
+            </div>
+            <div class="bg-paper/70 p-5 rounded-2xl border border-forest/10 shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-mint flex items-center justify-center text-emerald mb-3">
+                    <i data-lucide="flame" class="w-5 h-5"></i>
+                </div>
+                <h3 class="serif text-base font-bold text-forest mb-1.5">Campfire &amp; Starlit Evenings</h3>
+                <p class="text-xs text-forest/70 leading-relaxed">
+                    Enjoy warm outdoor bonfires under starlit Kerala skies with fresh estate-brewed spice tea and barbecue on request.
+                </p>
+            </div>
+            <div class="bg-paper/70 p-5 rounded-2xl border border-forest/10 shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-mint flex items-center justify-center text-emerald mb-3">
+                    <i data-lucide="utensils" class="w-5 h-5"></i>
+                </div>
+                <h3 class="serif text-base font-bold text-forest mb-1.5">Farm-to-Table Kerala Dining</h3>
+                <p class="text-xs text-forest/70 leading-relaxed">
+                    Savor home-style Kerala delicacies cooked in earthen pots using single-origin spices harvested directly from our estate.
+                </p>
+            </div>
+        </div>
+
+        <!-- Section 3: Munnar Travel Distances -->
+        <div class="p-6 rounded-2xl bg-forest text-paper border border-brass/20">
+            <h2 class="serif text-xl font-bold text-paper mb-2">Key Munnar Excursions &amp; Travel Distances</h2>
+            <p class="text-xs text-paper/70 mb-4 max-w-2xl leading-relaxed">
+                Cloud Mountain Cottage offers an ideal base for exploring Munnar's iconic hill-country attractions while returning to complete peace at night.
+            </p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div class="p-3 rounded-xl bg-white/10 border border-white/10">
+                    <span class="block text-brass font-bold text-sm">~18 km</span>
+                    <span class="text-paper/80 text-[11px]">Munnar Town Center</span>
+                </div>
+                <div class="p-3 rounded-xl bg-white/10 border border-white/10">
+                    <span class="block text-brass font-bold text-sm">~25 km</span>
+                    <span class="text-paper/80 text-[11px]">Mattupetty Dam &amp; Lake</span>
+                </div>
+                <div class="p-3 rounded-xl bg-white/10 border border-white/10">
+                    <span class="block text-brass font-bold text-sm">~28 km</span>
+                    <span class="text-paper/80 text-[11px]">Eravikulam National Park</span>
+                </div>
+                <div class="p-3 rounded-xl bg-white/10 border border-white/10">
+                    <span class="block text-brass font-bold text-sm">~40 km</span>
+                    <span class="text-paper/80 text-[11px]">Top Station Clouds View</span>
+                </div>
+            </div>
+        </div>
     </div>
     @endif
 </div>
