@@ -4588,28 +4588,43 @@
                 grid.innerHTML = `
                     <div class="col-span-full py-12 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
                         <i data-lucide="image" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>
-                        <p class="font-medium text-xs text-gray-500">No photos in this album yet.</p>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Upload photos from device or enter image URLs below.</p>
+                        <p class="font-medium text-xs text-gray-500">No media in this album yet.</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Upload photos or videos from device or enter a media link below.</p>
                     </div>
                 `;
                 setTimeout(() => lucide.createIcons(), 30);
                 return;
             }
 
-            grid.innerHTML = photos.map(p => `
+            grid.innerHTML = photos.map(p => {
+                const isVideo = p.media_type === 'video' || (p.video_url && p.video_url.length > 0);
+                const mediaPreview = isVideo
+                    ? `<div class="w-full h-full bg-slate-900 flex flex-col items-center justify-center relative">
+                        ${p.thumbnail_url ? `<img src="${escapeAdminHtml(p.thumbnail_url)}" class="w-full h-full object-cover">` : ''}
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+                            <span class="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-md">
+                                <i data-lucide="play" class="w-4 h-4 ml-0.5"></i>
+                            </span>
+                        </div>
+                        <span class="absolute bottom-1 right-1 text-[9px] bg-black/75 text-rose-300 px-1 py-0.5 rounded font-bold uppercase">Video</span>
+                       </div>`
+                    : `<img src="${escapeAdminHtml(p.image_url)}" class="w-full h-full object-cover">`;
+
+                return `
                 <div class="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50 shadow-xs aspect-video sm:aspect-square flex items-center justify-center" id="album-photo-card-${p.id}">
-                    <img src="${escapeAdminHtml(p.image_url)}" class="w-full h-full object-cover">
+                    ${mediaPreview}
                     <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity p-2 flex flex-col justify-between text-white">
                         <div class="flex justify-between items-start">
                             <span class="text-[10px] bg-black/60 px-1.5 py-0.5 rounded font-mono">#${p.sort_order || p.id}</span>
-                            <button type="button" onclick="deletePhotoFromAlbum(${currentManagingAlbumId}, ${p.id})" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded-lg transition" title="Delete Photo">
+                            <button type="button" onclick="deletePhotoFromAlbum(${currentManagingAlbumId}, ${p.id})" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded-lg transition" title="Delete Media">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                             </button>
                         </div>
-                        <div class="text-[11px] truncate font-medium">${escapeAdminHtml(p.title || '')}</div>
+                        <div class="text-[11px] truncate font-medium">${escapeAdminHtml(p.title || (isVideo ? 'Album Video' : 'Album Photo'))}</div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
             setTimeout(() => lucide.createIcons(), 30);
         }
 
@@ -4633,7 +4648,7 @@
                 if (data.success) {
                     showToast(data.message || 'Photos added successfully!', 'success');
                     const countEl = document.getElementById('manage-album-photos-count');
-                    if (countEl) countEl.innerText = `${data.total_count} Photos`;
+                    if (countEl) countEl.innerText = `${data.total_count} Items`;
                     renderAlbumPhotosGrid(data.photos || []);
 
                     const badge = document.getElementById(`album-card-count-${currentManagingAlbumId}`);
@@ -4644,6 +4659,42 @@
             } catch (e) {
                 console.error(e);
                 showToast('Error uploading photos', 'error');
+            } finally {
+                fileInput.value = '';
+            }
+        }
+
+        async function uploadVideosToCurrentAlbum(fileInput) {
+            if (!currentManagingAlbumId) return;
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) return;
+
+            const files = Array.from(fileInput.files);
+            showToast(`Uploading ${files.length} video(s) to album...`, 'info');
+
+            const formData = new FormData();
+            files.forEach(f => formData.append('videos[]', f));
+
+            try {
+                const res = await fetch(`/admin/gallery/albums/${currentManagingAlbumId}/photos`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message || 'Videos added successfully!', 'success');
+                    const countEl = document.getElementById('manage-album-photos-count');
+                    if (countEl) countEl.innerText = `${data.total_count} Items`;
+                    renderAlbumPhotosGrid(data.photos || []);
+
+                    const badge = document.getElementById(`album-card-count-${currentManagingAlbumId}`);
+                    if (badge) badge.innerText = `${data.total_count} Photos`;
+                } else {
+                    showToast(data.message || 'Failed to add videos', 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Error uploading videos', 'error');
             } finally {
                 fileInput.value = '';
             }
@@ -7686,6 +7737,25 @@
             } catch (err) {
                 console.error(err);
                 showToast('Network error toggling testimonial visibility', 'error');
+            }
+        }
+
+        async function toggleTestimonialPin(id) {
+            try {
+                const res = await fetch(`/admin/testimonials/${id}/toggle-pin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    setTimeout(() => window.location.reload(), 600);
+                } else {
+                    showToast(data.message || 'Failed to toggle pin status', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Network error toggling pin status', 'error');
             }
         }
 

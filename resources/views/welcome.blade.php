@@ -49,17 +49,23 @@
     }
     usort($heroSlidesList, fn($a, $b) => ($a['sort_order'] ?? 1) <=> ($b['sort_order'] ?? 1));
 
-    // Curated Testimonials
+    // Curated Testimonials (Pinned to Home Page)
     $reviewsList = (isset($testimonials) && $testimonials->isNotEmpty()) 
-        ? $testimonials->where('is_active', true) 
+        ? $testimonials->filter(fn($t) => $t->is_active && ($t->is_pinned ?? true))->values()
         : collect([
             (object)[
                 'guest_name' => $hContent['review_author'] ?? 'Ananya & Ravi',
                 'stay_title' => $hContent['review_subtitle'] ?? 'Garden Residence · Munnar Retreat',
                 'quote' => $hContent['review_quote'] ?? 'Everything felt easy — from the wooden cottage to dinner to knowing what was nearby. Truly peaceful and pure.',
                 'rating' => 5,
+                'photos' => [],
+                'videos' => [],
             ]
         ]);
+
+    if ($reviewsList->isEmpty() && isset($testimonials) && $testimonials->isNotEmpty()) {
+        $reviewsList = $testimonials->where('is_active', true)->values();
+    }
 
     // Curated Gallery Albums (Published with High-Res Photo Collections)
     $galleryAlbumsList = (isset($galleryAlbums) && $galleryAlbums->isNotEmpty())
@@ -1257,9 +1263,15 @@
                                 “{{ $t->quote }}”
                             </p>
                             <!-- Author -->
-                            <div class="pt-2">
+                            <div class="pt-2 flex flex-col items-center">
                                 <p class="text-sm font-bold text-forest">{{ $t->guest_name }}</p>
                                 <p class="text-xs text-forest/50 font-medium mt-0.5">{{ $t->stay_title }}</p>
+                                <button type="button" 
+                                        onclick="openWelcomeTestimonialStory({{ $tIdx }})" 
+                                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-paper hover:bg-forest hover:text-paper text-forest text-xs font-bold soft-border transition shadow-2xs mt-3 cursor-pointer">
+                                    <i data-lucide="book-open" class="w-3.5 h-3.5 text-brass"></i>
+                                    <span>View Story</span>
+                                </button>
                             </div>
                         </div>
                     @endforeach
@@ -1292,8 +1304,49 @@
 
         </div>
 
+        <!-- Action Button below carousel -->
+        <div class="mt-8 flex items-center justify-center">
+            <a href="{{ route('reviews.index') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-forest hover:bg-emerald text-paper font-bold text-xs shadow-card transition cursor-pointer">
+                <span>Read All Google-Style Reviews ({{ count($reviewsList) > 0 ? count($reviewsList) : '30+' }}+ Verified Stories)</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-brass"></i>
+            </a>
+        </div>
+
     </div>
 </section>
+
+<!-- TESTIMONIAL STORY MODAL -->
+<div id="welcome-testimonial-story-modal" class="hidden fixed inset-0 z-[120] bg-black/75 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target === this) closeWelcomeTestimonialStory()">
+    <div class="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto soft-border shadow-2xl p-6 sm:p-8 space-y-5 animate-fade-in text-forest relative">
+        <button type="button" onclick="closeWelcomeTestimonialStory()" class="absolute top-4 right-4 p-2 rounded-full bg-paper hover:bg-forest hover:text-white transition cursor-pointer text-forest/60">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+
+        <div class="flex items-center gap-2 text-brass text-lg" id="story-modal-stars">
+            ★★★★★
+        </div>
+
+        <p class="serif text-lg sm:text-xl text-forest leading-relaxed italic font-normal" id="story-modal-quote">
+            "..."
+        </p>
+
+        <div class="pt-2 border-t border-forest/10 flex items-center justify-between">
+            <div>
+                <h4 class="font-bold text-sm text-forest" id="story-modal-author">Guest Name</h4>
+                <p class="text-xs text-forest/60" id="story-modal-subtitle">Stay Details</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                Verified Stay
+            </span>
+        </div>
+
+        <!-- Story Attached Media Container -->
+        <div id="story-modal-media" class="space-y-3 hidden">
+            <span class="text-[10px] font-bold text-forest/50 uppercase tracking-wider block">Attached Photos &amp; Video</span>
+            <div id="story-modal-media-content" class="space-y-2"></div>
+        </div>
+    </div>
+</div>
 
 
 <!-- =========================================================================
@@ -1630,6 +1683,7 @@
         </button>
 
         <img id="lightbox-img" src="" alt="Cottage Photograph" class="max-h-[75vh] max-w-[92vw] sm:max-w-[85vw] rounded-xl sm:rounded-2xl object-contain shadow-2xl transition duration-200">
+        <video id="lightbox-video" controls playsinline class="hidden max-h-[75vh] max-w-[92vw] sm:max-w-[85vw] rounded-xl sm:rounded-2xl shadow-2xl bg-black"></video>
 
         <!-- Next button -->
         <button id="lightbox-next-btn" type="button" onclick="lightboxNext(event)" class="absolute right-2 sm:right-6 z-40 text-white/80 hover:text-white bg-black/60 hover:bg-black/80 p-3 rounded-full backdrop-blur-xs transition shadow-lg cursor-pointer" aria-label="Next photo">
@@ -1841,8 +1895,8 @@
        GALLERY ALBUMS & FULLSCREEN LIGHTBOX VIEWER
        ===================================================================== */
     const homeAlbums = {!! json_encode($galleryAlbumsList->map(function($a) {
-        $validImgs = $a->images->filter(fn($img) => !empty($img->image_url) && !str_contains($img->image_url, 'images.unsplash.com'))->values();
-        $firstImg = $validImgs->first()?->image_url;
+        $validImgs = $a->images->filter(fn($img) => (!empty($img->image_url) || !empty($img->video_url)) && !str_contains((string)$img->image_url, 'images.unsplash.com'))->values();
+        $firstImg = $validImgs->first(fn($i) => !empty($i->image_url))?->image_url ?: $validImgs->first()?->thumbnail_url;
         return [
             'id' => $a->id,
             'name' => $a->name ?: 'Cottage Album',
@@ -1855,7 +1909,10 @@
             'images' => $validImgs->map(function($img) {
                 return [
                     'id' => $img->id,
-                    'url' => $img->image_url,
+                    'url' => $img->image_url ?: $img->video_url,
+                    'media_type' => $img->media_type ?: (!empty($img->video_url) ? 'video' : 'image'),
+                    'video_url' => $img->video_url,
+                    'thumbnail_url' => $img->thumbnail_url ?: $img->image_url,
                     'title' => $img->title ?: 'Photograph'
                 ];
             })
@@ -1877,7 +1934,7 @@
 
         if (branchEl) branchEl.textContent = album.branch;
         if (catEl) catEl.textContent = album.category;
-        if (countEl) countEl.textContent = `${album.images.length} Photos`;
+        if (countEl) countEl.textContent = `${album.images.length} Items`;
         if (titleEl) titleEl.textContent = album.name;
         if (descEl) descEl.textContent = album.description;
 
@@ -1890,14 +1947,24 @@
             } else {
                 if (emptyEl) emptyEl.classList.add('hidden');
                 album.images.forEach((img, idx) => {
+                    const isVid = img.media_type === 'video' || !!img.video_url;
                     const item = document.createElement('div');
                     item.className = 'group relative rounded-2xl overflow-hidden bg-forest/5 shadow-xs cursor-pointer h-48 sm:h-52 transition hover:shadow-lg border border-forest/10';
                     item.onclick = function() { window.openLightboxForAlbum(albumId, idx); };
                     item.innerHTML = `
-                        <img src="${img.url}" alt="${img.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <img src="${img.thumbnail_url || img.url}" alt="${img.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        ${isVid ? `
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/25 group-hover:bg-black/40 transition">
+                            <span class="w-10 h-10 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition">
+                                <i data-lucide="play" class="w-5 h-5 ml-0.5"></i>
+                            </span>
+                        </div>
+                        ` : ''}
                         <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-3.5 text-white">
                             <span class="text-xs font-bold leading-tight line-clamp-1">${img.title}</span>
-                            <span class="text-[10px] text-brass mt-0.5 flex items-center gap-1"><i data-lucide="zoom-in" class="w-3 h-3"></i> Full Resolution</span>
+                            <span class="text-[10px] text-brass mt-0.5 flex items-center gap-1">
+                                <i data-lucide="${isVid ? 'play-circle' : 'zoom-in'}" class="w-3 h-3"></i> ${isVid ? 'Watch Video' : 'Full Resolution'}
+                            </span>
                         </div>
                     `;
                     grid.appendChild(item);
@@ -1941,7 +2008,12 @@
     };
 
     window.openLightbox = function(url, caption) {
-        currentLightboxList = [{ url: url, title: caption || 'Cottage Photograph' }];
+        const isVid = !!(url && url.match(/\.(mp4|webm|mov|ogg)$/i));
+        currentLightboxList = [{
+            url: url,
+            title: caption || (isVid ? 'Cottage Video' : 'Cottage Photograph'),
+            media_type: isVid ? 'video' : 'image'
+        }];
         currentLightboxIndex = 0;
         const tagEl = document.getElementById('lightbox-album-tag');
         if (tagEl) tagEl.textContent = '';
@@ -1958,15 +2030,34 @@
         if (!currentLightboxList.length) return;
         const photo = currentLightboxList[currentLightboxIndex];
         const imgEl = document.getElementById('lightbox-img');
+        const videoEl = document.getElementById('lightbox-video');
         const capEl = document.getElementById('lightbox-caption');
         const counterEl = document.getElementById('lightbox-counter');
         const prevBtn = document.getElementById('lightbox-prev-btn');
         const nextBtn = document.getElementById('lightbox-next-btn');
 
-        if (imgEl) {
-            imgEl.src = photo.url;
-            imgEl.alt = photo.title || 'Cottage Photograph';
+        const isVideo = photo.media_type === 'video' || !!photo.video_url || (photo.url && photo.url.match(/\.(mp4|webm|mov|ogg)$/i));
+
+        if (isVideo) {
+            if (imgEl) imgEl.classList.add('hidden');
+            if (videoEl) {
+                videoEl.classList.remove('hidden');
+                videoEl.src = photo.video_url || photo.url;
+                videoEl.load();
+            }
+        } else {
+            if (videoEl) {
+                videoEl.pause();
+                videoEl.src = '';
+                videoEl.classList.add('hidden');
+            }
+            if (imgEl) {
+                imgEl.classList.remove('hidden');
+                imgEl.src = photo.url;
+                imgEl.alt = photo.title || 'Cottage Photograph';
+            }
         }
+
         if (capEl) capEl.textContent = photo.title || '';
         if (counterEl) counterEl.textContent = `${currentLightboxIndex + 1} / ${currentLightboxList.length}`;
 
@@ -1994,6 +2085,11 @@
     };
 
     window.closeLightbox = function() {
+        const videoEl = document.getElementById('lightbox-video');
+        if (videoEl) {
+            videoEl.pause();
+            videoEl.src = '';
+        }
         const lbModal = document.getElementById('lightbox-modal');
         if (lbModal) lbModal.classList.add('hidden');
         const avModal = document.getElementById('album-viewer-modal');
@@ -2176,6 +2272,74 @@
         stopTestTimer();
         startTestTimer();
     }
+
+    const welcomeTestimonialsList = @json($reviewsList);
+
+    window.openWelcomeTestimonialStory = function(idx) {
+        stopTestTimer();
+        const t = welcomeTestimonialsList[idx];
+        if (!t) return;
+
+        const modal = document.getElementById('welcome-testimonial-story-modal');
+        const quoteEl = document.getElementById('story-modal-quote');
+        const authorEl = document.getElementById('story-modal-author');
+        const subtitleEl = document.getElementById('story-modal-subtitle');
+        const starsEl = document.getElementById('story-modal-stars');
+        const mediaBox = document.getElementById('story-modal-media');
+        const mediaContent = document.getElementById('story-modal-media-content');
+
+        if (quoteEl) quoteEl.textContent = `“${t.quote}”`;
+        if (authorEl) authorEl.textContent = t.guest_name || 'Verified Traveler';
+        if (subtitleEl) subtitleEl.textContent = t.stay_title || 'Country Side Cottages Stay';
+        if (starsEl) starsEl.textContent = '★'.repeat(t.rating || 5);
+
+        if (mediaBox && mediaContent) {
+            mediaContent.innerHTML = '';
+            let hasMedia = false;
+
+            if (t.photos && Array.isArray(t.photos) && t.photos.length > 0) {
+                hasMedia = true;
+                const photoWrap = document.createElement('div');
+                photoWrap.className = 'flex items-center gap-2 overflow-x-auto py-1';
+                t.photos.forEach(p => {
+                    const img = document.createElement('img');
+                    img.src = p;
+                    img.className = 'w-20 h-20 object-cover rounded-xl soft-border shrink-0 cursor-pointer';
+                    img.onclick = () => window.open(p, '_blank');
+                    photoWrap.appendChild(img);
+                });
+                mediaContent.appendChild(photoWrap);
+            }
+
+            if (t.videos && Array.isArray(t.videos) && t.videos.length > 0) {
+                hasMedia = true;
+                t.videos.forEach(v => {
+                    const vid = document.createElement('video');
+                    vid.src = v;
+                    vid.controls = true;
+                    vid.playsInline = true;
+                    vid.className = 'w-full max-h-48 rounded-xl object-cover bg-black';
+                    mediaContent.appendChild(vid);
+                });
+            }
+
+            if (hasMedia) {
+                mediaBox.classList.remove('hidden');
+            } else {
+                mediaBox.classList.add('hidden');
+            }
+        }
+
+        if (modal) modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeWelcomeTestimonialStory = function() {
+        const modal = document.getElementById('welcome-testimonial-story-modal');
+        if (modal) modal.classList.add('hidden');
+        document.body.style.overflow = '';
+        startTestTimer();
+    };
 
     /* =====================================================================
        BOOKING DATE SYNCHRONIZATION

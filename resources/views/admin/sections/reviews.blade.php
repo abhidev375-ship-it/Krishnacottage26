@@ -381,6 +381,12 @@
                                 <i data-lucide="{{ $item->is_active ? 'eye' : 'eye-off' }}" class="w-3.5 h-3.5"></i>
                                 <span>{{ $item->is_active ? 'Active' : 'Hidden' }}</span>
                             </button>
+
+                            <!-- Pin to Home Page Switch -->
+                            <button type="button" onclick="toggleTestimonialPin({{ $item->id }})" class="p-1.5 rounded-lg border text-xs font-bold flex items-center gap-1.5 cursor-pointer transition {{ ($item->is_pinned ?? true) ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-gray-100 text-gray-500 border-gray-200' }}" title="Pin or unpin testimonial on Home Page carousel">
+                                <i data-lucide="pin" class="w-3.5 h-3.5 {{ ($item->is_pinned ?? true) ? 'text-amber-600 fill-amber-500' : 'text-gray-400' }}"></i>
+                                <span>{{ ($item->is_pinned ?? true) ? 'Pinned' : 'Unpinned' }}</span>
+                            </button>
                         </div>
 
                         <!-- Center: Testimonial Details -->

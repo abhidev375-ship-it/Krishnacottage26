@@ -13,6 +13,9 @@ class GalleryImage extends Model
     protected $fillable = [
         'gallery_album_id',
         'image_url',
+        'media_type',
+        'video_url',
+        'thumbnail_url',
         'title',
         'alt_text',
         'description',

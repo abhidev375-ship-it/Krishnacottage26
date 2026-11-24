@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AuditLog;
+use App\Models\Branch;
 use App\Models\Guest;
 use App\Models\NotificationLog;
 use App\Models\Payment;
@@ -208,12 +209,15 @@ class BookingAvailabilityService
         $ci = Carbon::parse($checkInStr)->toDateString();
         $co = Carbon::parse($checkOutStr)->toDateString();
         $now = Carbon::now();
+        $todayStr = Carbon::today()->toDateString();
+        $isCurrentStay = ($ci <= $todayStr && $co > $todayStr);
 
         // Release expired holds first
         $this->releaseExpiredHolds();
 
         $query = Room::where('room_type_id', $roomTypeId)
             ->whereNotIn('operational_status', ['maintenance', 'blocked', 'out_of_order'])
+            ->when($isCurrentStay, fn($q) => $q->where('operational_status', '!=', 'occupied'))
             // Exclude rooms with overlapping room_blocks
             ->whereDoesntHave('blocks', function ($q) use ($ci, $co) {
                 $q->where('start_date', '<', $co)
@@ -282,6 +286,63 @@ class BookingAvailabilityService
         }
 
         return $freeRooms;
+    }
+
+    /**
+     * Look for other branches having available units for requested dates when current branch cannot satisfy request.
+     */
+    public function getOtherBranchesAvailability(int $currentBranchId, int $requestedRooms, string $checkInStr, string $checkOutStr): array
+    {
+        $otherBranches = Branch::where('id', '!=', $currentBranchId)
+            ->where('is_active', true)
+            ->get();
+
+        $recommendations = [];
+
+        foreach ($otherBranches as $branch) {
+            $branchRoomTypes = RoomType::where('branch_id', $branch->id)
+                ->where('is_active', true)
+                ->where('is_bookable', true)
+                ->get();
+
+            $maxAvailableInBranch = 0;
+            $bestRoomType = null;
+
+            foreach ($branchRoomTypes as $rt) {
+                $avail = $this->getAvailablePhysicalRooms($rt->id, $checkInStr, $checkOutStr)->count();
+                if ($avail > $maxAvailableInBranch) {
+                    $maxAvailableInBranch = $avail;
+                    $bestRoomType = $rt;
+                }
+            }
+
+            if ($maxAvailableInBranch > 0) {
+                $recommendations[] = [
+                    'branch_id' => $branch->id,
+                    'branch_name' => $branch->name,
+                    'city' => $branch->city,
+                    'available_count' => $maxAvailableInBranch,
+                    'room_type_name' => $bestRoomType?->name,
+                    'room_type_slug' => $bestRoomType?->slug,
+                    'meets_full_request' => ($maxAvailableInBranch >= $requestedRooms),
+                    'view_url' => route('rooms.index', [
+                        'branch_id' => $branch->id,
+                        'check_in' => $checkInStr,
+                        'check_out' => $checkOutStr,
+                        'rooms' => min($requestedRooms, $maxAvailableInBranch),
+                    ]),
+                ];
+            }
+        }
+
+        usort($recommendations, function ($a, $b) {
+            if ($a['meets_full_request'] !== $b['meets_full_request']) {
+                return $b['meets_full_request'] ? 1 : -1;
+            }
+            return $b['available_count'] <=> $a['available_count'];
+        });
+
+        return $recommendations;
     }
 
     /**

@@ -2619,20 +2619,27 @@ async function handleCategoryFormSubmit(e) {
         <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 text-xs">
             <!-- Upload Toolbar -->
             <div class="p-3.5 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-wrap items-center justify-between gap-2">
                     <span class="font-bold text-brand-text text-[11px] flex items-center gap-1.5">
-                        <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-brand-primary"></i> Add Photos to This Album
+                        <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-brand-primary"></i> Add Photos &amp; Videos to Album
                     </span>
-                    <label class="px-3 py-1.5 bg-brand-primary hover:bg-brand-deep text-white rounded-lg cursor-pointer text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
-                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                        <span>Upload Files from Device</span>
-                        <input type="file" multiple accept="image/*" class="hidden" onchange="uploadPhotosToCurrentAlbum(this)">
-                    </label>
+                    <div class="flex items-center gap-2">
+                        <label class="px-3 py-1.5 bg-brand-primary hover:bg-brand-deep text-white rounded-lg cursor-pointer text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+                            <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                            <span>Upload Photos</span>
+                            <input type="file" multiple accept="image/*" class="hidden" onchange="uploadPhotosToCurrentAlbum(this)">
+                        </label>
+                        <label class="px-3 py-1.5 bg-rose-700 hover:bg-rose-800 text-white rounded-lg cursor-pointer text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+                            <i data-lucide="video" class="w-3.5 h-3.5"></i>
+                            <span>Upload Videos</span>
+                            <input type="file" multiple accept="video/*" class="hidden" onchange="uploadVideosToCurrentAlbum(this)">
+                        </label>
+                    </div>
                 </div>
                 <div class="flex gap-2">
-                    <input type="text" id="album-photo-new-url" placeholder="Or paste public image web address (URL)..." class="flex-1 px-3 py-2 rounded-lg border border-gray-300 text-xs">
+                    <input type="text" id="album-photo-new-url" placeholder="Or paste public image or video link (MP4, YouTube)..." class="flex-1 px-3 py-2 rounded-lg border border-gray-300 text-xs">
                     <button type="button" onclick="addUrlPhotoToCurrentAlbum()" class="px-3.5 py-2 bg-gray-200 hover:bg-gray-300 text-brand-text font-bold rounded-lg transition">
-                        Add Photo
+                        Add URL
                     </button>
                 </div>
             </div>

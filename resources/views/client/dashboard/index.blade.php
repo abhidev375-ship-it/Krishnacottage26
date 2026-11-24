@@ -29,17 +29,17 @@
                 @if($dashPhone)
                 <a href="tel:{{ $dashCleanPhone }}" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 text-paper font-bold text-xs flex items-center gap-1.5 transition touch-tap shadow-xs" title="Call {{ $dashBranch?->name ?? 'Front Desk' }} ({{ $dashPhone }})">
                     <i data-lucide="phone-call" class="w-3.5 h-3.5 text-brass"></i>
-                    <span class="hidden sm:inline">Call Desk:</span>
-                    <span>{{ $dashPhone }}</span>
+                    <span class="hidden sm:inline">Call Desk: {{ $dashPhone }}</span>
+                    <span class="sm:hidden">Call</span>
                 </a>
                 @endif
                 <button onclick="openDashboardChat()" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-paper font-bold text-xs flex items-center gap-1.5 transition touch-tap shadow-xs">
                     <i data-lucide="message-circle" class="w-3.5 h-3.5 text-brass"></i>
-                    <span>Concierge Chat</span>
+                    <span class="hidden xs:inline">Concierge</span> Chat
                 </button>
                 <a href="{{ route('rooms.index') }}" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-brass hover:brightness-105 text-forest font-bold text-xs flex items-center gap-1.5 shadow-card transition touch-tap">
                     <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                    <span>Book Another Stay</span>
+                    <span>Book Stay</span>
                 </a>
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
@@ -264,7 +264,7 @@
                         @endif
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                         @if($selectedStay->branch)
                         <a href="{{ $selectedStay->branch->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-paper hover:bg-white soft-border text-forest text-xs font-semibold transition flex items-center gap-1.5" title="Get Driving Directions on Google Maps">
                             <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald"></i>
@@ -279,7 +279,8 @@
                         @if($stayPhone)
                         <a href="tel:{{ $cleanStayPhone }}" class="px-3 py-2 rounded-xl bg-paper hover:bg-white soft-border text-forest text-xs font-semibold transition flex items-center gap-1.5" title="Call {{ $stayBranch ? $stayBranch->name : 'Front Desk' }}: {{ $stayPhone }}">
                             <i data-lucide="phone-call" class="w-3.5 h-3.5 text-emerald"></i>
-                            <span>Call Desk: {{ $stayPhone }}</span>
+                            <span class="hidden sm:inline">Call Desk: {{ $stayPhone }}</span>
+                            <span class="sm:hidden">Call</span>
                         </a>
                         @endif
                         <button onclick="openDashboardChat()" class="px-3.5 py-2 rounded-xl bg-mint hover:bg-emerald/20 text-emerald font-bold text-xs border border-emerald/20 transition flex items-center gap-1.5">
@@ -304,13 +305,13 @@
                 </div>
                 <div>
                     <h3 class="serif text-xl font-bold text-forest">Extend Your Stay in Paradise</h3>
-                    <p class="text-xs text-forest/60 mt-0.5">Want to prolong your holiday? Check live availability or view your custom manager loyalty offer.</p>
+                    <p class="text-xs text-forest/60 mt-0.5">Want to prolong your holiday? Check live availability and request a stay extension.</p>
                 </div>
             </div>
 
             @if($isInHouse)
             <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded-full border border-emerald-200 uppercase tracking-wider self-start sm:self-auto">
-                ⚡ Direct Manager Priority
+                ⚡ Direct Front Desk Priority
             </span>
             @endif
         </div>
@@ -331,7 +332,7 @@
                             </div>
                             <div>
                                 <span class="text-[10px] uppercase font-bold tracking-wider text-amber-800/70">Request #EXT-{{ $activeExt->id }}</span>
-                                <h4 class="serif text-lg font-bold text-amber-950">Extension Under Manager Loyalty Review</h4>
+                                <h4 class="serif text-lg font-bold text-amber-950">Extension Request Under Review</h4>
                             </div>
                         </div>
                         <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-200 text-amber-900 border border-amber-300 self-start sm:self-auto">
@@ -353,12 +354,12 @@
                         <div class="p-3 rounded-2xl bg-white/80 soft-border">
                             <span class="text-forest/50 block text-[9px] uppercase font-bold">Standard Estimate</span>
                             <span class="font-bold text-forest text-sm mt-0.5 block">₹{{ number_format($activeExt->standard_amount, 2) }}</span>
-                            <span class="text-[10px] text-amber-700 font-semibold">Discount being prepared</span>
+                            <span class="text-[10px] text-forest/60 font-semibold">Standard Nightly Tariff</span>
                         </div>
                     </div>
 
                     <p class="text-xs text-amber-900/80 leading-relaxed">
-                        Namaste! The property manager has been notified of your request. A special loyalty discount will be posted to your folio shortly. If you have any urgent requests, please reach out via <button onclick="openDashboardChat()" class="underline font-bold text-forest hover:text-emerald">Concierge Chat</button>.
+                        Namaste! The front desk manager has been notified of your request. Your stay extension will be confirmed shortly. If you have any urgent requests, please reach out via <button onclick="openDashboardChat()" class="underline font-bold text-forest hover:text-emerald">Concierge Chat</button>.
                     </p>
                 </div>
                 @elseif($activeExt->status === 'approved')
@@ -370,9 +371,9 @@
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-800">Exclusive Resort Courtesy</span>
+                                    <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-800">Stay Extension Details</span>
                                     <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-emerald-200 text-emerald-900">
-                                        {{ $activeExt->manager_discount_percentage > 0 ? $activeExt->manager_discount_percentage . '% OFF APPLIED' : 'APPROVED' }}
+                                        APPROVED
                                     </span>
                                 </div>
                                 <h4 class="serif text-xl font-bold text-forest">Stay Extension Approved! Checkout Extended</h4>
@@ -394,13 +395,13 @@
                         </div>
                         <div class="p-3.5 rounded-2xl bg-white/90 soft-border">
                             <span class="text-forest/50 block text-[9px] uppercase font-bold">Standard Value</span>
-                            <span class="font-semibold text-forest/60 text-sm mt-0.5 block line-through">₹{{ number_format($activeExt->standard_amount, 2) }}</span>
+                            <span class="font-semibold text-forest/70 text-sm mt-0.5 block">₹{{ number_format($activeExt->standard_amount, 2) }}</span>
                             <span class="text-[10px] text-forest/50">Base tariff + GST</span>
                         </div>
                         <div class="p-3.5 rounded-2xl bg-white/90 soft-border">
-                            <span class="text-forest/50 block text-[9px] uppercase font-bold">Manager Loyalty Price</span>
+                            <span class="text-forest/50 block text-[9px] uppercase font-bold">Confirmed Extension Tariff</span>
                             <span class="font-extrabold text-emerald text-base mt-0.5 block">₹{{ number_format($activeExt->offered_amount, 2) }}</span>
-                            <span class="text-[10px] text-emerald font-bold">Saved ₹{{ number_format(max(0, $activeExt->standard_amount - $activeExt->offered_amount), 2) }}</span>
+                            <span class="text-[10px] text-emerald font-semibold">Total payable</span>
                         </div>
                         <div class="p-3.5 rounded-2xl bg-white/90 soft-border">
                             <span class="text-forest/50 block text-[9px] uppercase font-bold">Settlement Status</span>
@@ -533,10 +534,10 @@
 
                             <button onclick="submitStayExtensionRequest({{ $selectedStay->id }})" id="ext-submit-btn" class="w-full py-3.5 rounded-xl bg-forest hover:bg-emerald text-paper font-bold text-xs flex items-center justify-center gap-2 shadow-card transition touch-tap">
                                 <i data-lucide="send" class="w-3.5 h-3.5 text-brass"></i>
-                                <span>Request Extension &amp; Loyalty Discount</span>
+                                <span>Request Stay Extension</span>
                             </button>
                             <p class="text-[10px] text-center text-forest/50 leading-relaxed">
-                                Once submitted, manager reviews and applies a discounted rate. You may settle on-hand or at checkout anytime.
+                                Once submitted, the front desk confirms availability for your requested dates. You may settle on-hand or at checkout anytime.
                             </p>
                         </div>
                     </div>

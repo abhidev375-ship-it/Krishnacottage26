@@ -194,6 +194,9 @@ class BookingController extends Controller
             $rt->stay_pricing = $bookingService->calculateStayPricing($rt, $startDate, $endDate, $roomsCount);
             $availableRooms = $bookingService->getAvailablePhysicalRooms($rt->id, $checkIn, $checkOut);
             $rt->available_rooms_count = $availableRooms->count();
+            $rt->other_branch_recommendations = ($rt->available_rooms_count < $roomsCount)
+                ? $bookingService->getOtherBranchesAvailability($rt->branch_id, $roomsCount, $checkIn, $checkOut)
+                : [];
             $rt->average_rating = isset($reviewsAvgStats[$rt->id]) ? round((float)$reviewsAvgStats[$rt->id], 2) : null;
             $rt->approved_reviews_count = (int)($reviewsCountStats[$rt->id] ?? 0);
         }
@@ -255,6 +258,12 @@ class BookingController extends Controller
         $startDate = Carbon::parse($checkIn);
         $endDate = Carbon::parse($checkOut);
         $nights = max(1, $startDate->diffInDays($endDate));
+
+        $availableRooms = $bookingService->getAvailablePhysicalRooms($roomType->id, $checkIn, $checkOut);
+        $availableRoomsCount = $availableRooms->count();
+        if ($availableRoomsCount > 0 && $roomsCount > $availableRoomsCount) {
+            $roomsCount = $availableRoomsCount;
+        }
 
         $unitCount = $roomType->rooms ? $roomType->rooms->count() : 0;
         if ($unitCount > 1 && $roomType->base_price >= 20000) {
@@ -325,6 +334,7 @@ class BookingController extends Controller
             'adults',
             'children',
             'roomsCount',
+            'availableRoomsCount',
             'childAges',
             'party',
             'nights',
@@ -379,6 +389,22 @@ class BookingController extends Controller
         $party = $bookingService->evaluatePartyComposition($adults, $children, $childAges);
         $effectiveAdults = $party['effective_adults'];
         $effectiveChildren = $party['effective_children'];
+
+        $availableRooms = $bookingService->getAvailablePhysicalRooms($roomType->id, $checkIn, $checkOut);
+        $availableRoomsCount = $availableRooms->count();
+
+        if ($availableRoomsCount === 0) {
+            return redirect()->route('rooms.show', [
+                'slug' => $roomType->slug,
+                'check_in' => $checkIn,
+                'check_out' => $checkOut,
+            ])->with('error', "Sorry, {$roomType->name} is fully reserved for your selected dates. Please adjust your dates.");
+        }
+
+        if ($roomsCount > $availableRoomsCount) {
+            $roomsCount = $availableRoomsCount;
+            session()->flash('info', "Notice: Only {$availableRoomsCount} villa(s) are available for your selected dates. Your booking has been adjusted to {$roomsCount} room(s).");
+        }
 
         $capacityCheck = $bookingService->validateRoomTypeCapacity($roomType, $effectiveAdults, $effectiveChildren, $roomsCount);
         if (!$capacityCheck['valid']) {
@@ -759,48 +785,16 @@ class BookingController extends Controller
                 $guest->update(['user_id' => $user->id]);
             }
 
-            // ATOMIC CONCURRENCY CHECK:
-            // Query physical rooms for this room type and lock them for update to prevent race conditions
-            $availableRooms = Room::where('room_type_id', $roomType->id)
-                ->whereNotIn('operational_status', ['maintenance', 'blocked', 'out_of_order'])
-                ->lockForUpdate()
-                ->get();
-
-            // Filter rooms that have zero overlapping reservations and room_blocks for requested dates
             $checkInStr = $startDate->toDateString();
             $checkOutStr = $endDate->toDateString();
 
-            $freeRoom = null;
-            foreach ($availableRooms as $room) {
-                // Check physical room capacity override
-                $roomCap = (int) ($room->max_guests ?? 0);
-                if ($roomCap > 0 && $roomCap < $totalGuests) {
-                    continue;
-                }
+            // ATOMIC CONCURRENCY CHECK:
+            // Query physical rooms for this room type and lock them for update to prevent race conditions
+            $availablePhysicalRooms = $bookingService->getAvailablePhysicalRooms($roomType->id, $checkInStr, $checkOutStr, null, true);
 
-                $hasOverlap = Reservation::where('room_id', $room->id)
-                    ->where(function ($q) {
-                        $q->whereIn('status', ['confirmed', 'checked_in'])
-                          ->orWhere(fn($sq) => $sq->where('status', 'hold')->where('hold_expires_at', '>', Carbon::now()));
-                    })
-                    ->where('check_in_date', '<', $checkOutStr)
-                    ->where('check_out_date', '>', $checkInStr)
-                    ->exists()
-                    ||
-                    $room->blocks()
-                        ->where('start_date', '<', $checkOutStr)
-                        ->where('end_date', '>', $checkInStr)
-                        ->exists();
-
-                if (!$hasOverlap) {
-                    $freeRoom = $room;
-                    break;
-                }
-            }
-
-            // SIMULTANEOUS RACE CONDITION DETECTED:
+            // SIMULTANEOUS RACE CONDITION OR CAPACITY LIMIT DETECTED:
             // If another user completed their payment and secured the last room milliseconds earlier
-            if (!$freeRoom) {
+            if ($availablePhysicalRooms->count() < $roomsCount) {
                 $refundTxnId = 'REF-' . date('Ymd') . '-' . strtoupper(Str::random(6));
 
                 // If online payment was completed, trigger automated Razorpay API refund
@@ -887,6 +881,7 @@ class BookingController extends Controller
             }
 
             // SUCCESSFUL ALLOCATION (FCFS winner):
+            $freeRoom = $availablePhysicalRooms->first();
             $guest->increment('total_stays', 1);
             $guest->increment('total_spent', $total);
 

@@ -19,6 +19,7 @@ use App\Http\Controllers\Client\ClientDiningController;
 use App\Http\Controllers\Client\ClientPageController;
 use App\Http\Controllers\Client\ClientSpiceController;
 use App\Http\Controllers\Client\CustomerPortalController;
+use App\Http\Controllers\Client\ReviewPublicController;
 use App\Http\Controllers\Client\StayExtensionController;
 use App\Http\Middleware\AdminAuthMiddleware;
 use App\Models\Branch;
@@ -136,6 +137,11 @@ Route::post('/book', [BookingController::class, 'store'])->name('booking.store')
 Route::post('/booking/razorpay/create-order', [BookingController::class, 'createRazorpayOrder'])->name('booking.razorpay.create-order');
 Route::get('/booking/confirmation/{code}', [BookingController::class, 'confirmation'])->name('booking.confirmation');
 Route::post('/reviews', [BookingController::class, 'storeReview'])->name('reviews.store');
+Route::get('/share-your-experience', [ReviewPublicController::class, 'create'])->name('reviews.share-experience');
+Route::get('/shareyourexperience', [ReviewPublicController::class, 'create'])->name('reviews.shareyourexperience');
+Route::post('/share-your-experience', [ReviewPublicController::class, 'store'])->name('reviews.share-experience.store');
+Route::post('/shareyourexperience', [ReviewPublicController::class, 'store']);
+Route::get('/reviews', [ReviewPublicController::class, 'index'])->name('reviews.index');
 Route::match(['get', 'post'], '/api/availability/check', [BookingController::class, 'checkAvailability'])->name('api.availability.check');
 Route::get('/api/weather/branches', function (\App\Services\WeatherService $weatherService) {
     $branches = \App\Models\Branch::where('status', 'active')->orderBy('sort_order')->get();
@@ -357,6 +363,7 @@ Route::prefix('admin')->middleware(AdminAuthMiddleware::class)->group(function (
     Route::post('/testimonials/promote-review/{id}', [TestimonialController::class, 'promoteFromReview'])->name('admin.testimonials.promote-review');
     Route::post('/testimonials/{id}/update', [TestimonialController::class, 'update'])->name('admin.testimonials.update');
     Route::post('/testimonials/{id}/toggle', [TestimonialController::class, 'toggle'])->name('admin.testimonials.toggle');
+    Route::post('/testimonials/{id}/toggle-pin', [TestimonialController::class, 'togglePin'])->name('admin.testimonials.toggle-pin');
     Route::delete('/testimonials/{id}', [TestimonialController::class, 'destroy'])->name('admin.testimonials.destroy');
     Route::post('/chat/{id}/claim', [CustomerActionController::class, 'claimChat'])->name('admin.chat.claim');
     Route::post('/chat/{id}/relieve', [CustomerActionController::class, 'relieveChat'])->name('admin.chat.relieve');

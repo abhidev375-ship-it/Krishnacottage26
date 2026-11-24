@@ -151,11 +151,32 @@ class TestimonialController extends Controller
         $testimonial->save();
 
         $statusLabel = $testimonial->is_active ? 'visible on welcome carousel' : 'hidden from welcome carousel';
+        \Illuminate\Support\Facades\Cache::forget('homepage_payload');
 
         return response()->json([
             'success' => true,
             'message' => "Testimonial is now {$statusLabel}.",
             'is_active' => $testimonial->is_active,
+        ]);
+    }
+
+    /**
+     * Toggle pinned status of a testimonial on the home page carousel.
+     */
+    public function togglePin(Request $request, int $id): JsonResponse
+    {
+        $testimonial = Testimonial::findOrFail($id);
+        $testimonial->is_pinned = !$testimonial->is_pinned;
+        $testimonial->save();
+
+        \Illuminate\Support\Facades\Cache::forget('homepage_payload');
+
+        $statusLabel = $testimonial->is_pinned ? 'pinned to home page carousel' : 'unpinned from home page carousel';
+
+        return response()->json([
+            'success' => true,
+            'message' => "Testimonial is now {$statusLabel}.",
+            'is_pinned' => $testimonial->is_pinned,
         ]);
     }
 
@@ -284,9 +305,14 @@ class TestimonialController extends Controller
             'rating' => $rating,
             'branch_id' => $branchId,
             'review_id' => $reviewId,
+            'photos' => isset($review) ? $review->photos : null,
+            'videos' => isset($review) ? $review->videos : null,
             'sort_order' => $nextOrder,
             'is_active' => true,
+            'is_pinned' => true,
         ]);
+
+        \Illuminate\Support\Facades\Cache::forget('homepage_payload');
 
         AuditLog::create([
             'user_id' => Auth::id() ?? 1,

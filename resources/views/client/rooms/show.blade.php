@@ -457,14 +457,14 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     @forelse($reviews as $rev)
                     @php
-                        $guestName = $rev->guest ? $rev->guest->full_name : 'Verified In-House Guest';
+                        $guestName = $rev->effective_guest_name;
                     @endphp
                     <div class="bg-white rounded-2xl p-4.5 soft-border shadow-xs space-y-2.5 flex flex-col justify-between">
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-8 h-8 rounded-full bg-mint text-emerald font-bold text-xs flex items-center justify-center">
-                                        {{ substr($guestName, 0, 1) }}
+                                        {{ strtoupper(substr($guestName, 0, 1)) }}
                                     </div>
                                     <div>
                                         <h4 class="text-xs font-bold text-forest">{{ $guestName }}</h4>
@@ -490,6 +490,14 @@
                             <p class="text-xs text-forest/75 leading-relaxed">
                                 "{{ $rev->comment }}"
                             </p>
+
+                            @if(!empty($rev->photos_list))
+                            <div class="flex items-center gap-1.5 pt-1 flex-wrap">
+                                @foreach(array_slice($rev->photos_list, 0, 3) as $rp)
+                                <img src="{{ $rp }}" alt="Guest photo" class="w-12 h-12 rounded-lg object-cover soft-border">
+                                @endforeach
+                            </div>
+                            @endif
                         </div>
 
                         <!-- Resort Manager Response if available -->
@@ -508,6 +516,13 @@
                         No reviews published yet for this cottage. Be among the first to experience this slow-living haven.
                     </div>
                     @endforelse
+                </div>
+
+                <div class="mt-4 text-center">
+                    <a href="{{ route('reviews.index', array_filter(['branch_id' => $roomType->branch_id])) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-forest hover:text-emerald transition underline">
+                        <span>Read all guest reviews for {{ $roomType->branch ? $roomType->branch->name : 'this resort' }}</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -670,10 +685,22 @@
                         </div>
                     </div>
 
+                    <!-- AVAILABILITY STATUS ALERT (SHOWS WHEN 0 AVAILABLE) -->
+                    <div id="detail-availability-alert" class="{{ ($availableRoomsCount ?? 1) == 0 ? '' : 'hidden' }} p-3 mb-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+                        <i data-lucide="calendar-x" class="w-4 h-4 text-rose-600 shrink-0"></i>
+                        <span id="detail-availability-alert-text">This villa is fully reserved for your selected dates. Please adjust your check-in or check-out dates.</span>
+                    </div>
+
                     <!-- CTA BUTTON -->
-                    <button type="submit" class="w-full py-3.5 rounded-xl bg-forest hover:bg-emerald text-paper font-bold text-xs tracking-wide shadow-card transition cursor-pointer">
+                    @if(($availableRoomsCount ?? 1) == 0)
+                    <button type="submit" id="detail-reserve-btn" disabled class="w-full py-3.5 rounded-xl bg-stone-300 text-stone-600 font-bold text-xs tracking-wide border border-stone-300 cursor-not-allowed">
+                        <span id="detail-reserve-btn-text">Reserved for Selected Dates</span>
+                    </button>
+                    @else
+                    <button type="submit" id="detail-reserve-btn" class="w-full py-3.5 rounded-xl bg-forest hover:bg-emerald text-paper font-bold text-xs tracking-wide shadow-card transition cursor-pointer">
                         <span id="detail-reserve-btn-text">Reserve {{ ($roomsCount ?? 1) > 1 ? ($roomsCount . ' Rooms') : '1 Room' }}</span>
                     </button>
+                    @endif
 
                     <p class="text-center text-[11px] text-forest/50">
                         You won't be charged yet &middot; Instant confirmation
@@ -1072,7 +1099,66 @@ async function handleReviewSubmit(e) {
             const mobileNightsEl = document.getElementById('detail-mobile-nights');
             if (mobileNightsEl) mobileNightsEl.textContent = diffNights;
 
+            // Live availability asynchronous re-check for updated dates
+            checkLiveDetailAvailability(inInput.value, outInput.value);
+
             updateDetailGuestUI();
+        }
+    }
+
+    async function checkLiveDetailAvailability(checkIn, checkOut) {
+        try {
+            const params = new URLSearchParams({
+                room_type_id: {{ $roomType->id }},
+                check_in: checkIn,
+                check_out: checkOut,
+                rooms: 1,
+                adults: detailGuestState.adults || 2,
+                children: detailGuestState.children || 0
+            });
+            const res = await fetch(`/api/availability/check?${params.toString()}`);
+            const data = await res.json();
+            
+            let availCount = 0;
+            if (data && data.results && data.results.length > 0) {
+                const suite = data.results.find(s => s.id == {{ $roomType->id }});
+                if (suite) {
+                    availCount = suite.available_rooms_count !== undefined ? suite.available_rooms_count : 1;
+                }
+            }
+
+            detailPricingConfig.maxAvailableRooms = availCount;
+            const reserveBtn = document.getElementById('detail-reserve-btn');
+            const reserveBtnText = document.getElementById('detail-reserve-btn-text');
+            const alertBox = document.getElementById('detail-availability-alert');
+            const plusBtn = document.getElementById('detail-rooms-plus');
+
+            if (availCount === 0) {
+                if (reserveBtn) {
+                    reserveBtn.disabled = true;
+                    reserveBtn.classList.remove('bg-forest', 'hover:bg-emerald', 'text-paper', 'cursor-pointer');
+                    reserveBtn.classList.add('bg-stone-300', 'text-stone-600', 'cursor-not-allowed', 'border', 'border-stone-300');
+                }
+                if (reserveBtnText) reserveBtnText.textContent = 'Reserved for Selected Dates';
+                if (alertBox) alertBox.classList.remove('hidden');
+                if (plusBtn) plusBtn.disabled = true;
+            } else {
+                if (reserveBtn) {
+                    reserveBtn.disabled = false;
+                    reserveBtn.classList.remove('bg-stone-300', 'text-stone-600', 'cursor-not-allowed', 'border', 'border-stone-300');
+                    reserveBtn.classList.add('bg-forest', 'hover:bg-emerald', 'text-paper', 'cursor-pointer');
+                }
+                if (alertBox) alertBox.classList.add('hidden');
+                if (plusBtn) plusBtn.disabled = (detailGuestState.rooms >= availCount);
+
+                // If currently selected rooms exceed newly available rooms, auto-clamp
+                if (detailGuestState.rooms > availCount) {
+                    detailGuestState.rooms = availCount;
+                }
+                updateDetailGuestUI();
+            }
+        } catch (e) {
+            console.error('Failed to check live availability:', e);
         }
     }
 
@@ -1084,7 +1170,7 @@ async function handleReviewSubmit(e) {
         avgRate: {{ (float)($stayPricing['average_nightly_rate'] ?? $roomType->base_price) }},
         taxRate: {{ (float)($stayPricing['tax_rate'] ?? 12.0) }},
         depositPct: {{ (float)($stayPricing['deposit_percentage'] ?? 20.0) }},
-        maxAvailableRooms: {{ max(1, (int)($availableRoomsCount ?? ($roomType->rooms ? $roomType->rooms->count() : 4))) }},
+        maxAvailableRooms: {{ (int)($availableRoomsCount ?? ($roomType->rooms ? $roomType->rooms->count() : 1)) }},
         maxGuestsPerRoom: {{ (int)($roomType->max_guests ?: 4) }}
     };
 
@@ -1163,7 +1249,11 @@ async function handleReviewSubmit(e) {
             document.getElementById('detail-rooms-multiplier').textContent = r > 1 ? ` \u00d7 ${r} rooms` : '';
         }
         if (document.getElementById('detail-reserve-btn-text')) {
-            document.getElementById('detail-reserve-btn-text').textContent = `Reserve ${r} Room${r > 1 ? 's' : ''}`;
+            if (maxRooms === 0) {
+                document.getElementById('detail-reserve-btn-text').textContent = 'Reserved for Selected Dates';
+            } else {
+                document.getElementById('detail-reserve-btn-text').textContent = `Reserve ${r} Room${r > 1 ? 's' : ''}`;
+            }
         }
     }
 

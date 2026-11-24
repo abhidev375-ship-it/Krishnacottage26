@@ -1615,16 +1615,20 @@ class AdminActionController extends Controller
 
         $request->validate([
             'images' => 'nullable|array',
-            'images.*' => 'file|image|mimes:jpeg,png,jpg,webp,gif,avif,svg|max:12288',
+            'images.*' => 'file|image|mimes:jpeg,png,jpg,webp,gif,avif,svg|max:15360',
+            'videos' => 'nullable|array',
+            'videos.*' => 'file|mimes:mp4,mov,webm,ogg,avi,mkv|max:61440',
             'image_urls' => 'nullable|array',
             'image_urls.*' => 'nullable|string',
+            'video_urls' => 'nullable|array',
+            'video_urls.*' => 'nullable|string',
             'single_url' => 'nullable|string',
         ]);
 
         $addedPhotos = [];
         $currentMaxOrder = $album->images()->max('sort_order') ?: 0;
 
-        // 1. Files uploaded from device
+        // 1. Files uploaded from device (Images)
         if ($request->hasFile('images')) {
             $dest = public_path('uploads/media');
             if (!file_exists($dest)) {
@@ -1641,6 +1645,7 @@ class AdminActionController extends Controller
                     $img = GalleryImage::create([
                         'gallery_album_id' => $album->id,
                         'image_url' => $url,
+                        'media_type' => 'image',
                         'title' => $album->name . ' Photo ' . $currentMaxOrder,
                         'sort_order' => $currentMaxOrder,
                     ]);
@@ -1649,20 +1654,54 @@ class AdminActionController extends Controller
             }
         }
 
-        // 2. Direct image URLs passed as array or single
+        // 1b. Video files uploaded from device
+        if ($request->hasFile('videos')) {
+            $dest = public_path('uploads/media');
+            if (!file_exists($dest)) {
+                mkdir($dest, 0755, true);
+            }
+
+            foreach ($request->file('videos') as $file) {
+                if ($file && $file->isValid()) {
+                    $filename = 'album_' . $album->id . '_vid_' . time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+                    $file->move($dest, $filename);
+                    $url = '/uploads/media/' . $filename;
+                    $currentMaxOrder++;
+
+                    $img = GalleryImage::create([
+                        'gallery_album_id' => $album->id,
+                        'image_url' => $url,
+                        'media_type' => 'video',
+                        'video_url' => $url,
+                        'title' => $album->name . ' Video ' . $currentMaxOrder,
+                        'sort_order' => $currentMaxOrder,
+                    ]);
+                    $addedPhotos[] = $img;
+                }
+            }
+        }
+
+        // 2. Direct URLs passed as array or single
         $urls = (array) ($request->input('image_urls') ?: []);
         if ($request->filled('single_url')) {
             $urls[] = $request->input('single_url');
+        }
+        if ($request->has('video_urls')) {
+            $urls = array_merge($urls, (array) $request->input('video_urls'));
         }
 
         foreach ($urls as $url) {
             $url = trim($url);
             if (!empty($url)) {
                 $currentMaxOrder++;
+                $isVideo = preg_match('/\.(mp4|webm|mov|ogg)($|\?)/i', $url) || str_contains($url, 'youtube.com') || str_contains($url, 'youtu.be') || str_contains($url, 'vimeo.com');
+
                 $img = GalleryImage::create([
                     'gallery_album_id' => $album->id,
                     'image_url' => $url,
-                    'title' => $album->name . ' Photo ' . $currentMaxOrder,
+                    'media_type' => $isVideo ? 'video' : 'image',
+                    'video_url' => $isVideo ? $url : null,
+                    'title' => $album->name . ($isVideo ? ' Video ' : ' Photo ') . $currentMaxOrder,
                     'sort_order' => $currentMaxOrder,
                 ]);
                 $addedPhotos[] = $img;

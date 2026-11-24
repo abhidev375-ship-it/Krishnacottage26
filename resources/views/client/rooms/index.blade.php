@@ -276,6 +276,29 @@
         <a href="{{ route('rooms.index') }}" class="inline-block mt-5 px-5 py-2.5 rounded-xl bg-forest text-paper font-bold text-xs hover:bg-forest/90 transition">Reset All Filters</a>
     </div>
     @else
+    @php
+        $hasConstrainedAvailability = $roomTypes->contains(fn($r) => isset($r->available_rooms_count) && $r->available_rooms_count < ($roomsCount ?? 1));
+    @endphp
+
+    @if($hasConstrainedAvailability && ($roomsCount ?? 1) > 1)
+    <div id="availability-notice-popup" class="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200/90 shadow-sm flex items-start justify-between gap-3 animate-fade-in">
+        <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="info" class="w-4 h-4"></i>
+            </div>
+            <div>
+                <h4 class="text-xs font-bold text-amber-950">Notice: Capacity Limit for Selected Dates</h4>
+                <p class="text-[11px] text-amber-900/80 mt-0.5 leading-relaxed">
+                    You filtered for <strong>{{ $roomsCount }} rooms</strong>. Some of our villas have fewer units remaining for your selected dates. The reservation options have been automatically adjusted to the maximum available capacity for each property, with alternative branch suggestions shown below.
+                </p>
+            </div>
+        </div>
+        <button type="button" onclick="document.getElementById('availability-notice-popup').remove()" class="text-amber-800/60 hover:text-amber-950 p-1" title="Dismiss">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
         @foreach($roomTypes as $room)
         @php
@@ -414,9 +437,10 @@
                         @if(isset($room->available_rooms_count))
                             @php
                                 $totalVillaUnits = $room->rooms ? $room->rooms->count() : $room->available_rooms_count;
+                                $effectiveRooms = min($roomsCount ?? 1, max(1, $room->available_rooms_count));
                             @endphp
                             @if($room->available_rooms_count == 0)
-                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Sold out for selected dates</span>
+                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Reserved for selected dates</span>
                             @elseif($room->available_rooms_count == 1)
                                 <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">🔥 Only 1 villa left for these dates!</span>
                             @elseif($room->available_rooms_count < ($roomsCount ?? 1))
@@ -427,12 +451,38 @@
                         @endif
                     </div>
 
-                    <a href="{{ route('rooms.show', array_filter(['slug' => $room->slug, 'check_in' => $checkIn, 'check_out' => $checkOut, 'adults' => $adults, 'children' => $children, 'rooms' => $roomsCount ?? 1, 'child_ages' => !empty($childAges) ? implode(',', $childAges) : null])) }}" 
-                       class="px-4 py-2 rounded-xl bg-forest hover:bg-emerald text-paper font-bold text-xs flex items-center gap-1.5 shadow-card transition">
-                        <span>Reserve {{ ($roomsCount ?? 1) > 1 ? ($roomsCount . ' Rooms') : '1 Room' }}</span>
-                        <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-brass"></i>
-                    </a>
+                    @if(isset($room->available_rooms_count) && $room->available_rooms_count == 0)
+                        <button type="button" disabled class="px-4 py-2 rounded-xl bg-stone-200 text-stone-500 font-bold text-xs flex items-center gap-1.5 cursor-not-allowed shadow-none border border-stone-300">
+                            <span>Reserved</span>
+                            <i data-lucide="lock" class="w-3.5 h-3.5 text-stone-400"></i>
+                        </button>
+                    @else
+                        @php
+                            $clampedRooms = min($roomsCount ?? 1, $room->available_rooms_count ?? 1);
+                        @endphp
+                        <a href="{{ route('rooms.show', array_filter(['slug' => $room->slug, 'check_in' => $checkIn, 'check_out' => $checkOut, 'adults' => $adults, 'children' => $children, 'rooms' => $clampedRooms, 'child_ages' => !empty($childAges) ? implode(',', $childAges) : null])) }}" 
+                           class="px-4 py-2 rounded-xl bg-forest hover:bg-emerald text-paper font-bold text-xs flex items-center gap-1.5 shadow-card transition">
+                            <span>Reserve {{ $clampedRooms > 1 ? ($clampedRooms . ' Rooms') : '1 Room' }}</span>
+                            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-brass"></i>
+                        </a>
+                    @endif
                 </div>
+
+                @if(!empty($room->other_branch_recommendations) && isset($room->available_rooms_count) && $room->available_rooms_count < ($roomsCount ?? 1))
+                <div class="mt-3.5 pt-3 border-t border-forest/10 space-y-2">
+                    <span class="text-[10px] font-bold text-amber-900 flex items-center gap-1">
+                        <i data-lucide="map-pin" class="w-3 h-3 text-emerald"></i> Looking for {{ $roomsCount }} rooms? Check our nearby branches:
+                    </span>
+                    <div class="space-y-1">
+                        @foreach(array_slice($room->other_branch_recommendations, 0, 2) as $alt)
+                        <a href="{{ $alt['view_url'] }}" class="flex items-center justify-between p-2 rounded-xl bg-amber-50/60 hover:bg-emerald-50 border border-amber-200/60 hover:border-emerald-300 transition text-[11px] group">
+                            <span class="font-bold text-forest group-hover:text-emerald">📍 {{ $alt['branch_name'] }} ({{ $alt['available_count'] }} available)</span>
+                            <span class="font-bold text-[10px] text-emerald flex items-center gap-0.5">Explore <i data-lucide="chevron-right" class="w-3 h-3"></i></span>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
         @endforeach
