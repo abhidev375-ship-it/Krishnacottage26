@@ -13,6 +13,7 @@ Allow: /contact
 Disallow: /admin
 Disallow: /api/
 Disallow: /dashboard
+Allow: /login
 Disallow: /account
 Disallow: /book/
 Disallow: /chat/
