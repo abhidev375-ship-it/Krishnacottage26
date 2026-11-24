@@ -55,13 +55,25 @@
                 </div>
             </div>
 
-            <div class="bg-brand-surface p-4 rounded-xl border border-gray-200/70 shadow-xs hover:border-brand-primary/40 transition">
+            <div onclick="navigateTo('rooms'); if(typeof switchRoomTab === 'function') switchRoomTab('availability');" class="bg-brand-surface p-4 rounded-xl border border-gray-200/70 shadow-xs hover:border-brand-primary/40 transition cursor-pointer group">
                 <div class="flex items-center justify-between text-brand-muted mb-2">
-                    <span class="text-[11px] font-semibold uppercase tracking-wider">Available</span>
-                    <i data-lucide="door-open" class="w-4 h-4 text-emerald-600"></i>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider group-hover:text-brand-primary">Available Today</span>
+                    <i data-lucide="door-open" class="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform"></i>
                 </div>
-                <div class="text-2xl font-bold text-emerald-700">{{ $availableRoomsCount }} <span class="text-xs font-normal text-brand-muted">/ {{ $totalRoomsCount }}</span></div>
-                <div class="text-[11px] text-emerald-600 font-medium mt-1">{{ $occupiedRoomsCount }} occupied</div>
+                <div class="text-2xl font-bold {{ $availableRoomsCount > 0 ? 'text-emerald-700' : 'text-amber-700' }}">{{ $availableRoomsCount }} <span class="text-xs font-normal text-brand-muted">/ {{ $totalRoomsCount }}</span></div>
+                <div class="text-[11px] text-brand-muted mt-1 flex items-center gap-1.5 flex-wrap">
+                    <span class="text-blue-700 font-medium">{{ $occupiedRoomsCount }} in-house</span>
+                    @if(($reservedTodayCount ?? 0) > 0)
+                        <span>·</span>
+                        <span class="text-amber-700 font-medium">{{ $reservedTodayCount }} booked today</span>
+                    @endif
+                </div>
+                @if(($upcomingWeekBookingsCount ?? 0) > 0)
+                    <div class="text-[10px] text-emerald-800 font-semibold mt-1.5 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60 inline-flex items-center gap-1">
+                        <i data-lucide="calendar" class="w-3 h-3"></i>
+                        <span>{{ $upcomingWeekBookingsCount }} stay{{ $upcomingWeekBookingsCount > 1 ? 's' : '' }} next 7 days</span>
+                    </div>
+                @endif
             </div>
 
             <div class="bg-brand-surface p-4 rounded-xl border border-gray-200/70 shadow-xs hover:border-brand-primary/40 transition">
@@ -324,44 +336,89 @@
                             <tr>
                                 <th class="px-3.5 py-2.5">Code / Guest</th>
                                 <th class="px-3.5 py-2.5">Dates</th>
-                                <th class="px-3.5 py-2.5">Branch / Room</th>
+                                <th class="px-3.5 py-2.5">Cottage & Room</th>
                                 <th class="px-3.5 py-2.5">Status</th>
+                                <th class="px-3.5 py-2.5">Payment & Settlement</th>
                                 <th class="px-3.5 py-2.5 text-right">Total</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            @forelse($reservations->take(5) as $res)
+                            @forelse($reservations->take(6) as $res)
+                            @php
+                                $isRecentNew = ($res->status === 'confirmed' && $res->created_at->gt(\Carbon\Carbon::now()->subDays(2)));
+                                $balanceDue = max(0, (float)$res->total_amount - (float)$res->paid_amount);
+                            @endphp
                             <tr class="hover:bg-brand-canvas/60 cursor-pointer transition" onclick="openReservationDrawer({{ $res->id }})">
                                 <td class="px-3.5 py-3">
-                                    <div class="font-semibold text-brand-text">{{ $res->booking_code }}</div>
-                                    <div class="text-[11px] text-brand-muted">{{ $res->guest ? $res->guest->full_name : 'Guest' }}</div>
+                                    <div class="font-bold text-brand-text flex items-center gap-1.5">
+                                        <span>{{ $res->booking_code }}</span>
+                                        @if($isRecentNew)
+                                            <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500 text-white animate-pulse">New</span>
+                                        @endif
+                                    </div>
+                                    <div class="text-[11px] text-brand-muted mt-0.5">{{ $res->guest ? $res->guest->full_name : 'Guest' }} · {{ $res->guest ? $res->guest->phone : '' }}</div>
                                 </td>
                                 <td class="px-3.5 py-3">
-                                    <div>{{ $res->check_in_date->format('d M Y') }}</div>
-                                    <div class="text-[11px] text-brand-muted">&rarr; {{ $res->check_out_date->format('d M Y') }}</div>
+                                    <div class="font-semibold text-brand-text">{{ $res->check_in_date->format('d M Y') }}</div>
+                                    <div class="text-[11px] text-brand-muted">&rarr; {{ $res->check_out_date->format('d M Y') }} ({{ max(1, $res->check_in_date->diffInDays($res->check_out_date)) }}N)</div>
                                 </td>
                                 <td class="px-3.5 py-3">
-                                    <div class="font-medium text-brand-text">{{ $res->branch ? $res->branch->code : '' }} · {{ $res->roomType ? $res->roomType->name : '' }}</div>
-                                    <div class="text-[11px] text-brand-muted">{{ $res->room ? 'Room ' . $res->room->room_number : 'Unassigned' }}</div>
+                                    <div class="font-medium text-brand-text">{{ $res->roomType ? $res->roomType->name : 'Cottage' }}</div>
+                                    <div class="mt-0.5">
+                                        @if($res->room)
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                                Villa {{ $res->room->room_number }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                                Unassigned
+                                            </span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-3.5 py-3">
                                     @if($res->status === 'confirmed')
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">Confirmed</span>
                                     @elseif($res->status === 'checked_in')
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Checked In</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">In-House</span>
                                     @elseif($res->status === 'checked_out')
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">Checked Out</span>
+                                    @elseif($res->status === 'cancelled')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">Cancelled</span>
                                     @else
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-50 text-gray-600 border border-gray-200">{{ ucfirst($res->status) }}</span>
                                     @endif
                                 </td>
-                                <td class="px-3.5 py-3 text-right font-semibold text-brand-text">
-                                    ₹{{ number_format($res->total_amount) }}
+                                <td class="px-3.5 py-3">
+                                    @if($res->payment_status === 'paid')
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <i data-lucide="check" class="w-3 h-3"></i> Paid Full
+                                        </span>
+                                        <div class="text-[10px] text-brand-muted mt-0.5">₹{{ number_format($res->paid_amount) }} · {{ strtoupper($res->payment_method ?: 'ONLINE') }}</div>
+                                    @elseif($res->payment_status === 'partial')
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                            <i data-lucide="alert-circle" class="w-3 h-3"></i> 20% Deposit
+                                        </span>
+                                        <div class="text-[10px] text-brand-muted mt-0.5">Paid ₹{{ number_format($res->paid_amount) }} · <span class="text-amber-800 font-bold">₹{{ number_format($balanceDue) }} Due</span></div>
+                                    @elseif($res->payment_status === 'refunded')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                            Refunded (₹{{ number_format($res->refunded_amount) }})
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                            Pending Desk
+                                        </span>
+                                        <div class="text-[10px] text-brand-muted mt-0.5">Pay at Resort</div>
+                                    @endif
+                                </td>
+                                <td class="px-3.5 py-3 text-right">
+                                    <div class="font-extrabold text-sm text-brand-text">₹{{ number_format($res->total_amount) }}</div>
+                                    <div class="text-[10px] text-brand-muted">{{ $res->adults }}A{{ $res->children > 0 ? ', '.$res->children.'C' : '' }}</div>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="py-8 text-center text-brand-muted">No reservations found.</td>
+                                <td colspan="6" class="py-8 text-center text-brand-muted">No reservations found.</td>
                             </tr>
                             @endforelse
                         </tbody>

@@ -224,10 +224,16 @@
 
 <!-- ROOMS LISTINGS CONTAINER (AIRBNB GRID) -->
 <div class="mx-auto max-w-[1480px] px-4 sm:px-6 py-8">
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
             <h2 class="serif text-2xl font-bold text-forest">Available Rooms & Cottages</h2>
-            <p class="text-xs text-forest/60 mt-0.5">{{ $roomTypes->count() }} stays found for {{ $nights }} night{{ $nights > 1 ? 's' : '' }} &middot; Transparent pricing, no hidden resort fees</p>
+            <div class="flex items-center gap-2 mt-1 flex-wrap">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-mint/80 border border-emerald/20 text-emerald-900 text-xs font-semibold">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald"></i>
+                    <span>{{ \Carbon\Carbon::parse($checkIn)->format('d M Y') }} &rarr; {{ \Carbon\Carbon::parse($checkOut)->format('d M Y') }} ({{ $nights }} night{{ $nights > 1 ? 's' : '' }})</span>
+                </span>
+                <span class="text-xs text-forest/60">{{ $roomTypes->count() }} option{{ $roomTypes->count() > 1 ? 's' : '' }} found &middot; Transparent pricing, zero hidden resort fees</span>
+            </div>
         </div>
         <div class="hidden sm:flex items-center gap-2 text-xs font-semibold text-emerald bg-mint px-3 py-1.5 rounded-xl border border-emerald/20">
             <i data-lucide="shield-check" class="w-4 h-4 text-emerald"></i>
@@ -406,12 +412,17 @@
                             @endif
                         </div>
                         @if(isset($room->available_rooms_count))
+                            @php
+                                $totalVillaUnits = $room->rooms ? $room->rooms->count() : $room->available_rooms_count;
+                            @endphp
                             @if($room->available_rooms_count == 0)
                                 <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Sold out for selected dates</span>
+                            @elseif($room->available_rooms_count == 1)
+                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">🔥 Only 1 villa left for these dates!</span>
                             @elseif($room->available_rooms_count < ($roomsCount ?? 1))
-                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">Only {{ $room->available_rooms_count }} room{{ $room->available_rooms_count > 1 ? 's' : '' }} left</span>
+                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">Only {{ $room->available_rooms_count }} of {{ $totalVillaUnits }} villas available</span>
                             @else
-                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200">{{ $room->available_rooms_count }} individual room{{ $room->available_rooms_count > 1 ? 's' : '' }} available</span>
+                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200">{{ $room->available_rooms_count }} of {{ $totalVillaUnits }} villas available</span>
                             @endif
                         @endif
                     </div>

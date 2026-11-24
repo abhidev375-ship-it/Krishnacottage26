@@ -640,8 +640,13 @@
 
         // ================= RESERVATION ACTIONS =================
         function openReservationDrawer(resId) {
-            const res = allReservations.find(r => r.id === resId);
-            if (!res) return;
+            const res = allReservations.find(r => r.id === resId) || (typeof allCheckedInReservations !== 'undefined' ? allCheckedInReservations.find(r => r.id === resId) : null);
+            if (!res) {
+                if (typeof openGuest360Modal === 'function') {
+                    openGuest360Modal(resId);
+                }
+                return;
+            }
 
             currentReservationId = res.id;
 
@@ -667,8 +672,32 @@
             document.getElementById('drawer-total').innerText = '₹' + Number(res.total_amount).toLocaleString();
             
             const payBadge = document.getElementById('drawer-payment-badge');
-            payBadge.innerText = res.payment_status.toUpperCase();
-            payBadge.className = res.payment_status === 'paid' ? 'font-bold text-emerald-700' : (res.payment_status === 'refunded' ? 'font-bold text-purple-700' : 'font-bold text-amber-700');
+            payBadge.innerText = (res.payment_status || 'PENDING').toUpperCase();
+            payBadge.className = res.payment_status === 'paid' ? 'font-bold text-emerald-700' : (res.payment_status === 'refunded' ? 'font-bold text-purple-700' : (res.payment_status === 'partial' ? 'font-bold text-amber-700' : 'font-bold text-rose-700'));
+
+            // Populate amount paid & balance due
+            const paidAmt = Number(res.paid_amount || 0);
+            const totalAmt = Number(res.total_amount || 0);
+            const balDue = Math.max(0, totalAmt - paidAmt);
+            const elPaid = document.getElementById('drawer-paid-amount');
+            const elBal = document.getElementById('drawer-balance-due');
+            const elMethod = document.getElementById('drawer-payment-method');
+            const elTxn = document.getElementById('drawer-transaction-id');
+            if (elPaid) elPaid.innerText = '₹' + paidAmt.toLocaleString();
+            if (elBal) {
+                elBal.innerText = '₹' + balDue.toLocaleString();
+                elBal.className = balDue > 0 ? 'font-bold text-amber-800' : 'font-bold text-emerald-700';
+            }
+            if (elMethod) elMethod.innerText = (res.payment_method ? res.payment_method.toUpperCase() : 'ONLINE');
+            if (elTxn) {
+                let txnId = '--';
+                if (res.payments && res.payments.length > 0 && res.payments[0].transaction_id) {
+                    txnId = res.payments[0].transaction_id;
+                } else if (res.payment_method === 'pay_at_resort') {
+                    txnId = 'Pay at Desk';
+                }
+                elTxn.innerText = txnId;
+            }
 
             const refundRow = document.getElementById('drawer-refund-row');
             if (refundRow) {

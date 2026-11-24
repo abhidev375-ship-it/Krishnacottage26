@@ -516,6 +516,9 @@ class BookingAvailabilityService
                 \Illuminate\Support\Facades\Log::warning("Telegram Booking Alert failed: " . $e->getMessage());
             }
 
+            // Invalidate cached payloads across website
+            \Illuminate\Support\Facades\Cache::forget('homepage_payload');
+
             return $reservation;
         });
     }

@@ -1017,6 +1017,9 @@ class BookingController extends Controller
             ];
         });
 
+        // Invalidate cached payloads across website
+        \Illuminate\Support\Facades\Cache::forget('homepage_payload');
+
         // Handle simultaneous race condition redirect or json response
         if (!empty($result['conflict'])) {
             $msg = "Simultaneous Booking Notice: Another guest completed their reservation for {$result['room_type_name']} moments before your transaction settled. Your payment of ₹" . number_format($result['refund_amount'], 2) . " has been 100% refunded (Refund Ref: #{$result['refund_id']}). An SMS confirmation has been dispatched.";

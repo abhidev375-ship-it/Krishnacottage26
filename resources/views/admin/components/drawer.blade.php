@@ -76,7 +76,7 @@
                     <span id="drawer-subtotal">₹0</span>
                 </div>
                 <div class="flex justify-between text-brand-muted">
-                    <span>Tax (GST 12%):</span>
+                    <span>Tax (GST):</span>
                     <span id="drawer-tax">₹0</span>
                 </div>
                 <div class="flex justify-between text-sm font-bold text-brand-text pt-2 border-t border-gray-100">
@@ -84,6 +84,22 @@
                     <span id="drawer-total" class="text-brand-primary">₹0</span>
                 </div>
                 <div class="flex justify-between text-xs pt-1">
+                    <span class="text-brand-muted">Amount Paid:</span>
+                    <span id="drawer-paid-amount" class="font-bold text-emerald-700">₹0</span>
+                </div>
+                <div class="flex justify-between text-xs pt-0.5">
+                    <span class="text-brand-muted">Balance Due at Check-In:</span>
+                    <span id="drawer-balance-due" class="font-bold text-amber-800">₹0</span>
+                </div>
+                <div class="flex justify-between text-xs pt-1 border-t border-gray-100">
+                    <span class="text-brand-muted">Payment Method:</span>
+                    <span id="drawer-payment-method" class="font-semibold text-brand-text">Online</span>
+                </div>
+                <div class="flex justify-between text-xs pt-0.5">
+                    <span class="text-brand-muted">Transaction ID:</span>
+                    <span id="drawer-transaction-id" class="font-mono text-[10px] text-brand-muted truncate max-w-[200px]">--</span>
+                </div>
+                <div class="flex justify-between text-xs pt-1 border-t border-gray-100">
                     <span class="text-brand-muted">Payment State:</span>
                     <span id="drawer-payment-badge" class="font-bold">Pending</span>
                 </div>
@@ -118,6 +134,9 @@
 
     <!-- Action Buttons Footer -->
     <div class="p-4 border-t border-gray-200 bg-gray-50/90 space-y-2" id="drawer-action-buttons">
+        <button type="button" onclick="closeDrawer(); openGuest360Modal(currentReservationId);" class="w-full py-2 bg-brand-primary hover:bg-brand-deep text-white font-bold rounded-lg text-xs shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="layout-grid" class="w-4 h-4"></i> Open Complete 360° Guest Console & Folio
+        </button>
         <div class="flex gap-2">
             <button onclick="triggerReservationCheckIn()" id="drawer-btn-checkin" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs shadow-xs transition flex items-center justify-center gap-1.5">
                 <i data-lucide="check-circle" class="w-4 h-4"></i> Check In

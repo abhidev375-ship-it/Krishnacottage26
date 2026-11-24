@@ -85,9 +85,27 @@ class AdminController extends Controller
             $roomsQuery->where('branch_id', $branchId);
         }
         $totalRoomsCount = (clone $roomsQuery)->count();
-        $availableRoomsCount = (clone $roomsQuery)->where('operational_status', 'available')->count();
-        $occupiedRoomsCount = (clone $roomsQuery)->where('operational_status', 'occupied')->count();
+        $occupiedRoomsCount = Reservation::forBranch($branchId)
+            ->where('status', 'checked_in')
+            ->count();
+        $reservedTodayCount = Reservation::forBranch($branchId)
+            ->where('status', 'confirmed')
+            ->whereDate('check_in_date', '<=', $today)
+            ->whereDate('check_out_date', '>', $today)
+            ->count();
         $maintenanceRoomsCount = (clone $roomsQuery)->whereIn('operational_status', ['maintenance', 'blocked', 'out_of_order'])->count();
+        $availableRoomsCount = max(0, $totalRoomsCount - ($occupiedRoomsCount + $reservedTodayCount + $maintenanceRoomsCount));
+
+        $upcomingWeekBookingsCount = Reservation::forBranch($branchId)
+            ->where('status', 'confirmed')
+            ->whereDate('check_in_date', '>=', $today)
+            ->whereDate('check_in_date', '<=', $today->copy()->addDays(7))
+            ->count();
+
+        $newOnlineBookingsCount = Reservation::forBranch($branchId)
+            ->where('status', 'confirmed')
+            ->where('created_at', '>=', Carbon::now()->subDays(2))
+            ->count();
 
         $pendingFoodOrders = FoodOrder::query()
             ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
@@ -107,7 +125,7 @@ class AdminController extends Controller
             ->count();
 
         // 2. Reservations Data
-        $reservations = Reservation::with(['branch', 'roomType', 'room', 'guest'])
+        $reservations = Reservation::with(['branch', 'roomType', 'room', 'guest', 'payments'])
             ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
             ->orderByDesc('created_at')
             ->get();
@@ -232,7 +250,7 @@ class AdminController extends Controller
 
         // 10. Fast Flight Deck: Today's Expected Arrivals and Departures (1-Tap Operation)
         $todayArrivals = Reservation::forBranch($branchId)
-            ->with(['branch', 'roomType', 'room', 'guest'])
+            ->with(['branch', 'roomType', 'room', 'guest', 'payments'])
             ->whereDate('check_in_date', $today)
             ->whereIn('status', ['confirmed', 'checked_in'])
             ->orderBy('check_in_date')
@@ -254,7 +272,7 @@ class AdminController extends Controller
             ->where('check_in_date', '<', $today->copy()->addDays(7)->toDateString())
             ->where('check_out_date', '>', $today->toDateString())
             ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
-            ->get(['id', 'room_type_id', 'check_in_date', 'check_out_date']);
+            ->get(['id', 'room_type_id', 'rooms_count', 'check_in_date', 'check_out_date']);
 
         $availabilityMatrix = [];
         foreach ($roomTypes as $rt) {
@@ -265,7 +283,7 @@ class AdminController extends Controller
                     $ci = is_string($res->check_in_date) ? $res->check_in_date : $res->check_in_date->toDateString();
                     $co = is_string($res->check_out_date) ? $res->check_out_date : $res->check_out_date->toDateString();
                     return $res->room_type_id == $rt->id && $ci <= $date && $co > $date;
-                })->count();
+                })->sum(fn($res) => max(1, (int)$res->rooms_count));
                 $available = max(0, $totalUnits - $booked);
                 $availabilityMatrix[$rt->id][$date] = [
                     'total' => $totalUnits,
@@ -339,6 +357,9 @@ class AdminController extends Controller
             'checkedInReservations',
             'todayArrivals',
             'todayDepartures',
+            'reservedTodayCount',
+            'upcomingWeekBookingsCount',
+            'newOnlineBookingsCount',
             'availabilityMatrix',
             'matrixDates',
             'homepageModules',

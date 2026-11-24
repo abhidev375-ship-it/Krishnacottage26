@@ -15,8 +15,11 @@
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span>In-House Fleet ({{ $checkedInReservations->count() }})</span>
                 </button>
-                <button type="button" onclick="switchReservationView('bookings')" id="btn-view-bookings" class="px-3 py-1.5 rounded-lg text-xs font-bold text-brand-muted hover:text-brand-text transition shrink-0">
-                    All Bookings ({{ $reservations->count() }})
+                <button type="button" onclick="switchReservationView('bookings')" id="btn-view-bookings" class="px-3 py-1.5 rounded-lg text-xs font-bold text-brand-muted hover:text-brand-text transition shrink-0 flex items-center gap-1.5">
+                    <span>All Bookings ({{ $reservations->count() }})</span>
+                    @if(($newOnlineBookingsCount ?? 0) > 0)
+                        <span class="px-1.5 py-0.2 rounded-full text-[9px] bg-amber-500 text-white font-bold animate-pulse">{{ $newOnlineBookingsCount }} New</span>
+                    @endif
                 </button>
                 <button type="button" onclick="switchReservationView('extensions')" id="btn-view-extensions" class="px-3 py-1.5 rounded-lg text-xs font-bold text-brand-muted hover:text-brand-text transition flex items-center gap-1.5 shrink-0">
                     <span>Stay Extensions</span>
@@ -37,6 +40,32 @@
             </button>
         </div>
     </div>
+
+    @php
+        $recentOnlineBookings = $reservations->filter(fn($r) => $r->status === 'confirmed' && $r->created_at->gt(\Carbon\Carbon::now()->subDays(2)));
+    @endphp
+    @if($recentOnlineBookings->isNotEmpty())
+        <div class="p-3.5 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <i data-lucide="bell-ring" class="w-4 h-4 animate-bounce"></i>
+                </span>
+                <div>
+                    <div class="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                        <span>{{ $recentOnlineBookings->count() }} New Online Booking{{ $recentOnlineBookings->count() > 1 ? 's' : '' }} Received</span>
+                        <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500 text-white uppercase">Awaiting Arrival</span>
+                    </div>
+                    <div class="text-[11px] text-amber-800 mt-0.5">
+                        Latest: <strong>{{ $recentOnlineBookings->first()->booking_code }}</strong> ({{ $recentOnlineBookings->first()->guest ? $recentOnlineBookings->first()->guest->full_name : 'Guest' }}) · Check-in: {{ $recentOnlineBookings->first()->check_in_date->format('d M Y') }} · ₹{{ number_format($recentOnlineBookings->first()->total_amount) }}
+                    </div>
+                </div>
+            </div>
+            <button type="button" onclick="switchReservationView('bookings')" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5 shrink-0 cursor-pointer">
+                <span>View in All Bookings</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+        </div>
+    @endif
 
     <!-- VIEW 0: ACTIVE IN-HOUSE FLEET (ADM-02B) -->
     <div id="view-inhouse-container" class="space-y-4">
@@ -358,9 +387,18 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($reservations as $res)
+                        @php
+                            $isNewBook = ($res->status === 'confirmed' && $res->created_at->gt(\Carbon\Carbon::now()->subDays(2)));
+                            $resBal = max(0, (float)$res->total_amount - (float)$res->paid_amount);
+                        @endphp
                         <tr class="res-row hover:bg-brand-canvas/60 transition cursor-pointer" data-status="{{ $res->status }}" onclick="openReservationDrawer({{ $res->id }})">
                             <td class="px-4 py-3.5">
-                                <div class="font-bold text-brand-text">{{ $res->booking_code }}</div>
+                                <div class="font-bold text-brand-text flex items-center gap-1.5">
+                                    <span>{{ $res->booking_code }}</span>
+                                    @if($isNewBook)
+                                        <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500 text-white animate-pulse">New</span>
+                                    @endif
+                                </div>
                                 <div class="text-[10px] text-brand-muted flex items-center gap-1">
                                     <span>{{ $res->created_at->format('d M Y') }}</span>
                                     @if($res->is_counter_booking)
@@ -409,13 +447,20 @@
                             </td>
                             <td class="px-4 py-3.5">
                                 @if($res->payment_status === 'paid')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Paid</span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <i data-lucide="check" class="w-3 h-3"></i> Paid Full
+                                    </span>
+                                    <div class="text-[10px] text-brand-muted mt-0.5">₹{{ number_format($res->paid_amount) }} · {{ strtoupper($res->payment_method ?: 'ONLINE') }}</div>
                                 @elseif($res->payment_status === 'partial')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">Partial (₹{{ number_format($res->paid_amount) }})</span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                        <i data-lucide="alert-circle" class="w-3 h-3"></i> 20% Deposit
+                                    </span>
+                                    <div class="text-[10px] text-brand-muted mt-0.5">Paid: ₹{{ number_format($res->paid_amount) }} · <span class="text-amber-800 font-bold">₹{{ number_format($resBal) }} Due</span></div>
                                 @elseif($res->payment_status === 'refunded')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">Refunded (₹{{ number_format($res->refunded_amount) }})</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">Refunded (₹{{ number_format($res->refunded_amount) }})</span>
                                 @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200">Pending</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Pending</span>
+                                    <div class="text-[10px] text-brand-muted mt-0.5">Pay at Resort</div>
                                 @endif
                             </td>
                             <td class="px-4 py-3.5 text-right font-bold text-brand-text">
