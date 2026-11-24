@@ -20,7 +20,7 @@ class ReviewPublicController extends Controller
      */
     public function create(Request $request)
     {
-        $branches = Branch::where('is_active', true)
+        $branches = Branch::where('status', 'active')
             ->with(['roomTypes' => fn($q) => $q->where('is_active', true)])
             ->orderBy('name')
             ->get();
@@ -198,7 +198,7 @@ class ReviewPublicController extends Controller
      */
     public function index(Request $request)
     {
-        $branches = Branch::where('is_active', true)->orderBy('name')->get();
+        $branches = Branch::where('status', 'active')->orderBy('name')->get();
         $selectedBranchId = $request->query('branch_id');
         $selectedRating = $request->query('rating');
         $hasMediaOnly = $request->boolean('has_media');
