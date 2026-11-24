@@ -294,7 +294,7 @@ class BookingAvailabilityService
     public function getOtherBranchesAvailability(int $currentBranchId, int $requestedRooms, string $checkInStr, string $checkOutStr): array
     {
         $otherBranches = Branch::where('id', '!=', $currentBranchId)
-            ->where('is_active', true)
+            ->where('status', 'active')
             ->get();
 
         $recommendations = [];
